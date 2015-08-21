@@ -86,6 +86,7 @@ int main(int argc, const char** argv)
 
     Mat frame;
     capture >> frame;
+    capture >> frame;
 
     if (frame.empty())
     {
