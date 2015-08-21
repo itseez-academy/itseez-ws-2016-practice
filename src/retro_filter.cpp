@@ -1,5 +1,6 @@
 #include "retro_filter.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
+#include <time.h>
 
 using namespace std;
 using namespace cv;
