@@ -1234,7 +1234,7 @@ norm_(const _Tp* src1, const _Tp* src2, size_t total, int cn, int normType, doub
 
 double norm(const Mat& src, int normType, const Mat& mask)
 {
-    if( normType == NORM_HAMMING || normType == NORM_HAMMING2 )
+    if( normType == cv::NORM_HAMMING || normType == cv::NORM_HAMMING2 )
     {
         if( !mask.empty() )
         {
@@ -1252,7 +1252,7 @@ double norm(const Mat& src, int normType, const Mat& mask)
         size_t total = planes[0].total();
         size_t i, nplanes = it.nplanes;
         double result = 0;
-        int cellSize = normType == NORM_HAMMING ? 1 : 2;
+        int cellSize = normType == cv::NORM_HAMMING ? 1 : 2;
 
         for( i = 0; i < nplanes; i++, ++it )
             result += normHamming(planes[0].data, total, cellSize);
@@ -1313,7 +1313,7 @@ double norm(const Mat& src, int normType, const Mat& mask)
 
 double norm(const Mat& src1, const Mat& src2, int normType, const Mat& mask)
 {
-    if( normType == NORM_HAMMING || normType == NORM_HAMMING2 )
+    if( normType == cv::NORM_HAMMING || normType == cv::NORM_HAMMING2 )
     {
         Mat temp;
         bitwise_xor(src1, src2, temp);
@@ -1329,7 +1329,7 @@ double norm(const Mat& src1, const Mat& src2, int normType, const Mat& mask)
         size_t total = planes[0].total();
         size_t i, nplanes = it.nplanes;
         double result = 0;
-        int cellSize = normType == NORM_HAMMING ? 1 : 2;
+        int cellSize = normType == cv::NORM_HAMMING ? 1 : 2;
 
         for( i = 0; i < nplanes; i++, ++it )
             result += normHamming(planes[0].data, total, cellSize);
