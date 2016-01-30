@@ -2972,7 +2972,7 @@ void printVersionInfo(bool useStdOut)
     ::testing::Test::RecordProperty("cv_build_type", build_type);
     if (useStdOut) std::cout << "Build type: " << build_type << std::endl;
 
-    const char* parallel_framework = currentParallelFramework();
+    const char* parallel_framework = "UNKNOWN";//currentParallelFramework();
 
     if (parallel_framework) {
         ::testing::Test::RecordProperty("cv_parallel_framework", parallel_framework);
