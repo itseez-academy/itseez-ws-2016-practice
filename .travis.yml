@@ -1,0 +1,20 @@
+language: cpp
+compiler:
+  - gcc
+  - clang
+sudo: false
+addons:
+  apt:
+    packages:
+    - libopencv-dev
+before_script:
+  - mkdir ../build
+  - cd ../build
+script:
+  - cmake ../itseez-ws-2016-practice
+  - make
+  - ./bin/test_skeleton
+  - ./bin/perf_skeleton --gtest_output=xml:perf_report.xml
+  - ../itseez-ws-2016-practice/3rdparty/opencv_ptest/misc/summary.py ./perf_report.xml
+notifications:
+  email: false
