@@ -16,11 +16,16 @@ void skeletonize(const Mat &input, Mat &output)
 
     // Downscale input image
     Mat small_image;
-    Size small_size(input.cols / 2, input.rows / 2);
+    Size small_size(input.cols / 1.5, input.rows / 1.5);
     // resize(gray_image, small_image, small_size);
     ImageResize(gray_image, small_image, small_size);
 
-    output = small_image;
+    // Binarization
+    threshold(small_image, small_image, 128, 255, THRESH_BINARY_INV);
 
     // Thinning
+    Mat thinned_image;
+    GuoHallThinning(small_image, thinned_image);
+
+    output = thinned_image;
 }
