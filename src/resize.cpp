@@ -1,4 +1,4 @@
-#include "internal.hpp"
+#include "skeleton_filter.hpp"
 #include <math.h>
 
 void ImageResize(const cv::Mat &src, cv::Mat &dst, const cv::Size sz)

@@ -1,4 +1,4 @@
-#include "internal.hpp"
+#include "skeleton_filter.hpp"
 
 static void GuoHallIteration(cv::Mat& im, int iter)
 {
