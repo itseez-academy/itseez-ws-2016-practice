@@ -63,7 +63,8 @@
 #define GTEST_DONT_DEFINE_ASSERT_GT 0
 #define GTEST_DONT_DEFINE_TEST      0
 
-#include "opencv2/ts/ts_gtest.h"
+// #include "opencv2/ts/ts_gtest.h"
+#include "ts_gtest.h"
 
 #ifndef GTEST_USES_SIMPLE_RE
 #  define GTEST_USES_SIMPLE_RE 0
