@@ -48,7 +48,5 @@ int main(int argc, const char** argv)
     imshow("Input image", image);
     waitKey(0);
 
-
-
     return 0;
 }
