@@ -1,6 +1,6 @@
-# Практика 5. Оптимизация производительности
+# Оптимизация производительности
 
-[![Build Status](https://travis-ci.org/Itseez-NNSU-SummerSchool2015/practice5-performance.svg)](https://travis-ci.org/Itseez-NNSU-SummerSchool2015/practice5-performance)
+[![Build Status](https://travis-ci.com/UNN-VMK-Software/itseez-ws-2016-practice.svg?token=74q9ezwHWyMjEnVK8mzs&branch=master)](https://travis-ci.com/UNN-VMK-Software/itseez-ws-2016-practice)
 
 ## Цели
 
