@@ -14,7 +14,7 @@ script:
   - cmake ../itseez-ws-2016-practice
   - make
   - ./bin/test_skeleton
-  - ./bin/perf_skeleton --gtest_output=xml:perf_report
-  - ../itseez-ws-2016-practice/3rdparty/opencv_ptest/misc/summary.py ./perf_report.py
+  - ./bin/perf_skeleton --gtest_output=xml:perf_report.xml
+  - ../itseez-ws-2016-practice/3rdparty/opencv_ptest/misc/summary.py ./perf_report.xml
 notifications:
   email: false
