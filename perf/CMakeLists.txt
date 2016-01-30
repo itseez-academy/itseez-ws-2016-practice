@@ -12,7 +12,7 @@ if(MSVC)
 endif()
 
 add_executable(${target} ${srcs} ${hdrs})
-target_link_libraries(${target} gtest opencv_ts ${LIBRARY})
+target_link_libraries(${target} gtest opencv_ptest ${LIBRARY})
 
 add_custom_command(
     TARGET ${target}
