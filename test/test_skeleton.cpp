@@ -60,3 +60,22 @@ TEST(skeleton, resize_matches_opencv)
     // std::cout << "Difference:\n" << reference - result << std::endl;
     EXPECT_LT(maxDifference(reference, result), 2);
 }
+
+
+TEST(skeleton, resize_const_image)
+{
+  // Arrange
+  Mat image(333, 333, CV_8UC1, 49);
+
+  Size sz(image.cols / 2, image.rows / 2);
+
+  // Act
+  Mat result;
+  ImageResize(image, result, sz);
+
+  // Assert
+  Mat reference(sz, CV_8UC1, 49);
+
+  // std::cout << "Difference:\n" << reference - result << std::endl;
+  EXPECT_LT(maxDifference(reference, result), 2);
+}
