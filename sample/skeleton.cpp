@@ -49,7 +49,9 @@ int main(int argc, const char** argv)
     waitKey(0);
 
     Mat output;
+    TS(skeletonize);
     skeletonize(image, output);
+    TE(skeletonize);
 
     imshow("Output image", output);
     waitKey(0);

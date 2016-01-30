@@ -11,7 +11,9 @@ before_script:
   - mkdir ../build
   - cd ../build
 script:
-  - cmake ../practice5-performance
+  - cmake ../itseez-ws-2016-practice
   - make -j
+  - ./bin/test_skeleton
+  - ./bin/perf_skeleton
 notifications:
   email: false
