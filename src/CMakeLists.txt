@@ -1,4 +1,4 @@
-set(target retrofilter)
+set(target ${LIBRARY})
 
 file(GLOB hdrs "*.h*")
 file(GLOB srcs "*.cpp")

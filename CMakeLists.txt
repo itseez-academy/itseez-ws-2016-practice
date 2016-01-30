@@ -33,8 +33,12 @@ foreach(cfg ${CMAKE_CONFIGURATION_TYPES})
 endforeach()
 
 
-set(PROJECT_NAME practice5)
+set(PROJECT_NAME skeleton)
 project(${PROJECT_NAME})
+
+set(LIBRARY    "${PROJECT_NAME}_filter")
+set(TESTS      "test_${PROJECT_NAME}")
+set(PERF_TESTS "perf_${PROJECT_NAME}")
 
 # Find OpenCV
 find_package(OpenCV REQUIRED)
@@ -43,7 +47,10 @@ set(LIBRARY_DEPS ${OpenCV_LIBS})
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include" ${OpenCV_INCLUDE_DIRS})
 
 # Add modules
+add_subdirectory(3rdparty)
 add_subdirectory(src)
+add_subdirectory(test)
+add_subdirectory(perf)
 add_subdirectory(sample)
 
 # Report generation summary
