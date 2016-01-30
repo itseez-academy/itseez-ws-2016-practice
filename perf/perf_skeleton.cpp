@@ -1,4 +1,4 @@
-// #include <gtest/gtest.h>
+#include "skeleton_filter.hpp"
 
 #include "opencv2/ts/ts.hpp"
 #include <iostream>
@@ -15,7 +15,7 @@ using std::tr1::get;
 
 typedef perf::TestBaseWithParam<Size> Size_Only;
 
-PERF_TEST_P(Size_Only, resize, testing::Values(TYPICAL_MAT_SIZES_ABS))
+PERF_TEST_P(Size_Only, ImageResize, testing::Values(TYPICAL_MAT_SIZES_ABS))
 {
     Size sz = GetParam();
     cout << sz << endl;
@@ -25,7 +25,11 @@ PERF_TEST_P(Size_Only, resize, testing::Values(TYPICAL_MAT_SIZES_ABS))
     cv::Mat src(sz, CV_8UC1), dst(Size(sz_to), CV_8UC1);
     declare.in(src, WARMUP_RNG).out(dst);
 
-    TEST_CYCLE() resize(src, dst, sz_to);
+    TEST_CYCLE()
+    {
+        // resize(src, dst, sz_to);
+        ImageResize(src, dst, sz_to);
+    }
 
     SANITY_CHECK(dst, 1 + 1e-6);
 }
