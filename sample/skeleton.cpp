@@ -44,16 +44,22 @@ int main(int argc, const char** argv)
 
     if (image.empty())
         cout << "Error: failed to open image " << image_file << endl;
-
+    
     imshow("Input image", image);
+    cout << "Show original image \nPress key on the image to start  \n";
+    
     waitKey(0);
-
+    
+    cout << "Skeletonization ...\n";
+    
     Mat output;
     TS(skeletonize);
     skeletonize(image, output);
     TE(skeletonize);
 
     imshow("Output image", output);
+    cout << "Show final image \n";
+    
     waitKey(0);
 
     return 0;
