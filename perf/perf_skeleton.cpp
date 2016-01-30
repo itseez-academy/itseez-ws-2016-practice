@@ -18,7 +18,7 @@ typedef perf::TestBaseWithParam<Size> Size_Only;
 PERF_TEST_P(Size_Only, ImageResize, testing::Values(TYPICAL_MAT_SIZES_ABS))
 {
     Size sz = GetParam();
-    cout << sz << endl;
+    // cout << sz << endl;
 
     Size sz_to(sz.width / 2, sz.height / 2);
 
