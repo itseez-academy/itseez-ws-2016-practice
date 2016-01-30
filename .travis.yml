@@ -15,6 +15,6 @@ script:
   - make -j
   - ./bin/test_skeleton
   - ./bin/perf_skeleton --gtest_output=xml:perf_report
-  - ../itseez-ws-2016-practice/3rdparty/perf-scripts/summary.py ./perf_report.py
+  - ../itseez-ws-2016-practice/3rdparty/opencv_ptest/misc/summary.py ./perf_report.py
 notifications:
   email: false
