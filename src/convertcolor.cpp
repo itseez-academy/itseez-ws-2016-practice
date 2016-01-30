@@ -1,4 +1,4 @@
-#include "internal.hpp"
+#include "skeleton_filter.hpp"
 
 void ConvertColor_BGR2GRAY_BT709(const cv::Mat& src, cv::Mat& dst)
 {
