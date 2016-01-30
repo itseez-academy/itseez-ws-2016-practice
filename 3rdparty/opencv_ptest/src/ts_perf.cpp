@@ -699,7 +699,7 @@ void TestBase::Init(const std::vector<std::string> & availableImpls,
     param_max_outliers  = std::min(100., std::max(0., args.get<double>("perf_max_outliers")));
     param_min_samples   = std::max(1u, args.get<unsigned int>("perf_min_samples"));
     param_max_deviation = std::max(0., args.get<double>("perf_max_deviation"));
-    param_seed          = args.get<uint64>("perf_seed");
+    param_seed          = 0;//args.get<uint64>("perf_seed");
     param_time_limit    = std::max(0., args.get<double>("perf_time_limit"));
     param_force_samples = args.get<unsigned int>("perf_force_samples");
     param_write_sanity  = args.get<bool>("perf_write_sanity");
