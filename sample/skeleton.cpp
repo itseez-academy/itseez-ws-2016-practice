@@ -7,7 +7,7 @@
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/objdetect/objdetect.hpp"
 
-#include "retro_filter.hpp"
+#include "skeleton_filter.hpp"
 
 using namespace std;
 using namespace cv;
@@ -43,7 +43,7 @@ int main(int argc, const char** argv)
     Mat image = imread(image_file);
 
     if (image.empty())
-        cout << "Error: failed to open image" << border << endl;
+        cout << "Error: failed to open image " << image_file << endl;
 
     imshow("Input image", image);
     waitKey(0);

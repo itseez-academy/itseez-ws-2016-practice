@@ -1,4 +1,4 @@
-set(target ${TESTS})
+set(target ${PERF_TESTS})
 
 file(GLOB hdrs "*.h*")
 file(GLOB srcs "*.cpp")
