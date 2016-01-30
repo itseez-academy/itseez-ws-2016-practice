@@ -667,7 +667,7 @@ void TestBase::Init(const std::vector<std::string> & availableImpls,
 #endif
     ;
 
-    cv::CommandLineParser args(argc, argv, command_line_keys.c_str());
+    cv::CommandLineParser args(argc, const_cast<const char**>(argv), command_line_keys.c_str());
     if (args.get<bool>("help"))
     {
         args.printParams();

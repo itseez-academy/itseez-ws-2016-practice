@@ -8,9 +8,9 @@
 
 using namespace cv;
 
-const int NORM_L2SQR    = 5;
-const int NORM_HAMMING  = 6;
-const int NORM_HAMMING2 = 7;
+const int HACK_NORM_L2SQR    = 5;
+const int HACK_NORM_HAMMING  = 6;
+const int HACK_NORM_HAMMING2 = 7;
 
 namespace cvtest
 {
@@ -1238,7 +1238,7 @@ norm_(const _Tp* src1, const _Tp* src2, size_t total, int cn, int normType, doub
 
 double norm(const Mat& src, int normType, const Mat& mask)
 {
-    if( normType == NORM_HAMMING || normType == NORM_HAMMING2 )
+    if( normType == HACK_NORM_HAMMING || normType == HACK_NORM_HAMMING2 )
     {
         if( !mask.empty() )
         {
@@ -1256,7 +1256,7 @@ double norm(const Mat& src, int normType, const Mat& mask)
         size_t total = planes[0].total();
         size_t i, nplanes = it.nplanes;
         double result = 0;
-        int cellSize = normType == NORM_HAMMING ? 1 : 2;
+        int cellSize = normType == HACK_NORM_HAMMING ? 1 : 2;
 
         for( i = 0; i < nplanes; i++, ++it )
             result += normHamming(planes[0].data, total, cellSize);
@@ -1317,7 +1317,7 @@ double norm(const Mat& src, int normType, const Mat& mask)
 
 double norm(const Mat& src1, const Mat& src2, int normType, const Mat& mask)
 {
-    if( normType == NORM_HAMMING || normType == NORM_HAMMING2 )
+    if( normType == HACK_NORM_HAMMING || normType == HACK_NORM_HAMMING2 )
     {
         Mat temp;
         bitwise_xor(src1, src2, temp);
@@ -1333,7 +1333,7 @@ double norm(const Mat& src1, const Mat& src2, int normType, const Mat& mask)
         size_t total = planes[0].total();
         size_t i, nplanes = it.nplanes;
         double result = 0;
-        int cellSize = normType == NORM_HAMMING ? 1 : 2;
+        int cellSize = normType == HACK_NORM_HAMMING ? 1 : 2;
 
         for( i = 0; i < nplanes; i++, ++it )
             result += normHamming(planes[0].data, total, cellSize);
