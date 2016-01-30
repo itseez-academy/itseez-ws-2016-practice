@@ -1263,7 +1263,7 @@ double norm(const Mat& src, int normType, const Mat& mask)
         return result;
     }
     int normType0 = normType;
-    normType = normType == NORM_L2SQR ? NORM_L2 : normType;
+    normType = normType == HACK_NORM_L2SQR ? NORM_L2 : normType;
 
     CV_Assert( mask.empty() || (src.size == mask.size && mask.type() == CV_8U) );
     CV_Assert( normType == NORM_INF || normType == NORM_L1 || normType == NORM_L2 );
@@ -1340,7 +1340,7 @@ double norm(const Mat& src1, const Mat& src2, int normType, const Mat& mask)
         return result;
     }
     int normType0 = normType;
-    normType = normType == NORM_L2SQR ? NORM_L2 : normType;
+    normType = normType == HACK_NORM_L2SQR ? NORM_L2 : normType;
 
     CV_Assert( src1.type() == src2.type() && src1.size == src2.size );
     CV_Assert( mask.empty() || (src1.size == mask.size && mask.type() == CV_8U) );
