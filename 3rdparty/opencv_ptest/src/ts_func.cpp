@@ -8,7 +8,8 @@
 
 using namespace cv;
 
-const int NORM_HAMMING = 6;
+const int NORM_L2SQR    = 5;
+const int NORM_HAMMING  = 6;
 const int NORM_HAMMING2 = 7;
 
 namespace cvtest
@@ -2943,7 +2944,7 @@ void printVersionInfo(bool useStdOut)
     ::testing::Test::RecordProperty("cv_version", CV_VERSION);
     if(useStdOut) std::cout << "OpenCV version: " << CV_VERSION << std::endl;
 
-    std::string buildInfo( cv::getBuildInformation() );
+    std::string buildInfo( "UNKNOWN" ); //cv::getBuildInformation() );
 
     size_t pos1 = buildInfo.find("Version control");
     size_t pos2 = buildInfo.find('\n', pos1);
