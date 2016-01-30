@@ -10,7 +10,7 @@ void ConvertColor_BGR2GRAY_BT709(const cv::Mat& src, cv::Mat& dst)
 
     for (int y = 0; y < sz.height; y++)
     {
-        const cv::Vec3b *psrc = dst.ptr<cv::Vec3b>(y);
+        const cv::Vec3b *psrc = src.ptr<cv::Vec3b>(y);
         uchar *pdst = dst.ptr<uchar>(y);
 
         for (int x = 0; x < sz.width; x++)
