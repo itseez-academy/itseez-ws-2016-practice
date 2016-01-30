@@ -3,7 +3,7 @@ set(target "opencv_ptest")
 file(GLOB hdrs "*/*.h" "*/*.hpp")
 file(GLOB srcs "*/*.cpp")
 
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/opencv_ptest/include")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include")
 add_library(${target} STATIC ${srcs})
 
 target_link_libraries(${target})
