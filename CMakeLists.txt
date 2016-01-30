@@ -47,7 +47,8 @@ set(LIBRARY_DEPS ${OpenCV_LIBS})
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include" ${OpenCV_INCLUDE_DIRS})
 
 # Add modules
-add_subdirectory(3rdparty)
+add_subdirectory(3rdparty/gtest)
+add_subdirectory(3rdparty/opencv_ptest)
 add_subdirectory(src)
 add_subdirectory(test)
 add_subdirectory(perf)
