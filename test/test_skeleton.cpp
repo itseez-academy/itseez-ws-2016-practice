@@ -34,9 +34,12 @@ TEST(skeleton, cvtcolor_matches_opencv)
     ConvertColor_BGR2GRAY_BT709(bgr, result);
 
     // Assert
-    Mat reference;
-    cvtColor(bgr, reference, CV_BGR2GRAY);
-    std::cout << "Difference:\n" << reference - result << std::endl;
+    Mat xyz;
+    cvtColor(bgr, xyz, CV_BGR2XYZ);
+    vector<Mat> planes;
+    split(xyz, planes);
+    Mat reference = planes[1];
+    // std::cout << "Difference:\n" << reference - result << std::endl;
     EXPECT_EQ(0, numberOfDifferentPixels(reference, result));
 }
 
@@ -54,6 +57,6 @@ TEST(skeleton, resize_matches_opencv)
     // Assert
     Mat reference;
     resize(image, reference, sz);
-    std::cout << "Difference:\n" << reference - result << std::endl;
+    // std::cout << "Difference:\n" << reference - result << std::endl;
     EXPECT_LT(maxDifference(reference, result), 2);
 }
