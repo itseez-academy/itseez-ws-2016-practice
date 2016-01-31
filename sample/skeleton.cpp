@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include <iostream>
 #include <string>
 
@@ -10,14 +9,10 @@
 using namespace std;
 using namespace cv;
 
-// Macros for time measurements
-#define TS(name) int64 t_##name = getTickCount()
-#define TE(name) printf("TIMER_" #name ": %.2fms\n", \
-    1000.f * ((getTickCount() - t_##name) / getTickFrequency()))
-
 const char* options =
-     "{ h | help  | false | print help       }"
-     "{ i | image |       | image to process }";
+     "{ i | image |       | image to process         }"
+     "{ s | save  | false | save intermediate images }"
+     "{ h | help  | false | print help               }";
 
 int main(int argc, const char** argv)
 {
@@ -36,20 +31,27 @@ int main(int argc, const char** argv)
     Mat input = imread(image_path);
     if (input.empty())
         cout << "Error: failed to open image " << image_path << endl;
+    else
+        cout << "Successfully opened image " << image_path << endl;
 
     // Show input image
-    imshow("Input image", input);
-    waitKey(0);
+    // imshow("Input image", input);
+    // waitKey(0);
+
+    // Check if we need to save intermadiate images
+    bool save_images = parser.get<bool>("save");
+    if (save_images)
+        cout << "Image saving is ENABLED" << endl;
+    else
+        cout << "Image saving is DISABLED" << endl;
 
     // Process image
     Mat output;
-    TS(skeletonize); // start timing
-    skeletonize(input, output);
-    TE(skeletonize); // stop timing
+    skeletonize(input, output, save_images);
 
     // Show output image
-    imshow("Output image", output);
-    waitKey(0);
+    // imshow("Output image", output);
+    // waitKey(0);
 
     return 0;
 }

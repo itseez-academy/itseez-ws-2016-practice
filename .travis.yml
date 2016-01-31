@@ -24,4 +24,4 @@ script:
   # Print performance metrics
   - ../itseez-ws-2016-practice/3rdparty/opencv_ptest/misc/summary.py ./perf_report.xml
   # Run sample application
-  - ./bin/skeleton --image ./bin/testdata/page.png
+  - ./bin/skeleton --help
