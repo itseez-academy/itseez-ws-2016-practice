@@ -50,8 +50,8 @@ int main(int argc, const char** argv)
     skeletonize(input, output, save_images);
 
     // Show output image
-    // imshow("Output image", output);
-    // waitKey(0);
+    imshow("Output image", output);
+    waitKey(1000);
 
     return 0;
 }
