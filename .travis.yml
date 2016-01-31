@@ -1,20 +1,32 @@
+sudo: false
+notifications:
+  email: false
 language: cpp
 compiler:
   - gcc
   - clang
-sudo: false
 addons:
   apt:
     packages:
     - libopencv-dev
+    - xvfb
 before_script:
+  # For headless testing
+  - "export DISPLAY=:99.0"
+  - "sh -e /etc/init.d/xvfb start"
+  - sleep 3 # give xvfb some time to start
+script:
+  # Run CMake in order to generate makefile
   - mkdir ../build
   - cd ../build
-script:
   - cmake ../itseez-ws-2016-practice
+  # Build
   - make
+  # Run regression tests
   - ./bin/test_skeleton
+  # Run performance tests
   - ./bin/perf_skeleton --gtest_output=xml:perf_report.xml
+  # Print performance metrics
   - ../itseez-ws-2016-practice/3rdparty/opencv_ptest/misc/summary.py ./perf_report.xml
-notifications:
-  email: false
+  # Run sample application
+  - ./bin/skeleton --image ./bin/testdata/page.png --save
