@@ -1,6 +1,7 @@
 # Оптимизация производительности
 
-[![Build Status](https://travis-ci.com/UNN-VMK-Software/itseez-ws-2016-practice.svg?token=74q9ezwHWyMjEnVK8mzs&branch=master)](travis)
+[![Build Status](https://travis-ci.com/UNN-VMK-Software/itseez-ws-2016-practice.svg?token=74q9ezwHWyMjEnVK8mzs&branch=master)][travis]
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)][gitter]
 
 Данный репозиторий представляет собой проект, на базе которого будут выполняться
 практические упражнения из курса по __Оптимизации приложений компьютерного
@@ -58,7 +59,8 @@
 
 <!-- LINKS -->
 
-[travis]: https://travis-ci.com/UNN-VMK-Software/itseez-ws-2016-practice
+[gitter]:    https://gitter.im/UNN-VMK-Software/mp2-lab1-set
+[travis]:    https://travis-ci.com/UNN-VMK-Software/itseez-ws-2016-practice
 [practice1]: https://github.com/UNN-VMK-Software/itseez-ws-2016-practice/blob/master/doc/practice1-development-tools.md
 [practice2]: https://github.com/UNN-VMK-Software/itseez-ws-2016-practice/blob/master/doc/practice2-profiling-and-benchmarking.md
 [practice3]: https://github.com/UNN-VMK-Software/itseez-ws-2016-practice/blob/master/doc/practice3-memory.md
