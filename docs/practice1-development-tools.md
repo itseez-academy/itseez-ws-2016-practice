@@ -399,7 +399,7 @@ Microsoft Visual Studio. Далее для определенности выпо
 
 __Примечание:__ генератор проекта должен совпадать с версией Visual Studio,
 которая использовалась при сборке OpenCV. В пакете OpenCV доступны библиотеки,
-собранные под VS 2010, 2012, 2013.
+собранные под VS 2010, 2012, 2013. [Описание структур данных OpenCV.][opencv-doc]
 
 ## Детальная инструкция по выполнению работы
 
@@ -507,3 +507,4 @@ __Примечание:__ генератор проекта должен сов�
 [tasks]:      https://github.com/itseez-academy/itseez-ws-2016-practice/blob/master/docs/practice1-development-tools.md#Задачи
 [gtest-doc]:  https://github.com/google/googletest/blob/master/googletest/docs/Documentation.md
 [gtest-prim]: https://github.com/google/googletest/blob/master/googletest/docs/Primer.md
+[opencv-doc]: http://docs.opencv.org/2.4.11/modules/core/doc/basic_structures.html
