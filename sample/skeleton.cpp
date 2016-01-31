@@ -23,7 +23,7 @@ int main(int argc, const char** argv)
     if (parser.get<bool>("help"))
     {
         parser.printParams();
-        return 1;
+        return 0;
     }
 
     // Load input image
