@@ -3,6 +3,12 @@ set(target "opencv_ptest")
 file(GLOB hdrs "*/*.h" "*/*.hpp")
 file(GLOB srcs "*/*.cpp")
 
+# VS2012 doesn't support correctly the tuples yet,
+# see http://code.google.com/p/googletest/issues/detail?id=412
+if(MSVC)
+    add_definitions(/D _VARIADIC_MAX=10)
+endif()
+
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include")
 add_library(${target} STATIC ${srcs})
 
