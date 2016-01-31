@@ -168,6 +168,12 @@ __Дополнительные задачи__
   $ git checkout [-b] add-new-google-tests
   # [-b] - создание и переход в ветку <branch_name>
   ```
+  
+  1. Перейти в ветку :
+
+  ```bash
+  $ git checkout <branch_name>
+  ```
 
   1. Удалить ветку в локальном репозитории:
 
