@@ -59,7 +59,7 @@
 
 <!-- LINKS -->
 
-[gitter]:    https://gitter.im/UNN-VMK-Software/mp2-lab1-set
+[gitter]:    https://gitter.im/UNN-VMK-Software/itseez-ws-2016-practice
 [travis]:    https://travis-ci.com/UNN-VMK-Software/itseez-ws-2016-practice
 [practice1]: https://github.com/UNN-VMK-Software/itseez-ws-2016-practice/blob/master/doc/practice1-development-tools.md
 [practice2]: https://github.com/UNN-VMK-Software/itseez-ws-2016-practice/blob/master/doc/practice2-profiling-and-benchmarking.md
