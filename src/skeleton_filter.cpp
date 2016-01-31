@@ -1,19 +1,7 @@
 #include "skeleton_filter.hpp"
 
-#include <stdio.h>
-
 #include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/highgui/highgui.hpp"
-
-// Macros for time measurements
-#if 1
-    #define TS(name) int64 t_##name = cv::getTickCount()
-    #define TE(name) printf("TIMER_" #name ": %.2fms\n", \
-        1000.f * ((cv::getTickCount() - t_##name) / cv::getTickFrequency()))
-#else
-    #define TS(name)
-    #define TE(name)
-#endif
 
 void skeletonize(const cv::Mat &input, cv::Mat &output, bool save_images)
 {
@@ -43,6 +31,7 @@ void skeletonize(const cv::Mat &input, cv::Mat &output, bool save_images)
     GuoHallThinning(small_image, thinned_image);
     if (save_images) cv::imwrite("4-thinning.png", thinned_image);
 
+    // Back inversion
     output = 255 - thinned_image;
     if (save_images) cv::imwrite("5-output.png", output);
 

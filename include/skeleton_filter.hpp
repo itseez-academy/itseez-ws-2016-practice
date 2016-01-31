@@ -2,6 +2,17 @@
 
 #include "opencv2/core/core.hpp"
 
+// Macros for time measurements
+#include <stdio.h>
+#if 1
+    #define TS(name) int64 t_##name = cv::getTickCount()
+    #define TE(name) printf("TIMER_" #name ": %.2fms\n", \
+        1000.f * ((cv::getTickCount() - t_##name) / cv::getTickFrequency()))
+#else
+    #define TS(name)
+    #define TE(name)
+#endif
+
 // Pipeline
 void skeletonize(const cv::Mat& input, cv::Mat& output, bool save_images);
 
