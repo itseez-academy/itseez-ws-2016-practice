@@ -15,12 +15,12 @@ void skeletonize(const cv::Mat &input, cv::Mat &output)
     // cv::resize(gray_image, small_image, small_size);
     ImageResize(gray_image, small_image, small_size);
 
-    // Binarization
+    // Binarization and inversion
     cv::threshold(small_image, small_image, 128, 255, cv::THRESH_BINARY_INV);
 
     // Thinning
     cv::Mat thinned_image;
     GuoHallThinning(small_image, thinned_image);
 
-    output = thinned_image;
+    output = 255 - thinned_image;
 }
