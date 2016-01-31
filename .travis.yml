@@ -1,8 +1,10 @@
+sudo: false
+notifications:
+  email: false
 language: cpp
 compiler:
   - gcc
   - clang
-sudo: false
 addons:
   apt:
     packages:
@@ -11,11 +13,15 @@ before_script:
   - mkdir ../build
   - cd ../build
 script:
+  # Run CMake in order to generate makefile
   - cmake ../itseez-ws-2016-practice
+  # Build
   - make
+  # Run regression tests
   - ./bin/test_skeleton
+  # Run performance tests
   - ./bin/perf_skeleton --gtest_output=xml:perf_report.xml
+  # Print performance metrics
   - ../itseez-ws-2016-practice/3rdparty/opencv_ptest/misc/summary.py ./perf_report.xml
+  # Run sample application
   - ./bin/skeleton --image ./testdata/page.png
-notifications:
-  email: false
