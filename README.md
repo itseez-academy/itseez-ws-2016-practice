@@ -61,9 +61,9 @@
 
 [gitter]:    https://gitter.im/itseez-academy/itseez-ws-2016-practice
 [travis]:    https://travis-ci.org/itseez-academy/itseez-ws-2016-practice
-[practice1]: https://github.com/UNN-VMK-Software/itseez-ws-2016-practice/blob/master/docs/practice1-development-tools.md
-[practice2]: https://github.com/UNN-VMK-Software/itseez-ws-2016-practice/blob/master/docs/practice2-profiling-and-benchmarking.md
-[practice3]: https://github.com/UNN-VMK-Software/itseez-ws-2016-practice/blob/master/docs/practice3-memory.md
-[practice4]: https://github.com/UNN-VMK-Software/itseez-ws-2016-practice/blob/master/docs/practice4-compiler.md
-[practice5]: https://github.com/UNN-VMK-Software/itseez-ws-2016-practice/blob/master/docs/practice5-fixed-point.md
-[practice6]: https://github.com/UNN-VMK-Software/itseez-ws-2016-practice/blob/master/docs/practice6-simd.md
+[practice1]: https://github.com/itseez-academy/itseez-ws-2016-practice/blob/master/docs/practice1-development-tools.md
+[practice2]: https://github.com/itseez-academy/itseez-ws-2016-practice/blob/master/docs/practice2-profiling-and-benchmarking.md
+[practice3]: https://github.com/itseez-academy/itseez-ws-2016-practice/blob/master/docs/practice3-memory.md
+[practice4]: https://github.com/itseez-academy/itseez-ws-2016-practice/blob/master/docs/practice4-compiler.md
+[practice5]: https://github.com/itseez-academy/itseez-ws-2016-practice/blob/master/docs/practice5-fixed-point.md
+[practice6]: https://github.com/itseez-academy/itseez-ws-2016-practice/blob/master/docs/practice6-simd.md
