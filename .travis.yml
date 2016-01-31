@@ -11,12 +11,14 @@ addons:
     - libopencv-dev
     - xvfb
 before_script:
-  - export DISPLAY=:99.0
-  - sh -e /etc/init.d/xvfb start
-  - mkdir ../build
-  - cd ../build
+  # For headless testing
+  - "export DISPLAY=:99.0"
+  - "sh -e /etc/init.d/xvfb start"
+  - sleep 3 # give xvfb some time to start
 script:
   # Run CMake in order to generate makefile
+  - mkdir ../build
+  - cd ../build
   - cmake ../itseez-ws-2016-practice
   # Build
   - make
