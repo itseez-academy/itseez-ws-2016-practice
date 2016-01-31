@@ -1,7 +1,8 @@
-#include "skeleton_filter.hpp"
-
 #include "opencv_ptest/include/opencv2/ts/ts.hpp"
+
 #include <iostream>
+
+#include "skeleton_filter.hpp"
 
 using namespace std;
 using namespace perf;
