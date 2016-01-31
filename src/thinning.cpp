@@ -24,7 +24,7 @@ static void GuoHallIteration(cv::Mat& im, int iter)
             int N  = N1 < N2 ? N1 : N2;
             int m  = iter == 0 ? ((p6 | p7 | !p9) & p8) : ((p2 | p3 | !p5) & p4);
 
-            if (C == 1 && (N >= 2 && N <= 3) & m == 0)
+            if (C == 1 && (N >= 2 && N <= 3) & (m == 0))
                 marker.at<uchar>(i,j) = 1;
         }
     }
