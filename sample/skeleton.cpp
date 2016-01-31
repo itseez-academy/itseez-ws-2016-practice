@@ -35,10 +35,10 @@ int main(int argc, const char** argv)
         cout << "Successfully opened image " << image_path << endl;
 
     // Show input image
-    // imshow("Input image", input);
-    // waitKey(0);
+    imshow("Input image", input);
+    waitKey(1000);
 
-    // Check if we need to save intermadiate images
+    // Check if we need to save intermediate images
     bool save_images = parser.get<bool>("save");
     if (save_images)
         cout << "Image saving is ENABLED" << endl;

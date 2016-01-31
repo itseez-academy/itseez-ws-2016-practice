@@ -9,7 +9,10 @@ addons:
   apt:
     packages:
     - libopencv-dev
+    - xvfb
 before_script:
+  - export DISPLAY=:99.0
+  - sh -e /etc/init.d/xvfb start
   - mkdir ../build
   - cd ../build
 script:
@@ -24,4 +27,4 @@ script:
   # Print performance metrics
   - ../itseez-ws-2016-practice/3rdparty/opencv_ptest/misc/summary.py ./perf_report.xml
   # Run sample application
-  - ./bin/skeleton --help
+  - ./bin/skeleton --image ./bin/testdata/page.png
