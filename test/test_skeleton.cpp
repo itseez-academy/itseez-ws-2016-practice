@@ -108,3 +108,31 @@ TEST(skeleton, check_size_after_ImageResize)
 
 	EXPECT_EQ(true, success);
 }
+
+TEST(skeleton, check_color_after_ImageResize)
+{
+	const uchar color = 111;
+    Mat source(9, 9, CV_8UC1, color);
+
+	Mat result;
+	cv::Size newSize(10, 10);
+	ImageResize(source, result, newSize);
+
+	bool success = true;
+	for(int i = 0; i < newSize.width; ++i) {
+		for(int j = 0; j < newSize.height; ++j) {
+			if(source.at<uchar>(i, j) != color) {
+				success = false;
+				break;
+			}
+		}
+	}
+	
+	/*if(result.size[0] == newSize.width && result.size[1] == newSize.height)
+	{
+		success = true;
+	}*/
+
+	EXPECT_EQ(true, success);
+}
+
