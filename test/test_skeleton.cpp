@@ -130,6 +130,31 @@ TEST(skeleton, test_resize_dont_change_color_of_onecolored_image)
     minMaxLoc(result, &min, &max, &minLoc, &maxLoc);
 
     // Assert
-    ASSERT_EQ(color, result.at<uchar>(minLoc.x,minLoc.y));
-    ASSERT_EQ(color, result.at<uchar>(maxLoc.x,minLoc.y));
+    EXPECT_EQ(color, result.at<uchar>(minLoc.x,minLoc.y));
+    EXPECT_EQ(color, result.at<uchar>(maxLoc.x,minLoc.y));
+}
+
+
+// Task 4
+TEST(skeleton, test_cvtcolor_dont_change_onecolored_image)
+{
+    // Arrange
+    Mat bgr(5, 5, CV_8UC3, CV_RGB(120, 142, 111)); // R G B
+    
+    // Act
+    Mat result;
+    ConvertColor_BGR2GRAY_BT709(bgr, result);
+
+    uchar newColor = result.at<uchar>(0, 0);
+
+    // Assert
+
+    double min, max;
+    Point minLoc, maxLoc;
+
+    minMaxLoc(result, &min, &max, &minLoc, &maxLoc);
+
+    // Assert
+    EXPECT_EQ(newColor, result.at<uchar>(minLoc.x, minLoc.y));
+    EXPECT_EQ(newColor, result.at<uchar>(maxLoc.x, minLoc.y));
 }
