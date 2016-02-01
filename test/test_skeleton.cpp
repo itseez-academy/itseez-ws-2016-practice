@@ -96,3 +96,25 @@ TEST(skeleton, color_matches_ImageResizing)
     int difference_sum = countNonZero(difference_mat);
     EXPECT_EQ(0, difference_sum);
 }
+
+
+//TEST(skeleton, similar_colors_ConvertColor)
+//{
+//    Mat source(10, 10, CV_8UC3, Scalar(56, 86, 230));
+//    Mat result;
+//    ConvertColor_BGR2GRAY_BT709(source, result);
+//    Scalar expected_color(result<uchar>.at(0, 0));
+//    EXPECT_EQ();
+//}
+
+TEST(skeleton, black_count_GuoHallThinning)
+{
+    Mat source(10, 10, CV_8UC1);
+    randu(source, Scalar(0), Scalar(255));
+    threshold(source, source, 128, 255, cv::THRESH_BINARY);
+    int source_black_count = source.total() - countNonZero(source);
+    Mat result;
+    GuoHallThinning(source, result);
+    int result_black_count = result.total() - countNonZero(result);
+    EXPECT_TRUE(source_black_count <= result_black_count);
+}
