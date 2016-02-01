@@ -82,3 +82,16 @@ TEST(skeleton, guohall_size_matches)
 	EXPECT_EQ(image.rows, result.rows);
 	EXPECT_EQ(image.cols, result.cols);
 }
+TEST(skeleton, img_resize_argument_matches_size)
+{
+	// Arrange
+	Mat image(10, 10, CV_8UC1);
+	randu(image, Scalar(0), Scalar(255));
+	Size sz(image.cols / 2, image.rows / 2);
+
+	// Act
+	Mat result;
+	ImageResize(image, result, sz);
+	EXPECT_EQ(result.rows, sz.height);
+	EXPECT_EQ(result.cols, sz.width);
+}
