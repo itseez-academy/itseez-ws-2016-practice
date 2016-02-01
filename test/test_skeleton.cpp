@@ -79,3 +79,15 @@ TEST(skeleton, same_sizes)
 	EXPECT_EQ(input.rows,final.rows);
 
 }
+
+TEST(skeleton, resizefunc_size_test)
+{
+	Mat input(10, 10, CV_8UC3);
+	randu(input, Scalar::all(0), Scalar::all(255));
+	ConvertColor_BGR2GRAY_BT709(input, input);
+	Mat final(input.cols/2, input.rows/2, CV_8UC3);
+	Size finalsize(input.cols / 2, input.rows / 2);
+	ImageResize(input, final, finalsize);
+	EXPECT_EQ(input.cols / 2,final.cols);
+	EXPECT_EQ(input.rows / 2,final.rows);
+}
