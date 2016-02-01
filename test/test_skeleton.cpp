@@ -65,3 +65,69 @@ TEST(skeleton, 2_plus_2_equals_4)
 {
    EXPECT_EQ(4, 2 + 2);
 }
+
+TEST(skeleton, SizecheckForBGR2GRAY)
+{
+	Mat bgr(5, 5, CV_8UC3);
+    randu(bgr, Scalar::all(0), Scalar::all(255));
+
+	Mat result;
+	ConvertColor_BGR2GRAY_BT709(bgr, result);
+	
+	EXPECT_EQ(result.size, bgr.size);
+	
+}
+
+TEST(skeleton, SizecheckForGuoHall)
+{
+	Mat bgr(5, 5, CV_8UC1);
+    randu(bgr, Scalar::all(0), Scalar::all(255));
+
+	Mat result;
+	GuoHallThinning(bgr, result);
+
+	EXPECT_EQ(result.size, bgr.size);
+}
+
+TEST(skeleton, ResizeWorkchek)
+{
+	Mat bgr(40, 40, CV_8UC1);
+    randu(bgr, Scalar(0), Scalar(255));
+	Size sz(bgr.cols / 2, bgr.rows / 2);
+
+	Mat result;
+    ImageResize(bgr, result, sz);
+
+	
+	
+	bool rowscheck = false;
+	bool colscheck = false;
+
+	if (bgr.rows/2==result.rows)
+		rowscheck = true;
+	if (bgr.cols/2==result.cols)
+		colscheck = true;
+
+	EXPECT_TRUE(rowscheck&&colscheck);
+}
+
+TEST(skeleton, resizeColorcheck)
+{
+	Mat bgr(40, 40, CV_8UC1);
+    randu(bgr, Scalar(0), Scalar(0));
+	Size sz(bgr.cols / 2, bgr.rows / 2);
+	
+	Mat result;
+	ImageResize(bgr,result,sz);
+
+
+
+
+
+
+
+}
+
+
+
+
