@@ -156,5 +156,5 @@ TEST(skeleton, test_ConvertColor_BGR2GRAY_BT709_8UC3_plain)
 	GuoHallThinning(source, result);
 	
 	EXPECT_EQ(true, (countNonZero(result) < countNonZero(source)));
-+}
+}
 
