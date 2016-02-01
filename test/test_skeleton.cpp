@@ -79,3 +79,17 @@ TEST(skeleton, ConvertColor_received_size_is_equal_to_sourse_one)
 	EXPECT_EQ(bgr.cols, result.cols);
 	EXPECT_EQ(bgr.rows, result.rows);
 }
+
+TEST(skeleton, GuoHallThinning_received_size_is_equal_to_sourse_one)
+{
+	// Arrange
+    Mat bgr(100, 100, CV_8UC1);
+    randu(bgr, Scalar::all(0), Scalar::all(255));
+
+    // Act
+    Mat result;
+    GuoHallThinning(bgr, result);
+
+	EXPECT_EQ(bgr.cols, result.cols);
+	EXPECT_EQ(bgr.rows, result.rows);
+}
