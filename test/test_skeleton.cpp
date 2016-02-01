@@ -107,3 +107,16 @@ TEST(skeleton, test_resize)
 	EXPECT_EQ(sz.height , result.rows);
 	EXPECT_EQ(sz.width , result.cols);
 }
+TEST(skeleton, test_compare1)
+{
+    // Arrange
+    Mat image(1, 1, CV_8UC1,128);
+    Size sz(image.cols, image.rows);
+
+    // Act
+    Mat result;
+    ImageResize(image, result, sz);
+
+    // Assert
+	EXPECT_EQ(0, numberOfDifferentPixels(image, result));
+}
