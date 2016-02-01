@@ -61,7 +61,8 @@ TEST(skeleton, resize_matches_opencv)
     EXPECT_LT(maxDifference(reference, result), 2);
 }
 
-TEST(skeleton, cvtcolor_dont_resize_image)
+// Task 1
+TEST(skeleton, test_cvtcolor_dont_resize_image)
 {
     // Arrange
     Mat bgr(5, 5, CV_8UC3);
@@ -77,7 +78,7 @@ TEST(skeleton, cvtcolor_dont_resize_image)
     EXPECT_EQ(bgr.size, result.size);
 }
 
-TEST(skeleton, guo_hall_dont_resize_image)
+TEST(skeleton, test_guo_hall_dont_resize_image)
 {
     // Arrange
     Mat bgr(5, 5, CV_8UC1); // One color type
@@ -91,3 +92,22 @@ TEST(skeleton, guo_hall_dont_resize_image)
     EXPECT_EQ(bgr.dims, result.dims);
     EXPECT_EQ(bgr.size, result.size);
 }
+
+// Task 2
+TEST(skeleton, test_resize_gene_image)
+{
+    // Arrange
+    Mat bgr(5, 5, CV_8UC1);
+    randu(bgr, Scalar::all(0), Scalar::all(255));
+    const cv::Size SIZE_TO_SET(8, 13);
+
+    // Act
+    Mat result;
+    ImageResize(bgr, result, SIZE_TO_SET);
+
+    // Assert
+    EXPECT_EQ(SIZE_TO_SET, result.size());
+}
+
+
+
