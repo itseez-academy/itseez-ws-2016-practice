@@ -65,3 +65,17 @@ TEST(skeleton, 2_plus_2_equals_4)
 {
    EXPECT_EQ(4, 2 + 2);
 }
+
+TEST(skeleton, ConvertColor_received_size_is_equal_to_sourse_one)
+{
+	// Arrange
+    Mat bgr(100, 100, CV_8UC3);
+    randu(bgr, Scalar::all(0), Scalar::all(255));
+
+    // Act
+    Mat result;
+    ConvertColor_BGR2GRAY_BT709(bgr, result);
+
+	EXPECT_EQ(bgr.cols, result.cols);
+	EXPECT_EQ(bgr.rows, result.rows);
+}
