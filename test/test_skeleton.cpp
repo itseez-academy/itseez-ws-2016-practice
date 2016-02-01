@@ -65,3 +65,31 @@ TEST(skeleton, 2_plus_2_equals_4)
 {
 	EXPECT_EQ(4, 2 + 2);
 }
+
+TEST(skeleton, check_image_sz_BGR2GRAY_BT709){
+	// Arrange
+    Mat bgr(10, 10, CV_8UC3);
+    randu(bgr, Scalar::all(0), Scalar::all(255));
+
+     // Act
+    Mat result;
+    ConvertColor_BGR2GRAY_BT709(bgr, result);
+
+    // Assert
+
+	EXPECT_EQ(bgr.size, result.size);
+}
+
+TEST(skeleton, check_image_sz_GuoHallThinning){
+	// Arrange
+    Mat bgr(10, 10, CV_8UC1);
+    randu(bgr, Scalar::all(0), Scalar::all(255));
+
+     // Act
+    Mat result;
+    GuoHallThinning(bgr, result);
+
+    // Assert
+
+	EXPECT_EQ(bgr.size, result.size);
+}
