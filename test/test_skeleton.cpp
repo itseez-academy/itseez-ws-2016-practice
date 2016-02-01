@@ -23,9 +23,18 @@ int maxDifference(const cv::Mat &m1, const cv::Mat &m2)
     return (int)max_diff;
 }
 
-TEST(skeleton, 2_plus_2_equals_4)
+TEST(skeleton, cvtcolor_does_not_change_size)
 {
-   EXPECT_EQ(4, 2 + 2);
+	//Arrange
+	Mat bgr(5, 5, CV_8UC3);
+	randu(bgr, Scalar::all(0), Scalar::all(255));
+	
+	//Act
+	Mat xyz;
+	cvtColor(bgr, xyz, CV_BGR2XYZ);
+		
+	//Assert
+	EXPECT_EQ(bgr.size, xyz.size);
 }
 
 TEST(skeleton, cvtcolor_matches_opencv)
