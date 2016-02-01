@@ -12,7 +12,7 @@ if(MSVC)
 endif()
 
 add_executable(${target} ${srcs} ${hdrs})
-target_link_libraries(${target} gtest opencv_ptest ${LIBRARY})
+target_link_libraries(${target} gtest opencv_ptest ${LIBRARY} ${CMAKE_THREAD_LIBS_INIT} pthread)
 
 add_custom_command(
     TARGET ${target}
