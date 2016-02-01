@@ -100,7 +100,25 @@ TEST(skeleton, resize_match_size)
         for (size.width = src.cols * 2; size.width > 0; --size.width)
         {
             ImageResize(src, dst, size);
-            EXPECT_EQ(dst.size(), size);
+            ASSERT_EQ(dst.size(), size);
+        }
+    }
+}
+
+TEST(skeleton, resize_match_color)
+{
+    Mat src(3, 3, CV_8UC1);
+    uchar color = 123;
+    src.setTo(color);
+
+    Mat dst;
+    Size size;
+    for (size.height = src.rows * 2; size.height > 0; --size.height)
+    {
+        for (size.width = src.cols * 2; size.width > 0; --size.width)
+        {
+            ImageResize(src, dst, size);
+            ASSERT_EQ(countNonZero(dst != color), 0);
         }
     }
 }
