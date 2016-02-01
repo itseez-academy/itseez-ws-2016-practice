@@ -163,8 +163,7 @@ TEST(skeleton, test_ConvertColor_BGR2GRAY_BT709_8UC3_plain)
 
  TEST(skeleton, test_GuoHallThinning_number_of_black_pixels_not_less_source)
 {
-	typedef unsigned char uchar;
-	Mat src(9, 9, CV_8UC1);
+	Mat source(9, 9, CV_8UC1);
 	randu(source, Scalar::all(0), Scalar::all(2));
 	
 	Mat result;
