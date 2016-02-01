@@ -65,3 +65,57 @@ TEST(skeleton, test_multipy_2x2)
 {
 	EXPECT_EQ(2 * 2, 4);
 }
+
+TEST(skeleton, test_ConvertColor_BGR2GRAY_BT709_equalsSize)
+{
+	const Mat src(10, 10, CV_8UC3);
+	Mat dst;
+	ConvertColor_BGR2GRAY_BT709(src, dst);
+	EXPECT_EQ(src.size, dst.size);
+}
+
+TEST(skeleton, test_ImageResize_correctSize)
+{
+	Mat dst;
+	Size size(20, 15);
+	ImageResize(Mat(10, 10, CV_8UC1), dst, size);
+	EXPECT_EQ(dst.size[0], size.height);
+	EXPECT_EQ(dst.size[1], size.width);
+}
+
+TEST(skeleton, test_ImageResize_singleColorSave)
+{
+	typedef unsigned char uchar;
+	const uchar value = 145;
+	Mat src(10, 10, CV_8UC1, value);
+	Mat dst;
+	Size size(20, 15);
+	ImageResize(src, dst, size);
+	double dstMin, dstMax;
+	minMaxLoc(dst, &dstMin, &dstMax);
+	EXPECT_EQ(static_cast<uchar>(dstMin), value);
+	EXPECT_EQ(static_cast<uchar>(dstMax), value);
+}
+
+TEST(skeleton, test_ConvertColor_BGR2GRAY_BT709_singleColorSave)
+{
+	typedef unsigned char uchar;
+	const uchar value = 145;
+	Mat src(10, 10, CV_8UC3, value);
+	Mat dst;
+	Size size(20, 15);
+	ConvertColor_BGR2GRAY_BT709(src, dst);
+	double dstMin, dstMax;
+	minMaxLoc(dst, &dstMin, &dstMax);
+	EXPECT_EQ(static_cast<uchar>(dstMin), static_cast<uchar>(dstMax));
+}
+
+TEST(skeleton, test_GuoHallThinning_blackPixelsCountGeSource)
+{
+	typedef unsigned char uchar;
+	Mat src(10, 10, CV_8UC1);
+	randu(src, 0, 2);
+	Mat dst;
+	GuoHallThinning(src, dst);
+	EXPECT_EQ((countNonZero(dst) < countNonZero(src)), true);
+}
