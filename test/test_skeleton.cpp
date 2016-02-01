@@ -80,13 +80,11 @@ TEST(skeleton, isImageHaveSameSizeAfterConvertFromBGRToGray)
 
 TEST(skeleton, isImageHaveSameSizeAfterGuoHallThinning)
 {
-    Mat bgr(5, 5, CV_8UC3);
+    Mat bgr(5, 5, CV_8UC1);
     randu(bgr, Scalar::all(0), Scalar::all(255));
 
-    Mat grayImage;
-	ConvertColor_BGR2GRAY_BT709(bgr, grayImage);
 	Mat result;
-    GuoHallThinning(grayImage, result);
+    GuoHallThinning(bgr, result);
  
 	cv::Mat::MSize expectedSize(bgr.size);
 	EXPECT_EQ(expectedSize, result.size);
@@ -107,8 +105,8 @@ TEST(skeleton, isImageHaveProperSizeAfterResize)
 
 TEST(skeleton, isImageHaveSameColorAfterResize)
 {
-    Mat bgr(10, 10, CV_8UC1);
-    randu(bgr, Scalar::all(0), Scalar::all(1));
+	cv::Scalar color = 0.5;
+    Mat bgr(10, 10, CV_8UC1, color);
 
 	Mat result;
 	cv::Size small_size(2, 2);
@@ -118,9 +116,33 @@ TEST(skeleton, isImageHaveSameColorAfterResize)
 	minMaxLoc(bgr, &expectedMin, &expectedMax);
 	double max, min;
 	minMaxLoc(result, &min, &max);
-
 	EXPECT_EQ(expectedMin, expectedMax);
 	EXPECT_EQ(min, max);
 	EXPECT_EQ(expectedMin, min);
 }
 
+TEST(skeleton, is8UC3ImageHaveOneColorAfterConvertFromBGRToGray)
+{
+	cv::Scalar color = 0.5;
+	Mat bgr(10, 10, CV_8UC3, color);
+
+	Mat grayImage;
+	ConvertColor_BGR2GRAY_BT709(bgr, grayImage);
+
+	double max, min;
+	minMaxLoc(grayImage, &min, &max);
+	EXPECT_EQ(min, max);
+}
+
+TEST(skeleton, isImageHaveNotLessBlackPixelsAfterGuoHallThinning)
+{
+	Mat bgr(5, 5, CV_8UC1);
+	randu(bgr, Scalar::all(0), Scalar::all(255));
+
+	Mat result;
+    GuoHallThinning(bgr, result);
+
+	int expectedBlackPixels = bgr.rows*bgr.cols - countNonZero(bgr);
+	int blackPixels = result.rows*result.cols - countNonZero(result);
+	EXPECT_LE(expectedBlackPixels, blackPixels);
+}
