@@ -87,3 +87,20 @@ TEST(skeleton, thinning_match_size)
 
     EXPECT_EQ(src.size(), dst.size());
 }
+
+TEST(skeleton, resize_match_size)
+{
+    Mat src(3, 3, CV_8UC1);
+    randu(src, 0, 255);
+
+    Mat dst;
+    Size size;
+    for (size.height = src.rows * 2; size.height > 0; --size.height)
+    {
+        for (size.width = src.cols * 2; size.width > 0; --size.width)
+        {
+            ImageResize(src, dst, size);
+            EXPECT_EQ(dst.size(), size);
+        }
+    }
+}
