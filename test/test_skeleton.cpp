@@ -63,20 +63,25 @@ TEST(skeleton, resize_matches_opencv)
 
 TEST(skeleton, size_matches_ConvertColor)
 {
-	Mat source(10, 10, CV_8UC3);
-	Mat result;
-	ConvertColor_BGR2GRAY_BT709(source, result);
-	Size size_of_source(source.cols, source.rows);
-	Size size_of_result(result.cols, result.rows);
-	EXPECT_EQ(size_of_source, size_of_result);
+    Mat source(10, 10, CV_8UC3);
+    Mat result;
+    ConvertColor_BGR2GRAY_BT709(source, result);
+    EXPECT_EQ(source.size(), result.size());
 }
 
 TEST(skeleton, size_matches_GuoHallThinning)
 {
-	Mat source(10, 10, CV_8UC1);
-	Mat result;
-	GuoHallThinning(source, result);
-	Size size_of_source(source.cols, source.rows);
-	Size size_of_result(result.cols, result.rows);
-	EXPECT_EQ(size_of_source, size_of_result);
+    Mat source(10, 10, CV_8UC1);
+    Mat result;
+    GuoHallThinning(source, result);
+    EXPECT_EQ(source.size(), result.size());
+}
+
+TEST(skeleton, size_changed_ImageResizing)
+{
+    Mat source(10, 10, CV_8UC1);
+    Mat result;
+    Size expected_size(source.cols / 2, source.rows / 2);
+    ImageResize(source, result, expected_size);
+    EXPECT_EQ(expected_size, result.size());
 }
