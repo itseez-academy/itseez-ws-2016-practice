@@ -94,7 +94,7 @@ TEST(skeleton, test_guo_hall_dont_resize_image)
 }
 
 // Task 2
-TEST(skeleton, test_resize_gene_image)
+TEST(skeleton, test_resize_generates_correctly_sized_image)
 {
     // Arrange
     Mat bgr(5, 5, CV_8UC1);
@@ -109,5 +109,26 @@ TEST(skeleton, test_resize_gene_image)
     EXPECT_EQ(SIZE_TO_SET, result.size());
 }
 
+// Task 3
+TEST(skeleton, test_resize_dont_change_color_of_onecolored_image)
+{
+    // Arrange
+    Mat bgr = Mat::ones(20, 20, CV_8UC1);
+
+    const cv::Size SIZE_TO_SET(8, 13);
+
+    // Act
+    Mat result;
+    ImageResize(bgr, result, SIZE_TO_SET);
+
+    double min, max;
+    Point minLoc, maxLoc;
+
+    minMaxLoc(result, &min, &max, &minLoc, &maxLoc);
+
+    // Assert
+    ASSERT_EQ(1, result.at<uchar>(minLoc.x,minLoc.y));
+    ASSERT_EQ(1, result.at<uchar>(maxLoc.x,minLoc.y));
+}
 
 
