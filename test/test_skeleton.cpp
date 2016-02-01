@@ -64,3 +64,31 @@ TEST(skeleton, 2_plus_2_equals_4)
 {
    EXPECT_EQ(4, 2 + 2);
 }
+TEST(skeleton, test1_size)
+{
+    // Arrange
+    Mat bgr(5, 5, CV_8UC3);
+    randu(bgr, Scalar::all(0), Scalar::all(255));
+
+    // Act
+    Mat result;
+    ConvertColor_BGR2GRAY_BT709(bgr, result);
+
+    // Assert
+	EXPECT_EQ(result.rows , bgr.rows);
+	EXPECT_EQ(result.cols , bgr.cols);
+}
+TEST(skeleton, test2_size)
+{
+    // Arrange
+    Mat bgr(5, 5, CV_8UC1);
+    randu(bgr, Scalar::all(0), Scalar::all(255));
+
+    // Act
+    Mat result;
+    GuoHallThinning(bgr, result);
+
+    // Assert
+	EXPECT_EQ(result.rows , bgr.rows);
+	EXPECT_EQ(result.cols , bgr.cols);
+}
