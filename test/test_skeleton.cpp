@@ -90,5 +90,37 @@ TEST(skeleton, isImageHaveSameSizeAfterGuoHallThinning)
  
 	cv::Mat::MSize expectedSize(bgr.size);
 	EXPECT_EQ(expectedSize, result.size);
-	//EXPECT_EQ(5, result.size[1]);
 }
+
+TEST(skeleton, isImageHaveProperSizeAfterResize)
+{
+    Mat bgr(10, 10, CV_8UC1);
+    randu(bgr, Scalar::all(0), Scalar::all(255));
+
+	Mat result;
+	cv::Size small_size(2, 2);
+    ImageResize(bgr, result, small_size);
+ 
+	EXPECT_EQ(small_size.height, result.size[0]);
+	EXPECT_EQ(small_size.width, result.size[1]);
+}
+
+TEST(skeleton, isImageHaveSameColorAfterResize)
+{
+    Mat bgr(10, 10, CV_8UC1);
+    randu(bgr, Scalar::all(0), Scalar::all(1));
+
+	Mat result;
+	cv::Size small_size(2, 2);
+    ImageResize(bgr, result, small_size);
+ 
+	double expectedMax, expectedMin;
+	minMaxLoc(bgr, &expectedMin, &expectedMax);
+	double max, min;
+	minMaxLoc(result, &min, &max);
+
+	EXPECT_EQ(expectedMin, expectedMax);
+	EXPECT_EQ(min, max);
+	EXPECT_EQ(expectedMin, min);
+}
+
