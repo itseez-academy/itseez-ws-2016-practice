@@ -68,24 +68,43 @@ TEST(skeleton, 2_plus_2_equals_4)
 
 TEST(skeleton, check_size_ConvertColor_BGR2GRAY_BT709)
 {
-    Mat sourse(9, 9, CV_8UC3);
-    randu(sourse, Scalar::all(0), Scalar::all(255));
+    Mat source(9, 9, CV_8UC3);
+    randu(source, Scalar::all(0), Scalar::all(255));
 
     Mat result;
-    ConvertColor_BGR2GRAY_BT709(sourse, result);
+    ConvertColor_BGR2GRAY_BT709(source, result);
 
-	EXPECT_EQ(result.size, sourse.size);
+	EXPECT_EQ(result.size, source.size);
 }
 
 TEST(skeleton, check_size_GuoHallThinning)
 {
-    Mat sourse(9, 9, CV_8UC1);
-    randu(sourse, Scalar::all(0), Scalar::all(255));
+    Mat source(9, 9, CV_8UC1);
+    randu(source, Scalar::all(0), Scalar::all(255));
 
-	cv::threshold(sourse, sourse, 128, 255, cv::THRESH_BINARY_INV);
+	cv::threshold(source, source, 128, 255, cv::THRESH_BINARY_INV);
 
     Mat result;
-    GuoHallThinning(sourse, result);
+    GuoHallThinning(source, result);
 
-	EXPECT_EQ(result.size, sourse.size);
+	EXPECT_EQ(result.size, source.size);
+}
+
+TEST(skeleton, check_size_after_ImageResize)
+{
+    Mat source(9, 9, CV_8UC1);
+    randu(source, Scalar::all(0), Scalar::all(255));
+
+
+	Mat result;
+	cv::Size newSize(10, 10);
+	ImageResize(source, result, newSize);
+
+	bool success = false;
+	if(result.size[0] == newSize.width && result.size[1] == newSize.height)
+	{
+		success = true;
+	}
+
+	EXPECT_EQ(true, success);
 }
