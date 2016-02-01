@@ -108,3 +108,19 @@ TEST(skeleton, ImageResize_result_is_determined_sizes)
 	EXPECT_EQ(50, result.rows);
 	EXPECT_EQ(50, result.cols);
 }
+
+TEST(skeleton, ImageResize_result_have_the_same_colors)
+{
+	// Arrange
+	uchar color = 123;
+	Mat bgr(100, 100, CV_8UC1, Scalar(color));
+
+	// Act
+	Mat result;
+	Size size(50,50);
+	ImageResize(bgr, result,size);
+
+	Mat expect(50, 50, CV_8UC1, Scalar(color));
+
+	EXPECT_EQ(0, numberOfDifferentPixels(expect, result));
+}
