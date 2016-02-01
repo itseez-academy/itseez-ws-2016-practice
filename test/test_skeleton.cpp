@@ -73,3 +73,12 @@ TEST(skeleton, convert_colour_size_matches)
 	EXPECT_EQ(image.rows, result.rows);
 	EXPECT_EQ(image.cols, result.cols);
 }
+TEST(skeleton, guohall_size_matches)
+{
+	Mat image(10, 10, CV_8UC1);
+	randu(image, Scalar(0), Scalar(255));
+	Mat result;
+	GuoHallThinning(image, result);
+	EXPECT_EQ(image.rows, result.rows);
+	EXPECT_EQ(image.cols, result.cols);
+}
