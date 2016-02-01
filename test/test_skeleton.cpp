@@ -60,3 +60,8 @@ TEST(skeleton, resize_matches_opencv)
     // std::cout << "Difference:\n" << reference - result << std::endl;
     EXPECT_LT(maxDifference(reference, result), 2);
 }
+
+TEST(skeleton, test_multipy_2x2)
+{
+	EXPECT_EQ(2 * 2, 4);
+}
