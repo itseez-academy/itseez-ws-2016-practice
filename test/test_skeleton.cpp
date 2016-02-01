@@ -101,3 +101,18 @@ TEST(skeleton, ImageResize_matches_input)
 	EXPECT_EQ(size_new.height, sz.height);
 	EXPECT_EQ(size_new.width, sz.width);
 }
+
+TEST(skeleton, resize_same_color_check)
+{
+	Mat image(10, 20, CV_8UC1);
+	Mat image_small(5, 10, CV_8UC1);
+	image = cv::Scalar(10, 110, 210);
+	image_small = cv::Scalar(10, 110, 210);
+	Size sz(image.cols / 2, image.rows / 2);
+	Mat result;
+	ImageResize(image, result, sz);
+	Mat subtr = abs(result - image_small);
+	auto a = countNonZero(subtr);
+	EXPECT_EQ(a, 0);
+}
+
