@@ -85,3 +85,14 @@ TEST(skeleton, size_changed_ImageResizing)
     ImageResize(source, result, expected_size);
     EXPECT_EQ(expected_size, result.size());
 }
+
+TEST(skeleton, color_matches_ImageResizing)
+{
+    Mat source(10, 10, CV_8UC1, Scalar(128));
+    Mat expected(5, 5, CV_8UC1, Scalar(128));
+    Mat result;
+    ImageResize(source, result, Size(source.cols / 2, source.rows / 2));
+    Mat difference_mat = abs(expected - result);
+    int difference_sum = countNonZero(difference_mat);
+    EXPECT_EQ(0, difference_sum);
+}
