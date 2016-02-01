@@ -65,3 +65,17 @@ TEST(skeleton, 2_plus_2_equals_4)
 {
    EXPECT_EQ(4, 2 + 2);
 }
+
+TEST(skeleton, same_sizes)
+{
+	Mat input(10, 10, CV_8UC3);
+	
+    randu(input, Scalar::all(0), Scalar::all(255));
+	Mat dst(10, 10, CV_8UC3);
+	ConvertColor_BGR2GRAY_BT709(input,dst);
+	Mat final(10, 10, CV_8UC3);
+	GuoHallThinning(dst,final);
+	EXPECT_EQ(input.cols,final.cols);
+	EXPECT_EQ(input.rows,final.rows);
+
+}
