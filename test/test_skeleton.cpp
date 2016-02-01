@@ -116,3 +116,17 @@ TEST(skeleton, resize_same_color_check)
 	EXPECT_EQ(a, 0);
 }
 
+TEST(skeleton, 2GRAY_same_color_check)
+{
+	cv::Mat original(10, 10, CV_8UC3);
+	cv::Mat gray_image;
+	original = cv::Scalar(10, 110, 210);
+	ConvertColor_BGR2GRAY_BT709(original, gray_image);
+	cv::Mat dst = gray_image.reshape(1);
+	auto a = dst.at<uchar>(1, 1);
+	cv::Mat exp(10, 10, CV_8UC1);
+	exp = cv::Scalar(a);
+	Mat subtr = abs(exp - dst);
+	auto ba = countNonZero(subtr);
+	EXPECT_EQ(ba, 0);
+}	
