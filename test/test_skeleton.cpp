@@ -60,3 +60,34 @@ TEST(skeleton, resize_matches_opencv)
     // std::cout << "Difference:\n" << reference - result << std::endl;
     EXPECT_LT(maxDifference(reference, result), 2);
 }
+
+TEST(skeleton, cvtcolor_dont_resize_image)
+{
+    // Arrange
+    Mat bgr(5, 5, CV_8UC3);
+    randu(bgr, Scalar::all(0), Scalar::all(255));
+
+    // Act
+    Mat result;
+    ConvertColor_BGR2GRAY_BT709(bgr, result);
+
+    // Assert
+    // Looks like overkill...
+    EXPECT_EQ(bgr.dims, result.dims);
+    EXPECT_EQ(bgr.size, result.size);
+}
+
+TEST(skeleton, guo_hall_dont_resize_image)
+{
+    // Arrange
+    Mat bgr(5, 5, CV_8UC1); // One color type
+    randu(bgr, Scalar::all(0), Scalar::all(255));
+
+    // Act
+    Mat result;
+    GuoHallThinning(bgr, result);
+
+    // Assert
+    EXPECT_EQ(bgr.dims, result.dims);
+    EXPECT_EQ(bgr.size, result.size);
+}
