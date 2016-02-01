@@ -65,3 +65,14 @@ TEST(skeleton, 2_plus_2_equals_4)
 {
     EXPECT_EQ(2 + 2, 4);
 }
+
+TEST(skeleton, cvt_color_match_size)
+{
+    Mat bgr(5, 5, CV_8UC3);
+    randu(bgr, Scalar::all(0), Scalar::all(255));
+
+    Mat result;
+    ConvertColor_BGR2GRAY_BT709(bgr, result);
+
+    EXPECT_EQ(bgr.size(), result.size());
+}
