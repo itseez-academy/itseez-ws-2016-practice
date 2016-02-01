@@ -74,3 +74,12 @@ TEST(skeleton, ConvertColor_BGR2GRAY_BT709_fixed_size)
 	ConvertColor_BGR2GRAY_BT709(bgr, gray);
 	EXPECT_EQ(bgr.size(), gray.size());
 }
+
+TEST(skeleton, GuoHallThinning_fixed_size)
+{
+	Mat src(5, 5, CV_8UC1);
+	randu(src, Scalar::all(0), Scalar::all(255));
+	Mat dst;
+	GuoHallThinning(src, dst);
+	EXPECT_EQ(src.size(), dst.size());
+}
