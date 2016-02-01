@@ -6,5 +6,5 @@ foreach(app_filename ${app_list})
   get_filename_component(app ${app_filename} NAME_WE)
   # Add and configure executable file to be produced
   add_executable(${app} ${app_filename})
-  target_link_libraries(${app} ${LIBRARY_DEPS})
+  target_link_libraries(${app} ${LIBRARY_DEPS} ${CMAKE_THREAD_LIBS_INIT})
 endforeach()
