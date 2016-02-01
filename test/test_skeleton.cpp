@@ -115,6 +115,9 @@ TEST(skeleton, test_resize_dont_change_color_of_onecolored_image)
     // Arrange
     Mat bgr = Mat::ones(20, 20, CV_8UC1);
 
+    const uchar color(142);
+    bgr = color;
+
     const cv::Size SIZE_TO_SET(8, 13);
 
     // Act
@@ -127,8 +130,6 @@ TEST(skeleton, test_resize_dont_change_color_of_onecolored_image)
     minMaxLoc(result, &min, &max, &minLoc, &maxLoc);
 
     // Assert
-    ASSERT_EQ(1, result.at<uchar>(minLoc.x,minLoc.y));
-    ASSERT_EQ(1, result.at<uchar>(maxLoc.x,minLoc.y));
+    ASSERT_EQ(color, result.at<uchar>(minLoc.x,minLoc.y));
+    ASSERT_EQ(color, result.at<uchar>(maxLoc.x,minLoc.y));
 }
-
-
