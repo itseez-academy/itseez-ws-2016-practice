@@ -57,7 +57,7 @@ __Цель данной работы__ — познакомиться с source-
      с этого как правило начинают день программисты. И мы сразу же создаем новую
      ветку для выполнения второго практического задания.
 
-     ```bash
+     ```txt
      $ cd <itseez-ws-2016-practice>
      $ git checkout master
      $ git pull origin master
@@ -75,11 +75,17 @@ __Цель данной работы__ — познакомиться с source-
      Если сумма примерно равна общему времени работы алгоритма, значит вы
      знаете, где тратит свое время программа.
 
-  1. Далее запускаем демо-приложение с и без опции `--save`. Смотрим, какую
+  1. Далее запускаем демо-приложение с опцией `--save` и без нее. Смотрим, какую
      часть времени приложение тратило на сохранение изображений. Далее всегда
      работаем без опции `--save`, поскольку она сильно замедляет работу
      алгоритма. Это понятно, поскольку в данном случае идет работа с жестким
      диском, и она нас точно не интересует с точки зрения работы алгоритма.
+
+     ```txt
+     $ cd <itseez-ws-2016-practice-build>
+     $ ./bin/skeleton --image ./bin/testdata/sla.png --save
+     $ ./bin/skeleton --image ./bin/testdata/sla.png
+     ```
 
   1. Затем следует проанализировать разброс в замерах времени. Для этого
      запускаем демо-приложение несколько раз и записываем например на листочке
@@ -92,12 +98,51 @@ __Цель данной работы__ — познакомиться с source-
 мы научимся запускать его, сохранять метрики производительности в XML-файл, и
 затем анализировать их при помощи вспомогательных скриптов.
 
+  1. Итак, первым делом стоит запустить сборку с тестами на производительность.
+     Это можно сделать при помощи команды ниже, и вы должны увидеть следующий
+     вывод.
 
-Например так:
+     ```txt
+     $ cd <itseez-ws-2016-practice-build>
+     $ ./bin/perf_skeleton
 
-```bash
-$ ./bin/perf_skeleton --gtest_output=xml:perf_report.xml
-```
+     [==========] Running 3 tests from 1 test case.
+     [----------] Global test environment set-up.
+     [----------] 3 tests from Size_Only_ImageResize
+     [ RUN      ] Size_Only_ImageResize.ImageResize/0
+     [ VALUE    ]  640x480
+     [       OK ] Size_Only_ImageResize.ImageResize/0 (5 ms)
+     [ RUN      ] Size_Only_ImageResize.ImageResize/1
+     [ VALUE    ]  1280x720
+     [       OK ] Size_Only_ImageResize.ImageResize/1 (8 ms)
+     [ RUN      ] Size_Only_ImageResize.ImageResize/2
+     [ VALUE    ]  1920x1080
+     [       OK ] Size_Only_ImageResize.ImageResize/2 (16 ms)
+     [----------] 3 tests from Size_Only_ImageResize (29 ms total)
+
+     [----------] Global test environment tear-down
+     [==========] 3 tests from 1 test case ran. (29 ms total)
+     [  PASSED  ] 3 tests.
+     ```
+
+  1. Однако в случае выше мы не сделали главного — мы не сохранили метрики
+     производительности. Нужно понимать, что те числа, которые вывелись на
+     консоль, не имеют отношения к производительности, поскольку функции
+     выполнялись в цикле `TEST_CYCLE()` по несколько раз. Чтобы сохранить
+     метрики, нужно указать имя XML-файла:
+
+    ```txt
+     $ cd <itseez-ws-2016-practice-build>
+     $ ./bin/perf_skeleton --gtest_output=xml:perf_report.xml
+    ```
+
+  1. Далее стоит проанализировать содержимое собранного отчета. Детальную
+     информацию по метрикам можно получить при помощи скрипта `report.py` из
+     OpenCV:
+
+    ```txt
+     $ ./bin/perf_skeleton --gtest_output=xml:perf_report.xml
+    ```
 
 <!-- LINKS -->
 
