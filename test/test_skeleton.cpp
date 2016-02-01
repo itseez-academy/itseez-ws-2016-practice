@@ -92,3 +92,18 @@ TEST(skeleton, test2_size)
 	EXPECT_EQ(result.rows , bgr.rows);
 	EXPECT_EQ(result.cols , bgr.cols);
 }
+TEST(skeleton, test_resize)
+{
+    // Arrange
+    Mat image(10, 10, CV_8UC1);
+    randu(image, Scalar(0), Scalar(255));
+    Size sz(image.cols / 2, image.rows / 2);
+
+    // Act
+    Mat result;
+    ImageResize(image, result, sz);
+
+    // Assert
+	EXPECT_EQ(sz.height , result.rows);
+	EXPECT_EQ(sz.width , result.cols);
+}
