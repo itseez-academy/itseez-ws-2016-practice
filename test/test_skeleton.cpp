@@ -124,3 +124,18 @@ TEST(skeleton, ImageResize_result_have_the_same_colors)
 
 	EXPECT_EQ(0, numberOfDifferentPixels(expect, result));
 }
+
+TEST(skeleton, ConverColor_result_is_still_monochrome)
+{
+	// Arrange
+	Mat bgr(100, 100, CV_8UC3, Scalar::all(123));
+
+	// Act
+	Mat result;
+	ConvertColor_BGR2GRAY_BT709(bgr, result);
+
+	uchar color = result.at<uchar>(0,0);
+	Mat expect(100, 100, CV_8UC1, Scalar(color));
+	
+	EXPECT_EQ(0, numberOfDifferentPixels(expect, result));
+}
