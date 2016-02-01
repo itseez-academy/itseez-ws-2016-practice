@@ -61,7 +61,7 @@ TEST(skeleton, resize_matches_opencv)
     EXPECT_LT(maxDifference(reference, result), 2);
 }
 
-TEST(skeleton, 2_plus_2_nequals_4)
+TEST(skeleton, 2_plus_2_equals_4)
 {
-    EXPECT_NE(2 + 2, 4);
+    EXPECT_EQ(2 + 2, 4);
 }
