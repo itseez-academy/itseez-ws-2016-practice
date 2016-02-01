@@ -108,3 +108,15 @@ TEST(skeleton, resize_colour_matches)
 	
 	EXPECT_EQ(0, countNonZero(subtr));
 }
+TEST(skeleton, convert_trichannel_colour_matches)
+{
+	Mat image(10, 10, CV_8UC3, Scalar::all(42));
+	Mat result;
+	ConvertColor_BGR2GRAY_BT709(image, result);
+
+	uchar colour = result.at<uchar>(0, 0);
+	Mat templ(10, 10, CV_8UC1, Scalar(colour));
+	Mat diff = abs(result - templ);
+
+	EXPECT_EQ(0, countNonZero(diff));
+}
