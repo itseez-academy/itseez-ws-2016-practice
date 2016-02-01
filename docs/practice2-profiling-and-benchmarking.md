@@ -50,21 +50,21 @@ __Цель данной работы__ — познакомиться с source-
 
 ## Детальная инструкция по выполнению работы
 
+Прежде чем приступить к выполнению практической работы, рекомендуется получить
+свежие версии файлов из центрального репозитория. Это обычный шаг, с этого как
+правило начинают день программисты. И мы сразу же создаем новую ветку для
+выполнения второго практического задания.
+
+  ```txt
+  $ cd <itseez-ws-2016-practice>
+  $ git checkout master
+  $ git pull origin master
+  $ git checkout -b profiling-and-benchmarking
+  ```
+
 ### Профилирование
 
-  1. Прежде чем приступить к выполнению практической работы, рекомендуется
-     получить свежие версии файлов из центрального репозитория. Это обычный шаг,
-     с этого как правило начинают день программисты. И мы сразу же создаем новую
-     ветку для выполнения второго практического задания.
-
-     ```txt
-     $ cd <itseez-ws-2016-practice>
-     $ git checkout master
-     $ git pull origin master
-     $ git checkout -b profiling-and-benchmarking
-     ```
-
-  1. Далее нужно выполнить инструментировать функцию `skeletonize` замерами
+  1. Далее нужно выполнить инструментацию функции `skeletonize` замерами
      времени, чтобы понять, на что тратится время внутри нее. Для этого
      открываем ее код и обрамляем основные функции макросами `TS` и `TE`, как
      это сделано для функции `imwrite`.
@@ -140,9 +140,37 @@ __Цель данной работы__ — познакомиться с source-
      информацию по метрикам можно получить при помощи скрипта `report.py` из
      OpenCV:
 
-    ```txt
-     $ ./bin/perf_skeleton --gtest_output=xml:perf_report.xml
-    ```
+     ```txt
+      $ ../itseez-ws-2016-practice/3rdparty/opencv_ptest/misc/report.py ./perf_report.xml
+     ```
+
+     На консоль выведется полная статистика по метрикам:
+
+     ```txt
+               Name of Test                Number of     Number of   Min     Median  Geometric mean   Mean   Standard deviation
+                                       collected samples outliers
+     ImageResize::Size_Only::1280x720         100            2     5.40 ms  5.44 ms     5.66 ms     5.69 ms       0.59 ms
+     ImageResize::Size_Only::1920x1080        100            0     12.21 ms 12.39 ms    12.95 ms    12.99 ms      1.04 ms
+     ImageResize::Size_Only::640x480          100            4     1.80 ms  1.81 ms     1.91 ms     1.92 ms       0.25 ms
+     ```
+
+  1. Следующий скрипт позволяет сравнивать между собой несколько отчетов,
+     например за разные дни или на разных этапах оптимизации. Мы для простоты
+     просто запустим сборку с тестами по производительности несколько раз, и
+     сравним отчеты между собой.
+
+     ```txt
+     $ ./bin/perf_skeleton --gtest_output=xml:perf_report_1.xml
+     $ ./bin/perf_skeleton --gtest_output=xml:perf_report_2.xml
+     $ ./bin/perf_skeleton --gtest_output=xml:perf_report_3.xml
+     $ ../itseez-ws-2016-practice/3rdparty/opencv_ptest/misc/summary.py ./perf_report*
+     ```
+
+  1. Сравните колебания усредненных метрик с теми, что мы наблюдали при запуске
+     демо-приложения.
+
+### Реализация тестов производительности
+
 
 <!-- LINKS -->
 
