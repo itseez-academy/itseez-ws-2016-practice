@@ -68,11 +68,22 @@ TEST(skeleton, 2_plus_2_equals_4)
 
 TEST(skeleton, cvt_color_match_size)
 {
-    Mat bgr(5, 5, CV_8UC3);
-    randu(bgr, Scalar::all(0), Scalar::all(255));
+    Mat src(5, 5, CV_8UC3);
+    randu(src, Scalar::all(0), Scalar::all(255));
 
-    Mat result;
-    ConvertColor_BGR2GRAY_BT709(bgr, result);
+    Mat dst;
+    ConvertColor_BGR2GRAY_BT709(src, dst);
 
-    EXPECT_EQ(bgr.size(), result.size());
+    EXPECT_EQ(src.size(), dst.size());
+}
+
+TEST(skeleton, thinning_match_size)
+{
+    Mat src(5, 5, CV_8UC1);
+    randu(src, 0, 255);
+
+    Mat dst;
+    GuoHallThinning(src, dst);
+
+    EXPECT_EQ(src.size(), dst.size());
 }
