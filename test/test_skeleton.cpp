@@ -93,3 +93,18 @@ TEST(skeleton, GuoHallThinning_received_size_is_equal_to_sourse_one)
 	EXPECT_EQ(bgr.cols, result.cols);
 	EXPECT_EQ(bgr.rows, result.rows);
 }
+
+TEST(skeleton, ImageResize_result_is_determined_sizes)
+{
+	// Arrange
+    Mat bgr(100, 100, CV_8UC1);
+    randu(bgr, Scalar::all(0), Scalar::all(255));
+
+    // Act
+    Mat result;
+	Size size(50, 50);
+    ImageResize(bgr, result, size);
+
+	EXPECT_EQ(50, result.rows);
+	EXPECT_EQ(50, result.cols);
+}
