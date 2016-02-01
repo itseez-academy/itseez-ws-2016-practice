@@ -74,7 +74,7 @@ TEST(skeleton, check_size_ConvertColor_BGR2GRAY_BT709)
     Mat result;
     ConvertColor_BGR2GRAY_BT709(source, result);
 
-	EXPECT_EQ(result.size, source.size);
+	EXPECT_EQ(source.size, result.size);
 }
 
 TEST(skeleton, check_size_GuoHallThinning)
@@ -111,7 +111,7 @@ TEST(skeleton, check_size_after_ImageResize)
 
 TEST(skeleton, check_color_after_ImageResize)
 {
-	const uchar color = 111;
+	uchar color = 111;
     Mat source(9, 9, CV_8UC1, color);
 
 	Mat result;
@@ -119,20 +119,56 @@ TEST(skeleton, check_color_after_ImageResize)
 	ImageResize(source, result, newSize);
 
 	bool success = true;
-	for(int i = 0; i < newSize.width; ++i) {
-		for(int j = 0; j < newSize.height; ++j) {
-			if(source.at<uchar>(i, j) != color) {
+	for(int i = 0; i < newSize.width; ++i) 
+	{
+		for(int j = 0; j < newSize.height; ++j) 
+		{
+			if(source.at<uchar>(i, j) != color) 
+			{
+				success = false;
+				break;
+			}
+		}
+	}
+
+	EXPECT_EQ(true, success);
+}
+
+TEST(skeleton, test_ConvertColor_BGR2GRAY_BT709_8UC3_plain)
+{
+	uchar color = 111;
+	Mat source(9, 9, CV_8UC3, color);
+    randu(source, Scalar::all(0), Scalar::all(255));
+
+    Mat result;
+    ConvertColor_BGR2GRAY_BT709(source, result);
+	uchar resultColor = result.at<uchar>(0, 0);
+	
+	bool success = true;
+	cv::Size resultSize = result.size;
+	for(int i = 0; i < resultSize.width; ++i) 
+	{
+		for(int j = 0; j < resultSize.height; ++j) 
+		{
+			if(source.at<uchar>(i, j) != color) 
+			{
 				success = false;
 				break;
 			}
 		}
 	}
 	
-	/*if(result.size[0] == newSize.width && result.size[1] == newSize.height)
-	{
-		success = true;
-	}*/
-
 	EXPECT_EQ(true, success);
 }
+
+ TEST(skeleton, test_GuoHallThinning_number_of_black_pixels_not_less_source)
+{
+	Mat src(9, 9, CV_8UC1);
+	randu(source, Scalar::all(0), Scalar::all(2));
+	
+	Mat result;
+	GuoHallThinning(source, result);
+	
+	EXPECT_EQ(true, (countNonZero(result) < countNonZero(source)));
++}
 
