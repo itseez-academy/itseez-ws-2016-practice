@@ -83,3 +83,14 @@ TEST(skeleton, GuoHallThinning_fixed_size)
 	GuoHallThinning(src, dst);
 	EXPECT_EQ(src.size(), dst.size());
 }
+
+TEST(skeleton, ImageResize_correct)
+{
+	Mat src(5, 5, CV_8UC1);
+	randu(src, Scalar::all(0), Scalar::all(255));
+	Mat dst;
+	Size S(20, 25);
+	ImageResize(src, dst, S);
+	EXPECT_EQ(dst.size().height, S.height);
+	EXPECT_EQ(dst.size().width, S.width);
+}
