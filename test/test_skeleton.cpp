@@ -65,3 +65,27 @@ TEST(skeleton, 2_plus_2_equals_4)
 {
 	EXPECT_EQ(4, 2 + 2);
 }
+
+TEST(skeleton, 2GRAY_size_check)
+{
+	cv::Mat original(10, 10, CV_8UC3);
+	cv::Mat gray_image;
+	randu(original, Scalar::all(0), Scalar::all(255));
+	ConvertColor_BGR2GRAY_BT709(original, gray_image);
+	Size size_gray = gray_image.size();
+	Size size_original = original.size();
+	EXPECT_EQ(size_gray.height, size_original.height);
+	EXPECT_EQ(size_gray.width, size_original.width);
+}
+
+TEST(skeleton, GuoHall_size_check)
+{
+	cv::Mat original(10, 10, CV_8UC3);
+	cv::Mat guo_image;
+	randu(original, Scalar::all(0), Scalar::all(255));
+	ConvertColor_BGR2GRAY_BT709(original, guo_image);
+	Size size_guo = guo_image.size();
+	Size size_original = original.size();
+	EXPECT_EQ(size_guo.height, size_original.height);
+	EXPECT_EQ(size_guo.width, size_original.width);
+}
