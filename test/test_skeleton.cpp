@@ -64,3 +64,12 @@ TEST(skeleton, 2_plus_2_equals_4)
 {
 	EXPECT_EQ(4, 2 + 2);
 }
+TEST(skeleton, convert_colour_size_matches)
+{
+	Mat image(10, 10, CV_8UC3);
+	randu(image, Scalar::all(0), Scalar::all(255));
+	Mat result;
+	ConvertColor_BGR2GRAY_BT709(image, result);
+	EXPECT_EQ(image.rows, result.rows);
+	EXPECT_EQ(image.cols, result.cols);
+}
