@@ -1,4 +1,4 @@
-# Практика 1. Инструменты разработки ПО
+﻿# Практика 1. Инструменты разработки ПО
 
 ## Цели
 
@@ -108,8 +108,8 @@ __Дополнительные задачи__
      с репозиторием Git:
 
   ```bash
-  $ git config --global user.name "Your Name"
-  $ git config --global user.email "your.email@somewhere.com"
+  $ git config --local user.name "Your Name"
+  $ git config --local user.email "your.email@somewhere.com"
   ```
 
   Примечание: если не выполнить указанную операцию, то при попытке размещения
