@@ -4,6 +4,7 @@
 #include "opencv2/imgproc/imgproc.hpp"
 
 #include <iostream>
+#include <iterator>
 
 using namespace cv;
 
@@ -140,7 +141,7 @@ TEST(skeleton, test_cvtcolor_dont_change_onecolored_image)
 {
     // Arrange
     Mat bgr(5, 5, CV_8UC3, CV_RGB(120, 142, 111)); // R G B
-    
+
     // Act
     Mat result;
     ConvertColor_BGR2GRAY_BT709(bgr, result);
@@ -157,4 +158,35 @@ TEST(skeleton, test_cvtcolor_dont_change_onecolored_image)
     // Assert
     EXPECT_EQ(newColor, result.at<uchar>(minLoc.x, minLoc.y));
     EXPECT_EQ(newColor, result.at<uchar>(maxLoc.x, minLoc.y));
+}
+
+// Task 5
+TEST(skeleton, test_guo_hall_black_pixel_count)
+{
+    // Arrange
+    Mat bgr(5, 5, CV_8UC1); // One color type
+    randu(bgr, Scalar::all(0), Scalar::all(200));
+
+    // Act
+    Mat result;
+    GuoHallThinning(bgr, result);
+
+    // Assert
+    /*
+    std::cout << "********* Source **********" << std::endl;
+    std::copy(bgr.begin<uchar>(), bgr.end<uchar>(), std::ostream_iterator<uchar>(std::cout, " "));
+    std::cout << std::endl;
+    std::cout << "Black size: " << std::count(bgr.begin<uchar>(), bgr.end<uchar>(), 0) << std::endl;
+    std::cout << "White size: " << std::count(bgr.begin<uchar>(), bgr.end<uchar>(), 255) << std::endl;
+
+    std::cout << "********* Result **********" << std::endl;
+    std::copy(result.begin<uchar>(), result.end<uchar>(), std::ostream_iterator<uchar>(std::cout, " "));
+    std::cout << std::endl;
+    std::cout << "Black size: " << std::count(result.begin<uchar>(), result.end<uchar>(), 0) << std::endl;
+    std::cout << "White size: " << std::count(result.begin<uchar>(), result.end<uchar>(), 255) << std::endl;
+     */
+
+    ASSERT_LE(std::count(bgr.begin<uchar>(), bgr.end<uchar>(), 0),
+              std::count(result.begin<uchar>(), result.end<uchar>(), 0));
+
 }
