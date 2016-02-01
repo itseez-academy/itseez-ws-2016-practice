@@ -138,27 +138,13 @@ TEST(skeleton, test_ConvertColor_BGR2GRAY_BT709_8UC3_plain)
 {
 	uchar color = 111;
 	Mat source(9, 9, CV_8UC3, color);
-    randu(source, Scalar::all(0), Scalar::all(255));
 
     Mat result;
     ConvertColor_BGR2GRAY_BT709(source, result);
-	uchar resultColor = result.at<uchar>(0, 0);
 	
-	bool success = true;
-	cv::Size resultSize = result.size;
-	for(int i = 0; i < resultSize.width; ++i) 
-	{
-		for(int j = 0; j < resultSize.height; ++j) 
-		{
-			if(source.at<uchar>(i, j) != color) 
-			{
-				success = false;
-				break;
-			}
-		}
-	}
-	
-	EXPECT_EQ(true, success);
+	double minColor, maxColor;
+	minMaxLoc(result, &minColor, &maxColor);
+	EXPECT_EQ(static_cast<uchar>(minColor), static_cast<uchar>(maxColor));
 }
 
  TEST(skeleton, test_GuoHallThinning_number_of_black_pixels_not_less_source)
