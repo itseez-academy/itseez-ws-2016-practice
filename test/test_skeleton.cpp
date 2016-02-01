@@ -98,14 +98,17 @@ TEST(skeleton, color_matches_ImageResizing)
 }
 
 
-//TEST(skeleton, similar_colors_ConvertColor)
-//{
-//    Mat source(10, 10, CV_8UC3, Scalar(56, 86, 230));
-//    Mat result;
-//    ConvertColor_BGR2GRAY_BT709(source, result);
-//    Scalar expected_color(result<uchar>.at(0, 0));
-//    EXPECT_EQ();
-//}
+TEST(skeleton, similar_colors_ConvertColor)
+{
+   Mat source(10, 10, CV_8UC3, Scalar(56, 86, 230));
+   Mat result;
+   ConvertColor_BGR2GRAY_BT709(source, result);
+   Scalar expected_color(result.at<uchar>(0, 0));
+   Mat expected_color_mat(10, 10, CV_8UC1, expected_color);
+   Mat difference_mat = abs(expected_color_mat - result);
+   int difference_sum = countNonZero(difference_mat);
+   EXPECT_EQ(0, difference_sum);
+}
 
 TEST(skeleton, black_count_GuoHallThinning)
 {
