@@ -95,3 +95,16 @@ TEST(skeleton, img_resize_argument_matches_size)
 	EXPECT_EQ(result.rows, sz.height);
 	EXPECT_EQ(result.cols, sz.width);
 }
+TEST(skeleton, resize_colour_matches)
+{
+	int n = 10, m = 10, val = 42;
+	Mat image(n, m, CV_8UC1, Scalar(val));
+	Mat cmp(n / 2, m / 2, CV_8UC1, Scalar(val));
+	Size sz(n / 2, m / 2);
+
+	Mat result;
+	ImageResize(image, result, sz);
+	Mat subtr = abs(cmp - result);
+	
+	EXPECT_EQ(0, countNonZero(subtr));
+}
