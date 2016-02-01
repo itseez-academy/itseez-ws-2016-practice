@@ -66,3 +66,46 @@ TEST(skeleton, 2_plus_2_equals_4)
    EXPECT_EQ(4, 2 + 2);
 }
 
+TEST(skeleton, ConvertColorDoesNotChangeSize)
+{
+	Mat src(10, 20, CV_8UC3);
+	randu(src, Scalar::all(0), Scalar::all(255));
+	Mat dst;
+	ConvertColor_BGR2GRAY_BT709(src, dst);
+
+	EXPECT_EQ(src.size, dst.size);
+}
+
+TEST(skeleton, GuoHallThinningDoesNotChangeSize)
+{
+	Mat src(10, 20, CV_8UC1);
+	randu(src, Scalar(0), Scalar(255));
+	Mat dst;
+	GuoHallThinning(src, dst);
+
+	EXPECT_EQ(src.size, dst.size);
+}
+
+TEST(skeleton, ImageResizeSetsCorrectSize)
+{
+	Mat src(10, 20, CV_8UC1);
+	randu(src, Scalar(0), Scalar(255));
+	Mat dst;
+	int firstSize = 4;
+	int secondSize = 5;
+	Size sz(firstSize, secondSize);
+	ImageResize(src, dst, sz);
+
+	EXPECT_EQ(true, ((dst.cols == firstSize) && (dst.rows == secondSize)));
+}
+
+TEST(skeleton, ImageResizeSavesColor)
+{
+	Mat src(20, 16, CV_8UC1, Scalar(0));
+	//randu(src, Scalar(0), Scalar(255));
+	Mat dst;
+	Size sz(4, 5);
+	ImageResize(src, dst, sz);
+
+	//EXPECT_EQ(true, compare();
+}
