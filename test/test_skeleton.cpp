@@ -91,3 +91,20 @@ TEST(skeleton, resizefunc_size_test)
 	EXPECT_EQ(input.cols / 2,final.cols);
 	EXPECT_EQ(input.rows / 2,final.rows);
 }
+
+TEST(skeleton,resizefunc_color_test)
+{
+	cv::Mat input(100, 100, CV_8UC1);
+	input.setTo(Scalar(5));
+	cv::Mat final(input.cols/2,input.rows/2,CV_8UC1);
+	cv::Size finalsize(input.cols/2,input.rows/2);
+	ImageResize(input,final,finalsize);
+	bool flag = true;
+	for(int i = 0; i < final.rows; i++)
+		for(int j = 0; j < final.cols; j++)
+		{
+			if (final.at<uchar>(i,j) != 5)
+				flag = false;
+		}
+	EXPECT_EQ(true,flag);
+}
