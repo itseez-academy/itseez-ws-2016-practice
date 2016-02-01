@@ -65,3 +65,30 @@ TEST(skeleton, 2_plus_2_equals_4)
 {
    EXPECT_EQ(4, 2 + 2);
 }
+
+TEST(skeleton, isImageHaveSameSizeAfterConvertFromBGRToGray)
+{
+    Mat bgr(5, 5, CV_8UC3);
+    randu(bgr, Scalar::all(0), Scalar::all(255));
+
+    Mat result;
+    ConvertColor_BGR2GRAY_BT709(bgr, result);
+ 
+	cv::Mat::MSize expectedSize(bgr.size);
+	EXPECT_EQ(expectedSize, result.size);
+}
+
+TEST(skeleton, isImageHaveSameSizeAfterGuoHallThinning)
+{
+    Mat bgr(5, 5, CV_8UC3);
+    randu(bgr, Scalar::all(0), Scalar::all(255));
+
+    Mat grayImage;
+	ConvertColor_BGR2GRAY_BT709(bgr, grayImage);
+	Mat result;
+    GuoHallThinning(grayImage, result);
+ 
+	cv::Mat::MSize expectedSize(bgr.size);
+	EXPECT_EQ(expectedSize, result.size);
+	//EXPECT_EQ(5, result.size[1]);
+}
