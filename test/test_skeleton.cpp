@@ -80,10 +80,11 @@ TEST(skeleton, 2GRAY_size_check)
 
 TEST(skeleton, GuoHall_size_check)
 {
-	cv::Mat original(10, 10, CV_8UC3);
+	cv::Mat original(10, 10, CV_8UC1);
 	cv::Mat guo_image;
-	randu(original, Scalar::all(0), Scalar::all(255));
-	ConvertColor_BGR2GRAY_BT709(original, guo_image);
+	randu(original, Scalar(0), Scalar(255));
+	cv::threshold(original, original, 128, 255, cv::THRESH_BINARY_INV);
+	GuoHallThinning(original, guo_image);
 	Size size_guo = guo_image.size();
 	Size size_original = original.size();
 	EXPECT_EQ(size_guo.height, size_original.height);
@@ -130,3 +131,18 @@ TEST(skeleton, 2GRAY_same_color_check)
 	int ba = countNonZero(subtr);
 	EXPECT_EQ(ba, 0);
 }	
+
+TEST(skeleton, GuoHall_black_check)
+{
+	cv::Mat original(10, 10, CV_8UC1);
+	cv::Mat guo_image;
+	randu(original, Scalar(0), Scalar(255));
+	cv::threshold(original, original, 128, 255, cv::THRESH_BINARY_INV);
+	GuoHallThinning(original, guo_image);
+	
+	int nz1 = countNonZero(original);
+	int nz2 = countNonZero(guo_image);
+	EXPECT_LT(nz2, nz1);
+}
+
+
