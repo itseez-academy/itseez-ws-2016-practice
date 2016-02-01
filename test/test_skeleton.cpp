@@ -123,3 +123,30 @@ TEST(skeleton, bgr2grayfunc_color_test)
 				flag = false;
 	EXPECT_EQ(true,flag);
 }
+
+TEST(skeleton, guahall_correct_work_test)
+{
+	cv::Mat input(100,100,CV_8UC1);
+	randu(input, Scalar::all(0), Scalar::all(255));
+
+	cv::Mat inv(input.rows, input.cols,CV_8UC1);
+	cv::threshold(input, inv, 128, 255, cv::THRESH_BINARY_INV);
+
+	cv::Mat gh(input.rows, input.cols,CV_8UC1);
+	GuoHallThinning(inv, gh);
+
+	int blackpixelsinv = 0;
+	int blackpixelsgh= 0;
+
+	for(int i = 0; i < inv.rows; i++)
+		for(int j = 0; j < inv.cols; j++)
+			if (inv.at<uchar>(i,j) == 0)
+				blackpixelsinv++;
+	for(int i = 0; i < gh.rows; i++)
+		for(int j = 0; j < gh.cols; j++)
+			if (gh.at<uchar>(i,j) == 0)
+				blackpixelsgh++;
+
+	EXPECT_EQ(true, blackpixelsgh >= blackpixelsinv);
+
+}
