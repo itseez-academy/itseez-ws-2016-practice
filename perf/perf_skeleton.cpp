@@ -11,18 +11,18 @@ using std::tr1::make_tuple;
 using std::tr1::get;
 
 //
-// Test for the ConvertColor_BGR2GRAY_BT709 function
+// Test(s) for the ConvertColor_BGR2GRAY_BT709 function
 //
 
 // PERF_TEST(skeleton, ConvertColor_BGR2GRAY_BT709)
 // {
 //     Mat input = cv::imread("./bin/testdata/sla.png");
-
+//
 //     // Add code here
 // }
 
 //
-// Test for the ImageResize function
+// Test(s) for the ImageResize function
 //
 
 #define MAT_SIZES  ::perf::szVGA, ::perf::sz720p, ::perf::sz1080p
@@ -46,18 +46,18 @@ PERF_TEST_P(Size_Only, ImageResize, testing::Values(MAT_SIZES))
 }
 
 //
-// Test for the skeletonize function
+// Test(s) for the skeletonize function
 //
 
 // #define IMAGES testing::Values( std::string("./bin/testdata/sla.png"),\
 //                                 std::string("./bin/testdata/page.png"),\
 //                                 std::string("./bin/testdata/schedule.png") )
-
+//
 // typedef perf::TestBaseWithParam<std::string> ImageName;
-
+//
 // PERF_TEST_P(ImageName, skeletonize, IMAGES)
 // {
 //     Mat input = cv::imread(GetParam());
-
+//
 //     // Add code here
 // }
