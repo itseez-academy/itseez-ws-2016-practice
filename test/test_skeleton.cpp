@@ -90,6 +90,27 @@ TEST(skeleton, resize_matches_opencv)
     EXPECT_LT(maxDifference(reference, result), 2);
 }
 
+TEST(skeleton, imgresize_does_not_change_color)
+{
+    // Arrange
+	srand(0);
+	uchar color;
+	Mat image(5, 5, CV_8UC1, (color = rand() % 255));
+    Size sz(image.cols / 2, image.rows / 2);
+
+    // Act
+    Mat result;
+    ImageResize(image, result, sz);
+
+    // Assert
+	bool condition = true;
+
+	for (int i = 0; i < result.rows; i++)
+		for (int j = 0; j < result.cols; j++)
+			condition = condition && result.ptr(i, j)[0] == color;
+    EXPECT_EQ(condition, true);
+}
+
 TEST(skeleton, thinning_does_not_change_size)
 {
 	//Arrange
