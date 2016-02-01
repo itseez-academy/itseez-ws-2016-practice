@@ -120,3 +120,17 @@ TEST(skeleton, convert_trichannel_colour_matches)
 
 	EXPECT_EQ(0, countNonZero(diff));
 }
+TEST(skeleton, guohall_black_pixels)
+{
+	Mat black(10, 10, CV_8UC1, Scalar(0));
+	Mat grey(10, 10, CV_8UC1);
+	randu(grey, Scalar(0), Scalar(255));
+	threshold(grey, grey, 127, 255, cv::THRESH_BINARY_INV);
+
+	int total = 100;
+	int origBlacked = total - countNonZero(grey);
+	Mat res;
+	GuoHallThinning(grey, res);
+	int resBlacked = total - countNonZero(res);
+	EXPECT_LE(origBlacked, resBlacked);
+}
