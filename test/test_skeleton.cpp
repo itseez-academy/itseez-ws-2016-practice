@@ -60,3 +60,23 @@ TEST(skeleton, resize_matches_opencv)
     // std::cout << "Difference:\n" << reference - result << std::endl;
     EXPECT_LT(maxDifference(reference, result), 2);
 }
+
+TEST(skeleton, size_matches_ConvertColor)
+{
+	Mat source(10, 10, CV_8UC3);
+	Mat result;
+	ConvertColor_BGR2GRAY_BT709(source, result);
+	Size size_of_source(source.cols, source.rows);
+	Size size_of_result(result.cols, result.rows);
+	EXPECT_EQ(size_of_source, size_of_result);
+}
+
+TEST(skeleton, size_matches_GuoHallThinning)
+{
+	Mat source(10, 10, CV_8UC1);
+	Mat result;
+	GuoHallThinning(source, result);
+	Size size_of_source(source.cols, source.rows);
+	Size size_of_result(result.cols, result.rows);
+	EXPECT_EQ(size_of_source, size_of_result);
+}
