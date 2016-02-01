@@ -37,6 +37,20 @@ TEST(skeleton, cvtcolor_does_not_change_size)
 	EXPECT_EQ(bgr.size, xyz.size);
 }
 
+TEST(skeleton, thinning_does_not_change_size)
+{
+	//Arrange
+	Mat bgr(5, 5, CV_8UC1);
+	randu(bgr, Scalar::all(0), Scalar::all(255));
+	
+	//Act
+	Mat xyz;
+	GuoHallThinning(bgr, xyz);
+		
+	//Assert
+	EXPECT_EQ(bgr.size, xyz.size);
+}
+
 TEST(skeleton, cvtcolor_matches_opencv)
 {
     // Arrange
