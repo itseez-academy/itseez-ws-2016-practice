@@ -12,7 +12,10 @@ if(MSVC)
 endif()
 
 add_executable(${target} ${srcs} ${hdrs})
-target_link_libraries(${target} gtest ${LIBRARY} ${CMAKE_THREAD_LIBS_INIT} pthread)
+if (UNIX)
+  target_link_libraries(${target} gtest ${CMAKE_THREAD_LIBS_INIT}  pthread)
+endif (UNIX)
+target_link_libraries(${target} gtest ${LIBRARY})
 
 add_custom_command(
     TARGET ${target}
