@@ -108,3 +108,18 @@ TEST(skeleton,resizefunc_color_test)
 		}
 	EXPECT_EQ(true,flag);
 }
+
+TEST(skeleton, bgr2grayfunc_color_test)
+{
+	cv::Scalar col(100,150,200);
+	cv::Mat input(100,100,CV_8UC3,col);
+	cv::Mat final(100,100,CV_8UC1);
+	ConvertColor_BGR2GRAY_BT709(input, final);
+	bool flag = true;
+	int val = final.at<uchar>(0,0);
+	for(int i = 0; i < final.rows; i++)
+		for(int j = 0; j < final.cols; j++)
+			if (final.at<uchar>(i,j) != val)
+				flag = false;
+	EXPECT_EQ(true,flag);
+}
