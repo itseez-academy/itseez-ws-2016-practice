@@ -1,5 +1,5 @@
 #include "opencv_ptest/include/opencv2/ts/ts.hpp"
-#include <opencv\highgui.h>
+#include "opencv2/highgui/highgui.hpp"
 #include <iostream>
 
 #include "skeleton_filter.hpp"
@@ -56,16 +56,16 @@ PERF_TEST_P(Size_Only, ImageResize, testing::Values(MAT_SIZES))
 // Test(s) for the skeletonize function
 //
 /*
-#define IMAGES testing::Values( std::string("testdata/sla.png"),\
-                                std::string("testdata/page.png"),\
-                                std::string("testdata/schedule.png") )
+#define IMAGES testing::Values( std::string("testdata\\sla.png"),\
+                                std::string("testdata\\page.png"),\
+                                std::string("testdata\\schedule.png") )
 
 typedef perf::TestBaseWithParam<std::string> ImageName;
 
 PERF_TEST_P(ImageName, skeletonize, IMAGES)
 {
     Mat input = cv::imread(GetParam());
-	Mat output;
+	Mat output = input.clone();
 
     declare.in(input, WARMUP_RNG).out(output);
 
@@ -75,4 +75,5 @@ PERF_TEST_P(ImageName, skeletonize, IMAGES)
     }
 
     SANITY_CHECK(output, 1 + 1e-6);
-}*/
+}
+*/
