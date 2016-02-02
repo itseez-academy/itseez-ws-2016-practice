@@ -82,3 +82,17 @@ PERF_TEST_P(ImageName, skeletonize_without_saving, IMAGES)
     SANITY_CHECK(result, 1 + 1e-6);
 }
 
+PERF_TEST_P(ImageName, skeletonize_with_saving, IMAGES)
+{
+	Mat input = cv::imread(GetParam());
+	Mat result(input.size(), CV_8UC1);
+	declare.in(input, WARMUP_RNG).out(result).time(200).iterations(100);
+
+	TEST_CYCLE()
+    {
+        skeletonize(input, result, true);
+    }
+
+    SANITY_CHECK(result, 1 + 1e-6);
+}
+
