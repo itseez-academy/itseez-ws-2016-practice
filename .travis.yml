@@ -25,7 +25,6 @@ script:
   # Run regression tests
   - ./bin/test_skeleton
   # Run performance tests
-  - ./bin/perf_skeleton --help
   - ./bin/perf_skeleton --gtest_output=xml:perf_report.xml
   # Print performance metrics
   - ../itseez-ws-2016-practice/3rdparty/opencv_ptest/misc/summary.py ./perf_report.xml

@@ -678,6 +678,7 @@ void TestBase::Init(const std::vector<std::string> & availableImpls,
     ::testing::AddGlobalTestEnvironment(new PerfEnvironment);
 
     param_impl          = args.get<bool>("perf_run_cpu") ? "plain" : args.get<std::string>("perf_impl");
+    //TODO(Kornyakov): for some reason default parameter doesn't match on Travis
     std::string perf_strategy = "default"; //args.get<std::string>("perf_strategy");
     if (perf_strategy == "default")
     {
