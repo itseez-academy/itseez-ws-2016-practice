@@ -74,24 +74,24 @@ PERF_TEST_P(Size_Only, Thinning, testing::Values(MAT_SIZES))
 {
     Size sz = GetParam();
 
-    cv::Mat dst(sz, CV_8UC1);
-    declare.in(dst, WARMUP_RNG).out(dst);
+    cv::Mat image(sz, CV_8UC1);
+    declare.in(image, WARMUP_RNG).out(image);
     declare.time(40);
 
     cv::RNG rng(234231412);
-    rng.fill(dst, CV_8UC1, 0, 255);
-    cv::threshold(dst, dst, 240, 255, cv::THRESH_BINARY_INV);
+    rng.fill(image, CV_8UC1, 0, 255);
+    cv::threshold(image, image, 240, 255, cv::THRESH_BINARY_INV);
 
-    cv::Mat gold; GuoHallThinning(dst, gold);
+    cv::Mat gold; GuoHallThinning(image, gold);
 
     cv::Mat thinned_image;
     TEST_CYCLE()
     {
-        GuoHallThinning_optimized(dst, thinned_image);
+        GuoHallThinning_optimized(image, thinned_image);
     }
 
     cv::Mat diff; cv::absdiff(thinned_image, gold, diff);
     ASSERT_EQ(0, cv::countNonZero(diff));
 
-    SANITY_CHECK(dst);
+    SANITY_CHECK(image);
 }
