@@ -96,3 +96,19 @@ PERF_TEST_P(ImageName, skeletonize_with_saving, IMAGES)
     SANITY_CHECK(result, 1 + 1e-6);
 }
 
+PERF_TEST_P(Size_Only, GuoHallThinning, testing::Values(MAT_SIZES))
+{
+    Size sz_input = GetParam();
+
+    Mat input(sz_input, CV_8UC1);
+	randu(input, Scalar(0), Scalar(255));
+	Mat result(input.size(), CV_8UC1);
+	declare.in(input, WARMUP_RNG).out(result).iterations(100).time(200);
+
+    TEST_CYCLE()
+    {
+        GuoHallThinning(input, result);
+    }
+
+    SANITY_CHECK(result, 1 + 1e-6);
+}
