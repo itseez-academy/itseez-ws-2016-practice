@@ -11,8 +11,12 @@ using namespace cv;
 using std::tr1::make_tuple;
 using std::tr1::get;
 
-//#define TESTDATA_PATH "./bin/testdata/"
+//#define RUN_LOCAL
+#ifdef RUN_LOCAL
 #define TESTDATA_PATH "testdata/"
+#else
+#define TESTDATA_PATH "./bin/testdata/"
+#endif
 
 PERF_TEST(skeleton, ConvertColor_BGR2GRAY_BT709)
 {
