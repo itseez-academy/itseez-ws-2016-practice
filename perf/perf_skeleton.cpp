@@ -83,7 +83,6 @@ PERF_TEST_P(ImageName, skeletonize_without_save, IMAGES)
 // Test(s) for the skeletonize function with save
 //
 
-
 PERF_TEST_P(ImageName, skeletonize_with_save, IMAGES)
 {
     Mat input = imread(GetParam());
@@ -93,6 +92,27 @@ PERF_TEST_P(ImageName, skeletonize_with_save, IMAGES)
     TEST_CYCLE()
     {
         skeletonize(input, dst, true);
+    }
+    //Regression check
+    SANITY_CHECK(dst, 1 + 1e-6);
+}
+
+//
+// Test(s) for the GuoHallThinning function with save
+//
+
+PERF_TEST_P(Size_Only, GuoHallThinning, testing::Values(MAT_SIZES))
+{
+    Size in_size = GetParam();
+    Mat input(in_size, CV_8UC1);
+    randu(input, Scalar(0), Scalar(255));
+    threshold(input, input, 128, 255, cv::THRESH_BINARY);
+    Mat dst(input.size(), CV_8UC1);
+    //declaring input, output and how many iterations should we do
+    declare.in(input, WARMUP_RNG).out(dst).iterations(100).time(1000);
+    TEST_CYCLE()
+    {
+       GuoHallThinning(input, dst);
     }
     //Regression check
     SANITY_CHECK(dst, 1 + 1e-6);
