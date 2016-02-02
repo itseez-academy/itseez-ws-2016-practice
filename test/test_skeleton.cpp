@@ -60,3 +60,92 @@ TEST(skeleton, resize_matches_opencv)
     // std::cout << "Difference:\n" << reference - result << std::endl;
     EXPECT_LT(maxDifference(reference, result), 2);
 }
+
+TEST(skeleton, convt_size_test){
+    // Arrange
+    Mat bgr(5, 5, CV_8UC3);
+    randu(bgr, Scalar::all(0), Scalar::all(255));
+
+    // Act
+    Mat result;
+    ConvertColor_BGR2GRAY_BT709(bgr, result);
+
+    // Assert
+    EXPECT_EQ(bgr.size(), result.size());
+}
+
+TEST(skeleton, GHT_size_test){
+    // Arrange
+    Mat src(5, 5, CV_8UC1);
+    randu(src, Scalar::all(0), Scalar::all(255));
+
+    // Act
+    Mat result;
+    GuoHallThinning(src, result);
+
+    // Assert
+    EXPECT_EQ(src.size(), result.size());
+}
+
+TEST(skeleton, imres_size_test){
+    // Arrange
+    Mat src(10, 10, CV_8UC1);
+    randu(src, Scalar::all(0), Scalar::all(255));
+
+    // Act
+    Mat result;
+    Size sz(src.cols/2,src.rows/2);
+    ImageResize(src, result, sz);
+
+    // Assert
+    EXPECT_EQ(sz, result.size());
+}
+TEST(skeleton, imres_color_test){
+    // Arrange
+    Mat src(10, 10, CV_8UC1);
+    randu(src, Scalar::all(0), Scalar::all(255));
+
+    // Act
+    Mat result;
+    Size sz(src.cols / 2, src.rows / 2);
+    ImageResize(src, result, sz);
+
+    // Assert
+    EXPECT_EQ(CV_8UC1, result.type());
+}
+
+TEST(skeleton, convt_pixel_test){
+    // Arrange
+    Mat bgr(10, 10, CV_8UC3);
+    randu(bgr, Scalar::all(0), Scalar::all(255));
+
+    // Act
+    Mat result;
+    ConvertColor_BGR2GRAY_BT709(bgr, result);
+
+    // Assert
+    EXPECT_EQ(bgr.size(), result.size());
+}
+
+TEST(skeleton, GHT_pixel_test){
+    // Arrange
+    Mat src(15, 15, CV_8UC1);
+    randu(src, Scalar::all(0), Scalar::all(255));
+    size_t srccnt = 0;
+    size_t rescnt = 0;
+
+    // Act
+    Mat result;
+    GuoHallThinning(src, result);
+    uchar black = 0;
+
+    // Assert
+    for (size_t i = 0; i < result.cols; i++){
+        for (size_t j = 0; j < result.rows; j++)
+        {
+            if (result.at<uchar>(j, i) == black) rescnt++;
+            if (src.at<uchar>(i, j) == black) srccnt++;
+        }
+    }
+    EXPECT_GE(rescnt, srccnt);
+}
