@@ -13,14 +13,18 @@ void skeletonize(const cv::Mat &input, cv::Mat &output, bool save_images)
 
     // Convert to grayscale
     cv::Mat gray_image;
+	TS(convert_0);
     ConvertColor_BGR2GRAY_BT709(input, gray_image);
     if (save_images) cv::imwrite("1-convertcolor.png", gray_image);
+	TE(convert_0);
 
     // Downscale input image
     cv::Mat small_image;
     cv::Size small_size(input.cols / 1.5, input.rows / 1.5);
+	TS(resize_0);
     ImageResize(gray_image, small_image, small_size);
     if (save_images) cv::imwrite("2-resize.png", small_image);
+	TE(resize_0);
 
     // Binarization and inversion
     cv::threshold(small_image, small_image, 128, 255, cv::THRESH_BINARY_INV);
@@ -28,8 +32,10 @@ void skeletonize(const cv::Mat &input, cv::Mat &output, bool save_images)
 
     // Thinning
     cv::Mat thinned_image;
+	TS(thinning_0);
     GuoHallThinning(small_image, thinned_image);
-    if (save_images) cv::imwrite("4-thinning.png", thinned_image);
+	if (save_images) cv::imwrite("4-thinning.png", thinned_image);
+	TE(thinning_0);
 
     // Back inversion
     output = 255 - thinned_image;
