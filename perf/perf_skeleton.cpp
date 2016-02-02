@@ -45,6 +45,22 @@ PERF_TEST_P(Size_Only, ImageResize, testing::Values(MAT_SIZES))
     SANITY_CHECK(dst, 1 + 1e-6);
 }
 
+PERF_TEST_P(Size_Only, ConvertColor, testing::Values(MAT_SIZES))
+{
+    Size sz = GetParam();
+
+    cv::Mat src(sz, CV_8UC3), dst(Size(sz), CV_8UC1);
+    declare.in(src, WARMUP_RNG).out(dst);
+	declare.time(30);
+
+    TEST_CYCLE()
+    {
+        ConvertColor_BGR2GRAY_BT709(src, dst);
+    }
+
+    SANITY_CHECK(dst, 1 + 1e-6);
+}
+
 //
 // Test(s) for the skeletonize function
 //
