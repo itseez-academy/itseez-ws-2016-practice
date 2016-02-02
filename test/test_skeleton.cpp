@@ -122,3 +122,19 @@ TEST(skeleton, resize_match_color)
         }
     }
 }
+
+TEST(skeleton, cvt_color_match_monochrome)
+{
+    Mat src(5, 5, CV_8UC1);
+    randu(src, Scalar::all(0), Scalar::all(255));
+
+    Mat src_multi_channel;
+    std::vector<Mat> mat_vec(3);
+    mat_vec[0] = mat_vec[1] = mat_vec[2] = src;
+    merge(mat_vec, src_multi_channel);
+
+    Mat dst;
+    ConvertColor_BGR2GRAY_BT709(src_multi_channel, dst);
+
+    EXPECT_EQ(countNonZero(dst != src), 0);
+}
