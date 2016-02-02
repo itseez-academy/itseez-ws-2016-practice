@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include "skeleton_filter.hpp"
+#include <opencv\highgui.h>
 
 using namespace std;
 using namespace perf;
@@ -17,6 +18,7 @@ using std::tr1::get;
 // PERF_TEST(skeleton, ConvertColor_BGR2GRAY_BT709)
 // {
 //     Mat input = cv::imread("./bin/testdata/sla.png");
+	
 //
 //     // Add code here
 // }
@@ -44,6 +46,37 @@ PERF_TEST_P(Size_Only, ImageResize, testing::Values(MAT_SIZES))
 
     SANITY_CHECK(dst, 1 + 1e-6);
 }
+
+PERF_TEST(skeleton, ConvertColor_BGR2GRAY_BT709)
+ {
+	
+	cv::Mat input(640,480, CV_8UC3), dst(640,480, CV_8UC1);
+	declare.in(input, WARMUP_NONE).out(dst);
+	
+    TEST_CYCLE()
+    {
+       ConvertColor_BGR2GRAY_BT709(input, dst);
+    }
+
+    SANITY_CHECK(dst, 1 + 1e-6);
+     // Add code here
+ } 
+
+ /* PERF_TEST_2(ImageName, skeletonize, IMAGES)
+ {
+     Mat input = cv::imread(GetParam());
+	 Mat res;
+	declare.in(src, WARMUP_RNG).out(res);
+
+	TEST_CYCLE()
+    {
+		skeletonize(input,res,0);
+    }
+
+    SANITY_CHECK(res, 1 + 1e-6);
+
+     // Add code here
+ } */
 
 //
 // Test(s) for the skeletonize function
