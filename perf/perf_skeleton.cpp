@@ -11,7 +11,7 @@ using namespace cv;
 using std::tr1::make_tuple;
 using std::tr1::get;
 
-//#define RUN_LOCAL
+#define RUN_LOCAL
 #ifdef RUN_LOCAL
 #define TESTDATA_PATH "testdata/"
 #else
@@ -23,13 +23,13 @@ PERF_TEST(skeleton, ConvertColor_BGR2GRAY_BT709)
     Mat input = cv::imread(TESTDATA_PATH"sla.png");
 
 	cv::Mat src(input), dst(input);
-	declare.in(src, WARMUP_RNG).out(dst);
+	declare.in(src).out(dst);
 	TEST_CYCLE()
 	{
 		ConvertColor_BGR2GRAY_BT709(src, dst);
 	}
 
-	SANITY_CHECK(dst, 1 + 1e-6);
+	SANITY_CHECK_NOTHING();
 }
 
 #define MAT_SIZES  ::perf::szVGA, ::perf::sz720p, ::perf::sz1080p
@@ -52,19 +52,20 @@ PERF_TEST_P(Size_Only, ImageResize, testing::Values(MAT_SIZES))
     SANITY_CHECK(dst, 1 + 1e-6);
 }
 
-//
-// Test(s) for the skeletonize function
-//
+#define IMAGES testing::Values(std::string(TESTDATA_PATH"sla.png"),\
+                               std::string(TESTDATA_PATH"page.png"),\
+                               std::string(TESTDATA_PATH"schedule.png"))
 
-// #define IMAGES testing::Values( std::string("./bin/testdata/sla.png"),\
-//                                 std::string("./bin/testdata/page.png"),\
-//                                 std::string("./bin/testdata/schedule.png") )
-//
-// typedef perf::TestBaseWithParam<std::string> ImageName;
-//
-// PERF_TEST_P(ImageName, skeletonize, IMAGES)
-// {
-//     Mat input = cv::imread(GetParam());
-//
-//     // Add code here
-// }
+typedef perf::TestBaseWithParam<std::string> testParams_t;;
+
+PERF_TEST_P(testParams_t, skeletonize, IMAGES)
+{
+	cv::Mat src = cv::imread(GetParam());
+	cv::Mat dst(src);
+	declare.in(src).out(dst);
+	TEST_CYCLE()
+	{
+		skeletonize(src, dst, false);
+	}
+	SANITY_CHECK_NOTHING();
+}
