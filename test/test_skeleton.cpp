@@ -138,3 +138,14 @@ TEST(skeleton, cvt_color_match_monochrome)
 
     EXPECT_EQ(countNonZero(dst != src), 0);
 }
+
+TEST(skeleton, thinning_blacks_count)
+{
+    Mat src(5, 5, CV_8UC1);
+    randu(src, 0, 255);
+
+    Mat dst;
+    GuoHallThinning(src, dst);
+
+    EXPECT_LT(countNonZero(dst), countNonZero(src));
+}
