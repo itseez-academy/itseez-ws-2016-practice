@@ -58,6 +58,24 @@ PERF_TEST_P(Size_Only, ImageResize, testing::Values(MAT_SIZES))
     SANITY_CHECK(dst, 1 + 1e-6);
 }
 
+PERF_TEST(ImageResizeTest, ImageResize)
+{
+	Mat input = cv::imread("./bin/testdata/sla.png");
+	cv::Mat src(input.size(), CV_8UC1);
+	ConvertColor_BGR2GRAY_BT709(input, src);
+	Size sz_to(src.size().width / 2, src.size().height / 2);
+    cv::Mat dst(Size(sz_to), CV_8UC1);
+    declare.in(src).out(dst);
+	declare.time(30);
+
+    TEST_CYCLE()
+    {
+        ImageResize(src, dst, sz_to);
+    }
+
+    SANITY_CHECK(dst, 1 + 1e-6);
+}
+
 PERF_TEST(GuoHallThinningTest, GuoHallThinning)
 {
 	Mat input = cv::imread("./bin/testdata/sla.png");
