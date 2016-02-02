@@ -112,10 +112,10 @@ TEST(skeleton, check_size_after_ImageResize)
 TEST(skeleton, check_color_after_ImageResize)
 {
 	uchar color = 111;
-    Mat source(9, 9, CV_8UC1, color);
+    Mat source(10, 10, CV_8UC1, color);
 
 	Mat result;
-	cv::Size newSize(10, 10);
+	cv::Size newSize(9, 9);
 	ImageResize(source, result, newSize);
 
 	bool success = true;
