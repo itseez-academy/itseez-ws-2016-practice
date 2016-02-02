@@ -181,7 +181,7 @@ TEST(skeleton, BGR2GRAY_BT709_blPixelsCount){
     cv::compare(whImage,image,mdiff,cv::CMP_NE);
     int nzInput = cv::countNonZero(mdiff);
 
-    mdiff.deallocate();
+//    mdiff.deallocate();
 
     cv::compare(whImage,result,mdiff,cv::CMP_NE);
     int nzResult = cv::countNonZero(mdiff);
