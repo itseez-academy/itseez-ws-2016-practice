@@ -121,3 +121,18 @@ TEST(skeleton, black_count_GuoHallThinning)
     int result_black_count = result.total() - countNonZero(result);
     EXPECT_TRUE(source_black_count <= result_black_count);
 }
+
+TEST(skeleton, correct_resize_ImageResize)
+{
+       // Arrange
+    Mat image(10, 10, CV_8UC1);
+    randu(image, Scalar(0), Scalar(255));
+    Size sz(image.cols, image.rows);
+
+    // Act
+    Mat result;
+    ImageResize(image, result, sz);
+    Mat difference_mat = abs(image - result);
+    int difference_sum = countNonZero(difference_mat);
+    EXPECT_EQ(0, difference_sum) <<image<<std::endl<<result;
+}
