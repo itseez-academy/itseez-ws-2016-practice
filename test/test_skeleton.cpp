@@ -125,7 +125,7 @@ TEST(skeleton, ImageResize_result_have_the_same_colors)
 	EXPECT_EQ(0, numberOfDifferentPixels(expect, result));
 }
 
-TEST(skeleton, ConverColor_result_is_still_monochrome)
+TEST(skeleton, ConverColor_result_is_still_having_single_color)
 {
 	// Arrange
 	Mat bgr(100, 100, CV_8UC3, Scalar::all(123));
@@ -138,4 +138,17 @@ TEST(skeleton, ConverColor_result_is_still_monochrome)
 	Mat expect(100, 100, CV_8UC1, Scalar(color));
 	
 	EXPECT_EQ(0, numberOfDifferentPixels(expect, result));
+}
+
+TEST(skeleton, GuoHallThinning_number_of_black_pix_is_not_reduced)
+{
+	// Arrange
+    Mat bgr(100, 100, CV_8UC1);
+    randu(bgr, Scalar::all(0), Scalar::all(255));
+
+    // Act
+    Mat result;
+    GuoHallThinning(bgr, result);
+
+	ASSERT_TRUE(countNonZero(result) <= countNonZero(bgr));
 }
