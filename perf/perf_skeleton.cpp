@@ -22,7 +22,7 @@ PERF_TEST(skeleton, ConvertColor_BGR2GRAY_BT709)
 	Mat source(input);
 	Mat destination(input);
 
-    declare.in(source, WARMUP_RNG).out(destination);
+    declare.in(source).out(destination);
 	declare.time(30);
     TEST_CYCLE()
     {
