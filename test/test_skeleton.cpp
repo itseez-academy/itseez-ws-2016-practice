@@ -82,8 +82,8 @@ TEST(skeleton, CC_CheckCorrectSize)
 }
 TEST(skeleton, GHT_CheckCorrectSize)
 {
-	Mat Start(12, 14, CV_8UC3);
-	randu(Start, Scalar::all(0), Scalar::all(255));
+	Mat Start(12, 14, CV_8UC1);
+	randu(Start, Scalar(0), Scalar(255));
 	Mat Final;
 	GuoHallThinning(Start, Final);
 	EXPECT_EQ(Start.size, Final.size);

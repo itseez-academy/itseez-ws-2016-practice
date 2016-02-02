@@ -16,11 +16,34 @@ using std::tr1::get;
 
 typedef perf::TestBaseWithParam<Size> Size_Only;
 
-PERF_TEST_P(Size_Only, ImageResize, testing::Values(TYPICAL_MAT_SIZES_ABS))
+// From First Day
+
+//PERF_TEST_P(Size_Only, ImageResize, testing::Values(TYPICAL_MAT_SIZES_ABS))
+//{
+//    Size sz = GetParam();
+//    // cout << sz << endl;
+//
+//    Size sz_to(sz.width / 2, sz.height / 2);
+//
+//    cv::Mat src(sz, CV_8UC1), dst(Size(sz_to), CV_8UC1);
+//    declare.in(src, WARMUP_RNG).out(dst);
+//
+//    TEST_CYCLE()
+//    {
+//        // resize(src, dst, sz_to);
+//        ImageResize(src, dst, sz_to);
+//    }
+//
+//    SANITY_CHECK(dst, 1 + 1e-6);
+//}
+
+#define MAT_SIZES  ::perf::szVGA, ::perf::sz720p, ::perf::sz1080p
+
+typedef perf::TestBaseWithParam<Size> Size_Only;
+
+PERF_TEST_P(Size_Only, ImageResize, testing::Values(MAT_SIZES))
 {
     Size sz = GetParam();
-    // cout << sz << endl;
-
     Size sz_to(sz.width / 2, sz.height / 2);
 
     cv::Mat src(sz, CV_8UC1), dst(Size(sz_to), CV_8UC1);
@@ -28,7 +51,6 @@ PERF_TEST_P(Size_Only, ImageResize, testing::Values(TYPICAL_MAT_SIZES_ABS))
 
     TEST_CYCLE()
     {
-        // resize(src, dst, sz_to);
         ImageResize(src, dst, sz_to);
     }
 
