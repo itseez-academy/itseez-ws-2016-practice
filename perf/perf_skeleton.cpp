@@ -18,7 +18,7 @@ using std::tr1::get;
 
  PERF_TEST(skeleton, ConvertColor_BGR2GRAY_BT709)
  {
-     Mat input = cv::imread("C:/Users/olimp50/Desktop/semichev/itseez-ws-2016-practice-build/bin/testdata/sla.png");
+     Mat input = cv::imread("./testdata/sla.png");
 	 Mat output;
 	 output = input.clone();
 
