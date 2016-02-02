@@ -106,14 +106,14 @@ TEST(skeleton, BGR2GRAY_one_color_image_to_one_color_image)
 	EXPECT_EQ(0, countNonZero(match));
 }
 
-TEST(skeleton, ImageResize_one_color_image_to_one_color_image)
-{
-	Scalar color(123, 32, 203);
-	Mat src(5, 5, CV_8UC1, color);
-	Mat dst;
-	Size S(20, 25);
-	ImageResize(src, dst, S);
-	Mat expectedDst(20, 25, CV_8UC1, src.at<uchar>(0, 0));
-	Mat match = abs(expectedDst - dst);
-	EXPECT_EQ(0, countNonZero(match));
-}
+//TEST(skeleton, ImageResize_one_color_image_to_one_color_image)
+//{
+//	Scalar color(123, 32, 203);
+//	Mat src(5, 5, CV_8UC1, color);
+//	Mat dst;
+//	Size S(20, 25);
+//	ImageResize(src, dst, S);
+//	Mat expectedDst(20, 25, CV_8UC1, src.at<uchar>(0, 0));
+//	Mat match = abs(expectedDst - dst);
+//	EXPECT_EQ(0, countNonZero(match));
+//}
