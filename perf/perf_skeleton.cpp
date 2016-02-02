@@ -76,3 +76,23 @@ PERF_TEST_P(ImageName, skeletonize, IMAGES)
 
     SANITY_CHECK(output, 1 + 1e-6);
 }
+
+PERF_TEST(skeletonguo, GuoHallThinning)
+{
+    Mat input = cv::imread("./bin/testdata/sla.png");
+
+    Mat output = input.clone();
+    ConvertColor_BGR2GRAY_BT709(input, input);
+    cv::Size small_size(input.cols / 1.5, input.rows / 1.5);
+    ImageResize(input, input, small_size);
+    cv::threshold(input, input, 128, 255, cv::THRESH_BINARY_INV);
+
+    declare.in(input, WARMUP_RNG).out(output);
+    declare.time(10);
+
+    TEST_CYCLE()
+    {
+        GuoHallThinning(input, output);
+    }
+    SANITY_CHECK(output, 1 + 1e-6);
+}
