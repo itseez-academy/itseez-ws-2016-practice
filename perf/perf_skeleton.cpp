@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include "skeleton_filter.hpp"
+#include "opencv\highgui.h"
 
 using namespace std;
 using namespace perf;
@@ -14,12 +15,22 @@ using std::tr1::get;
 // Test(s) for the ConvertColor_BGR2GRAY_BT709 function
 //
 
-// PERF_TEST(skeleton, ConvertColor_BGR2GRAY_BT709)
-// {
-//     Mat input = cv::imread("./bin/testdata/sla.png");
-//
-//     // Add code here
-// }
+PERF_TEST(skeleton, ConvertColor_BGR2GRAY_BT709)
+{
+	//Mat input = cv::imread("testdata/sla.png");
+	Mat input = cv::imread("./bin/testdata/sla.png"); //TRAVIS
+	Mat source(input);
+	Mat destination(input);
+
+    declare.in(source, WARMUP_RNG).out(destination);
+	declare.time(30);
+    TEST_CYCLE()
+    {
+        ConvertColor_BGR2GRAY_BT709(source, destination);
+    }
+
+    SANITY_CHECK_NOTHING();
+ }
 
 //
 // Test(s) for the ImageResize function
@@ -28,6 +39,24 @@ using std::tr1::get;
 #define MAT_SIZES  ::perf::szVGA, ::perf::sz720p, ::perf::sz1080p
 
 typedef perf::TestBaseWithParam<Size> Size_Only;
+
+/*PERF_TEST(skeleton, perf_ImageResize_sla)
+{
+	Mat input = cv::imread("testdata/sla.png");
+	//Mat input = cv::imread("./bin/testdata/sla.png"); //TRAVIS
+
+	Size newSize(input.size().width, input.size().height);
+	Mat source(input);
+	Mat destination(Size(newSize), CV_8UC1);
+
+    declare.in(source).out(destination);
+    TEST_CYCLE()
+    {
+		ImageResize(source, destination, newSize);
+    }
+
+    SANITY_CHECK_NOTHING();
+ }*/
 
 PERF_TEST_P(Size_Only, ImageResize, testing::Values(MAT_SIZES))
 {
