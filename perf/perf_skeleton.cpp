@@ -62,9 +62,15 @@ PERF_TEST_P(Size_Only, ImageResize, testing::Values(MAT_SIZES))
 
  typedef perf::TestBaseWithParam<std::string> ImageName;
 
- //PERF_TEST_P(ImageName, skeletonize, IMAGES)
- //{
- //    Mat input = cv::imread(GetParam());
-
- //    // Add code here
- //}
+ PERF_TEST_P(ImageName, skeletonize, IMAGES)
+ {
+     Mat input = cv::imread(GetParam());
+	 Mat result(input);
+	 declare.in(input).out(result);
+	 declare.time(30);
+	 TEST_CYCLE()
+	 {
+		skeletonize(input, result, false);
+	 }
+	 SANITY_CHECK(result, 1 + 1e-6);
+ }
