@@ -679,7 +679,7 @@ void TestBase::Init(const std::vector<std::string> & availableImpls,
 
     param_impl          = args.get<bool>("perf_run_cpu") ? "plain" : args.get<std::string>("perf_impl");
     std::string perf_strategy = args.get<std::string>("perf_strategy");
-    if (perf_strategy == "default")
+    if (strcmp(perf_strategy.c_str(), "default") == 0)
     {
         // nothing
     }
