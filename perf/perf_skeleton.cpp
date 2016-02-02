@@ -1,4 +1,5 @@
 #include "opencv_ptest/include/opencv2/ts/ts.hpp"
+#include "opencv2/highgui/highgui.hpp"
 
 #include <iostream>
 
@@ -10,20 +11,22 @@ using namespace cv;
 using std::tr1::make_tuple;
 using std::tr1::get;
 
-//
-// Test(s) for the ConvertColor_BGR2GRAY_BT709 function
-//
+//#define TESTDATA_PATH "./bin/testdata/"
+#define TESTDATA_PATH "testdata/"
 
-// PERF_TEST(skeleton, ConvertColor_BGR2GRAY_BT709)
-// {
-//     Mat input = cv::imread("./bin/testdata/sla.png");
-//
-//     // Add code here
-// }
+PERF_TEST(skeleton, ConvertColor_BGR2GRAY_BT709)
+{
+    Mat input = cv::imread(TESTDATA_PATH"sla.png");
 
-//
-// Test(s) for the ImageResize function
-//
+	cv::Mat src(input), dst(input);
+	declare.in(src, WARMUP_RNG).out(dst);
+	TEST_CYCLE()
+	{
+		ConvertColor_BGR2GRAY_BT709(src, dst);
+	}
+
+	SANITY_CHECK(dst, 1 + 1e-6);
+}
 
 #define MAT_SIZES  ::perf::szVGA, ::perf::sz720p, ::perf::sz1080p
 
