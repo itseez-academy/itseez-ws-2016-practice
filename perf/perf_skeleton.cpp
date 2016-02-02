@@ -82,12 +82,12 @@ PERF_TEST_P(Size_Only, Thinning, testing::Values(MAT_SIZES))
     rng.fill(dst, CV_8UC1, 0, 255);
     cv::threshold(dst, dst, 240, 255, cv::THRESH_BINARY_INV);
 
-    cv::Mat gold; GuoHallThinning_original(dst, gold);
+    cv::Mat gold; GuoHallThinning(dst, gold);
 
     cv::Mat thinned_image;
     TEST_CYCLE()
     {
-        GuoHallThinning(dst, thinned_image);
+        GuoHallThinning_optimized(dst, thinned_image);
     }
 
     cv::Mat diff; cv::absdiff(thinned_image, gold, diff);
