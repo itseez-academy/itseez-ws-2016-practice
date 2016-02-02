@@ -18,7 +18,7 @@ using std::tr1::get;
 
  PERF_TEST(skeleton, ConvertColor_BGR2GRAY_BT709)
  {
-     Mat input = cv::imread("./testdata/sla.png");
+     Mat input = cv::imread("./bin/testdata/sla.png");
 	 Mat output;
 	 output = input.clone();
 
@@ -61,15 +61,15 @@ PERF_TEST_P(Size_Only, ImageResize, testing::Values(MAT_SIZES))
 //
 
 
-// #define IMAGES testing::Values( std::string("./bin/testdata/sla.png"),\
-//                                 std::string("./bin/testdata/page.png"),\
-//                                 std::string("./bin/testdata/schedule.png") )
-//
-// typedef perf::TestBaseWithParam<std::string> ImageName;
-//
-// PERF_TEST_P(ImageName, skeletonize, IMAGES)
-// {
-//     Mat input = cv::imread(GetParam());
-//
-//     // Add code here
-// }
+ //#define IMAGES testing::Values( std::string("./testdata/sla.png"),\
+ //                                std::string("./testdata/page.png"),\
+ //                                std::string("./bin/testdata/schedule.png") )
+
+ //typedef perf::TestBaseWithParam<std::string> ImageName;
+
+ //PERF_TEST_P(ImageName, skeletonize, IMAGES)
+ //{
+ //    Mat input = cv::imread(GetParam());
+
+ //    // Add code here
+ //}
