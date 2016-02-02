@@ -69,3 +69,16 @@ PERF_TEST_P(testParams_t, skeletonize, IMAGES)
 	}
 	SANITY_CHECK_NOTHING();
 }
+
+PERF_TEST_P(testParams_t, ImageResize, IMAGES)
+{
+	cv::Mat src = cv::imread(GetParam());
+	cv::Size newSize(src.rows / 2, src.cols / 2);
+	cv::Mat dst(newSize, CV_8UC1);
+	declare.in(src).out(dst);
+	TEST_CYCLE()
+	{
+		ImageResize(src, dst, newSize);
+	}
+	SANITY_CHECK_NOTHING();
+}
