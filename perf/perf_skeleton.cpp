@@ -3,6 +3,8 @@
 #include <iostream>
 
 #include "skeleton_filter.hpp"
+#include "opencv2/imgproc/imgproc.hpp"
+#include "opencv2/highgui/highgui.hpp"
 
 using namespace std;
 using namespace perf;
@@ -10,16 +12,25 @@ using namespace cv;
 using std::tr1::make_tuple;
 using std::tr1::get;
 
+
+#define PATH "./bin/testdata"
+
 //
 // Test(s) for the ConvertColor_BGR2GRAY_BT709 function
 //
 
-// PERF_TEST(skeleton, ConvertColor_BGR2GRAY_BT709)
-// {
-//     Mat input = cv::imread("./bin/testdata/sla.png");
-//
-//     // Add code here
-// }
+PERF_TEST(skeleton, ConvertColor_BGR2GRAY_BT709)
+{
+	Mat input = cv::imread(PATH"/sla.png");
+	Mat result(input.size(), CV_8UC1);
+	declare.in(input).out(result);
+
+	TEST_CYCLE()
+	{
+		ConvertColor_BGR2GRAY_BT709(input, result);
+	}
+	SANITY_CHECK(result, 1 + 1e-6);
+}
 
 //
 // Test(s) for the ImageResize function
