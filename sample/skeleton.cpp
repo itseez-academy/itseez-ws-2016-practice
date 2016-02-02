@@ -37,7 +37,7 @@ int main(int argc, const char** argv)
     // Show input image
     imshow("Input image", input);
     waitKey(1000);
-
+    
     // Check if we need to save intermediate images
     bool save_images = parser.get<bool>("save");
     if (save_images)
