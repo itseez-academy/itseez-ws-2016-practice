@@ -23,7 +23,6 @@ PERF_TEST(skeleton, ConvertColor_BGR2GRAY_BT709)
     Mat result = input;
 	declare.in(input, WARMUP_RNG).out(result);
     
-	// Add code here
 	TEST_CYCLE()
 	{
 		ConvertColor_BGR2GRAY_BT709(input, result);
@@ -45,7 +44,7 @@ PERF_TEST_P(Size_Only, ImageResize, testing::Values(MAT_SIZES))
     Size sz = GetParam();
     Size sz_to(sz.width / 2, sz.height / 2);
 
-    cv::Mat src(sz, CV_8UC1), dst(Size(sz_to), CV_8UC1);
+    Mat src(sz, CV_8UC1), dst(Size(sz_to), CV_8UC1);
     declare.in(src, WARMUP_RNG).out(dst);
 
     TEST_CYCLE()
@@ -74,7 +73,6 @@ PERF_TEST_P(ImageName, skeletonize, IMAGES)
 	declare.in(input, WARMUP_RNG).out(result);
 	declare.time(30);
 
-    // Add code here
 	TEST_CYCLE()
     {
         skeletonize(input, result, false);
@@ -83,3 +81,33 @@ PERF_TEST_P(ImageName, skeletonize, IMAGES)
     SANITY_CHECK(result, 1 + 1e-6);
 }
 
+PERF_TEST_P(ImageName, ConvertColor_BGR2GRAY_BT709, IMAGES)
+{
+    Mat input = cv::imread(GetParam());
+
+	Mat result = input;
+	declare.in(input, WARMUP_RNG).out(result);
+
+	TEST_CYCLE()
+    {
+        ConvertColor_BGR2GRAY_BT709(input, result);
+    }
+
+    SANITY_CHECK(result, 1 + 1e-6);
+}
+
+PERF_TEST_P(Size_Only, GuoHallThinning, testing::Values(MAT_SIZES))
+{
+    Size sz = GetParam();
+
+    Mat src(sz, CV_8UC1);
+	Mat dst = src;
+    declare.in(src, WARMUP_RNG).out(dst);
+
+    TEST_CYCLE()
+    {
+        GuoHallThinning(src, dst);
+    }
+
+    SANITY_CHECK(dst, 1 + 1e-6);
+}
