@@ -3,7 +3,7 @@
 #include <iostream>
 
 #include "skeleton_filter.hpp"
-#include "opencv\highgui.h"
+#include "opencv2/highgui/highgui.hpp"
 
 using namespace std;
 using namespace perf;
@@ -15,7 +15,7 @@ using std::tr1::get;
 // Test(s) for the ConvertColor_BGR2GRAY_BT709 function
 //
 
-PERF_TEST(skeleton, ConvertColor_BGR2GRAY_BT709)
+PERF_TEST(skeleton, ConvertColor_BGR2GRAY_BT709_sla)
 {
 	//Mat input = cv::imread("testdata/sla.png");
 	Mat input = cv::imread("./bin/testdata/sla.png"); //TRAVIS
@@ -40,10 +40,11 @@ PERF_TEST(skeleton, ConvertColor_BGR2GRAY_BT709)
 
 typedef perf::TestBaseWithParam<Size> Size_Only;
 
-/*PERF_TEST(skeleton, perf_ImageResize_sla)
+PERF_TEST(skeleton, perf_ImageResize_sla)
 {
-	Mat input = cv::imread("testdata/sla.png");
-	//Mat input = cv::imread("./bin/testdata/sla.png"); //TRAVIS
+	//Mat input = cv::imread("testdata/sla.png");
+	Mat input = cv::imread("./bin/testdata/sla.png"); //TRAVIS
+	ConvertColor_BGR2GRAY_BT709(input, input);
 
 	Size newSize(input.size().width, input.size().height);
 	Mat source(input);
@@ -56,7 +57,7 @@ typedef perf::TestBaseWithParam<Size> Size_Only;
     }
 
     SANITY_CHECK_NOTHING();
- }*/
+ }
 
 PERF_TEST_P(Size_Only, ImageResize, testing::Values(MAT_SIZES))
 {
@@ -78,15 +79,20 @@ PERF_TEST_P(Size_Only, ImageResize, testing::Values(MAT_SIZES))
 // Test(s) for the skeletonize function
 //
 
-// #define IMAGES testing::Values( std::string("./bin/testdata/sla.png"),\
-//                                 std::string("./bin/testdata/page.png"),\
-//                                 std::string("./bin/testdata/schedule.png") )
-//
-// typedef perf::TestBaseWithParam<std::string> ImageName;
-//
-// PERF_TEST_P(ImageName, skeletonize, IMAGES)
-// {
-//     Mat input = cv::imread(GetParam());
-//
-//     // Add code here
-// }
+#define IMAGES testing::Values( std::string("./bin/testdata/sla.png"),\
+                                std::string("./bin/testdata/page.png"),\
+                                std::string("./bin/testdata/schedule.png") )
+
+typedef perf::TestBaseWithParam<std::string> ImageName;
+
+PERF_TEST_P(ImageName, skeletonize, IMAGES)
+{
+    Mat input = cv::imread(GetParam());
+	Mat dst(input);
+	declare.in(input).out(dst);
+	TEST_CYCLE()
+    {
+        skeletonize(input, dst, false);
+    }
+	SANITY_CHECK_NOTHING();
+}
