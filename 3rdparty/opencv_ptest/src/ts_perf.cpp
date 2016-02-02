@@ -678,8 +678,8 @@ void TestBase::Init(const std::vector<std::string> & availableImpls,
     ::testing::AddGlobalTestEnvironment(new PerfEnvironment);
 
     param_impl          = args.get<bool>("perf_run_cpu") ? "plain" : args.get<std::string>("perf_impl");
-    std::string perf_strategy = args.get<std::string>("perf_strategy");
-    if (strcmp(perf_strategy.c_str(), "default") == 0)
+    std::string perf_strategy = "default"; //args.get<std::string>("perf_strategy");
+    if (perf_strategy == "default")
     {
         // nothing
     }
