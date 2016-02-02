@@ -34,15 +34,19 @@ PERF_TEST_P(Size_Only, ImageResize, testing::Values(MAT_SIZES))
     Size sz = GetParam();
     Size sz_to(sz.width / 2, sz.height / 2);
 
-    cv::Mat src(sz, CV_8UC1), dst(Size(sz_to), CV_8UC1);
+    cv::Mat src(sz, CV_8UC1);
+    cv::Mat dst(Size(sz_to), CV_8UC1);
     declare.in(src, WARMUP_RNG).out(dst);
+
+    cv::RNG rng(234231412);
+    rng.fill(src, CV_8UC1, 0, 255);
 
     TEST_CYCLE()
     {
         ImageResize(src, dst, sz_to);
     }
 
-    SANITY_CHECK(dst, 1 + 1e-6);
+    SANITY_CHECK(dst);
 }
 
 //
@@ -61,3 +65,33 @@ PERF_TEST_P(Size_Only, ImageResize, testing::Values(MAT_SIZES))
 //
 //     // Add code here
 // }
+
+//
+// Test(s) for the Thinning function
+//
+
+PERF_TEST_P(Size_Only, Thinning, testing::Values(MAT_SIZES))
+{
+    Size sz = GetParam();
+
+    cv::Mat dst(sz, CV_8UC1);
+    declare.in(dst, WARMUP_RNG).out(dst);
+    declare.time(40);
+
+    cv::RNG rng(234231412);
+    rng.fill(dst, CV_8UC1, 0, 255);
+    cv::threshold(dst, dst, 240, 255, cv::THRESH_BINARY_INV);
+
+    cv::Mat gold; GuoHallThinning_original(dst, gold);
+
+    cv::Mat thinned_image;
+    TEST_CYCLE()
+    {
+        GuoHallThinning(dst, thinned_image);
+    }
+
+    cv::Mat diff; cv::absdiff(thinned_image, gold, diff);
+    ASSERT_EQ(0, cv::countNonZero(diff));
+
+    SANITY_CHECK(dst);
+}
