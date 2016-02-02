@@ -1,7 +1,6 @@
 #include "opencv_ptest/include/opencv2/ts/ts.hpp"
-
 #include <iostream>
-
+#include "opencv2/highgui/highgui.hpp"
 #include "skeleton_filter.hpp"
 
 using namespace std;
@@ -14,15 +13,20 @@ using std::tr1::get;
 // Test(s) for the ConvertColor_BGR2GRAY_BT709 function
 //
 
-// PERF_TEST(skeleton, ConvertColor_BGR2GRAY_BT709)
-// {
-//     Mat input = cv::imread("./bin/testdata/sla.png");
-//
-//     // Add code here
-// }
+PERF_TEST(skeleton, ConvertColor_BGR2GRAY_BT709)
+{
+    Mat input = imread("./bin/testdata/sla.png");
+    Mat output;
+    TEST_CYCLE()
+    {
+        ImageResize(input, output);
+    }
+
+    SANITY_CHECK(output, 1 + 1e-6);
+}
 
 //
-// Test(s) for the ImageResize function
+//Test(s) for the ImageResize function
 //
 
 #define MAT_SIZES  ::perf::szVGA, ::perf::sz720p, ::perf::sz1080p
