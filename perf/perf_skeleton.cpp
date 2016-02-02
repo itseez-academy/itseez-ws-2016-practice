@@ -61,3 +61,30 @@ PERF_TEST_P(Size_Only, ImageResize, testing::Values(MAT_SIZES))
 //
 //     // Add code here
 // }
+
+void Invert(const Mat& src, Mat& dst)
+{
+    for (int y = 0; y < src.rows; ++y)
+    {
+        for (int x = 0; x < src.cols; ++x)
+        {
+            dst.at<uchar>(y, x) = 255 - src.at<uchar>(y, x);
+        }
+    }
+}
+
+PERF_TEST_P(Size_Only, Invert, testing::Values(MAT_SIZES))
+{
+    Size sz = GetParam();
+    Mat src(sz, CV_8UC1);
+    Mat dst(sz, CV_8UC1);
+
+    declare.in(src, WARMUP_RNG).out(dst);
+
+    TEST_CYCLE()
+    {
+        Invert(src, dst);
+    }
+
+    SANITY_CHECK(dst);
+} 
