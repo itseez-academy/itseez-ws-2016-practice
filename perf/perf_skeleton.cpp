@@ -48,6 +48,7 @@ PERF_TEST_P(Size_Only, ImageResize, testing::Values(MAT_SIZES))
 
     cv::Mat src(sz, CV_8UC1), dst(Size(sz_to), CV_8UC1);
     declare.in(src, WARMUP_RNG).out(dst);
+	declare.time(30);
 
     TEST_CYCLE()
     {
@@ -64,7 +65,7 @@ PERF_TEST(GuoHallThinningTest, GuoHallThinning)
 	ConvertColor_BGR2GRAY_BT709(input, grayImage);
 	Mat result(grayImage.size(), CV_8UC1);
     declare.in(grayImage).out(result);
-	declare.time(100);
+	declare.time(30);
 
     TEST_CYCLE()
     {
@@ -78,15 +79,22 @@ PERF_TEST(GuoHallThinningTest, GuoHallThinning)
 // Test(s) for the skeletonize function
 //
 
-// #define IMAGES testing::Values( std::string("./bin/testdata/sla.png"),\
-//                                 std::string("./bin/testdata/page.png"),\
-//                                 std::string("./bin/testdata/schedule.png") )
-//
-// typedef perf::TestBaseWithParam<std::string> ImageName;
-//
-// PERF_TEST_P(ImageName, skeletonize, IMAGES)
-// {
-//     Mat input = cv::imread(GetParam());
-//
-//     // Add code here
-// }
+#define IMAGES testing::Values( std::string("./bin/testdata/sla.png"),\
+                                std::string("./bin/testdata/page.png"),\
+                                std::string("./bin/testdata/schedule.png") )
+typedef perf::TestBaseWithParam<std::string> ImageName;
+
+PERF_TEST_P(ImageName, skeletonize, IMAGES)
+{
+    Mat input = cv::imread(GetParam());
+	Mat result(input.size(), CV_8UC1);
+	declare.in(input).out(result);
+	declare.time(30);
+
+	TEST_CYCLE()
+    {
+        skeletonize(input, result, false);
+    }
+
+    SANITY_CHECK(result, 1 + 1e-6);
+}
