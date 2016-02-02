@@ -11,7 +11,7 @@ addons:
     - libopencv-dev
     - xvfb
 before_script:
-  # For headless testing
+  # For headless testing of the sample application (cv::imshow)
   - "export DISPLAY=:99.0"
   - "sh -e /etc/init.d/xvfb start"
   - sleep 3 # give xvfb some time to start
@@ -24,8 +24,8 @@ script:
   - make
   # Run regression tests
   - ./bin/test_skeleton
-  # Run performance tests
-  - ./bin/perf_skeleton --gtest_output=xml:perf_report.xml
+  # Run performance tests (we take only one sample, so we don't wait long)
+  - ./bin/perf_skeleton --perf_min_samples=1 --perf_force_samples=1 --gtest_output=xml:perf_report.xml
   # Print performance metrics
   - ../itseez-ws-2016-practice/3rdparty/opencv_ptest/misc/summary.py ./perf_report.xml
   # Run sample application
