@@ -73,6 +73,7 @@ PERF_TEST_P(testParams_t, skeletonize, IMAGES)
 PERF_TEST_P(testParams_t, ImageResize, IMAGES)
 {
 	cv::Mat src = cv::imread(GetParam());
+	ConvertColor_BGR2GRAY_BT709(src, src);
 	cv::Size newSize(src.rows / 2, src.cols / 2);
 	cv::Mat dst(newSize, CV_8UC1);
 	declare.in(src).out(dst);
