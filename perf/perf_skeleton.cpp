@@ -20,15 +20,13 @@ using std::tr1::get;
 
 PERF_TEST(skeleton, ConvertColor_BGR2GRAY_BT709)
 {
-    Mat input = cv::imread(TESTDATA_PATH"sla.png");
-
-	cv::Mat src(input), dst(input);
+    Mat src = cv::imread(TESTDATA_PATH"sla.png");
+	cv::Mat dst(src);
 	declare.in(src).out(dst);
 	TEST_CYCLE()
 	{
 		ConvertColor_BGR2GRAY_BT709(src, dst);
 	}
-
 	SANITY_CHECK_NOTHING();
 }
 
@@ -80,6 +78,21 @@ PERF_TEST_P(testParams_t, ImageResize, IMAGES)
 	TEST_CYCLE()
 	{
 		ImageResize(src, dst, newSize);
+	}
+	SANITY_CHECK_NOTHING();
+}
+
+PERF_TEST_P(testParams_t, GuoHallThinning, IMAGES)
+{
+	cv::Mat src = cv::imread(GetParam());
+	ConvertColor_BGR2GRAY_BT709(src, src);
+	cv::Size newSize(src.rows / 2, src.cols / 2);
+	ImageResize(src, src, newSize); // for fasting
+	cv::Mat dst(src);
+	declare.in(src).out(dst);
+	TEST_CYCLE()
+	{
+		GuoHallThinning(src, dst);
 	}
 	SANITY_CHECK_NOTHING();
 }
