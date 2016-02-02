@@ -61,13 +61,39 @@ PERF_TEST_P(Size_Only, ImageResize, testing::Values(MAT_SIZES))
 }
 
 //
-// Test(s) for the skeletonize function
+// Test(s) for the skeletonize function without save
 //
 
 
-//PERF_TEST_P(ImageName, skeletonize, IMAGES)
-//{
-//    Mat input = imread(GetParam());
+PERF_TEST_P(ImageName, skeletonize_without_save, IMAGES)
+{
+    Mat input = imread(GetParam());
+    Mat dst(input.size(), CV_8UC1);
+    //declaring input, output and how many iterations should we do
+    declare.in(input, WARMUP_RNG).out(dst).iterations(100).time(30);
+    TEST_CYCLE()
+    {
+        skeletonize(input, dst, false);
+    }
+    //Regression check
+    SANITY_CHECK(dst, 1 + 1e-6);
+}
 
-//    // Add code here
-//}
+//
+// Test(s) for the skeletonize function with save
+//
+
+
+PERF_TEST_P(ImageName, skeletonize_with_save, IMAGES)
+{
+    Mat input = imread(GetParam());
+    Mat dst(input.size(), CV_8UC1);
+    //declaring input, output and how many iterations should we do
+    declare.in(input, WARMUP_RNG).out(dst).iterations(100).time(1000);
+    TEST_CYCLE()
+    {
+        skeletonize(input, dst, true);
+    }
+    //Regression check
+    SANITY_CHECK(dst, 1 + 1e-6);
+}
