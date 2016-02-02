@@ -134,3 +134,13 @@ TEST(skeleton, guohall_black_pixels)
 	int resBlacked = total - countNonZero(res);
 	EXPECT_LE(origBlacked, resBlacked);
 }
+TEST(skeleton, resize_same_size)
+{
+    Mat image(10, 10, CV_8UC1);
+    randu(image, Scalar(0), Scalar(255));
+    Mat resized;
+    Size sameSize(image.cols, image.rows);
+    ImageResize(image, resized, sameSize);
+    Mat result = abs(resized-image);
+    EXPECT_EQ(0, countNonZero(result));
+}
