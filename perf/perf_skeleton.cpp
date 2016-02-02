@@ -73,3 +73,63 @@ PERF_TEST_P(Size_Only, ImageResize, testing::Values(MAT_SIZES))
      }
      SANITY_CHECK(output,1 + 1e-6);
  }
+
+//GuoHallThinning
+#define IMAGES testing::Values( std::string("./bin/testdata/sla.png"),\
+                                std::string("./bin/testdata/page.png"),\
+                                std::string("./bin/testdata/schedule.png") )
+
+typedef perf::TestBaseWithParam<std::string> ImageName;
+
+PERF_TEST_P(ImageName, GuoHallThinning, IMAGES)
+{
+    Mat input = cv::imread(GetParam());
+
+    // Add code here
+
+    declare.iterations(10);
+    declare.time(300);
+
+    Mat output,gray_image;
+
+    ConvertColor_BGR2GRAY_BT709(input, gray_image);
+
+    // Downscale input image
+    cv::Mat small_image;
+    cv::Size small_size(input.cols / 1.5, input.rows / 1.5);
+    ImageResize(gray_image, small_image, small_size);
+
+    // Binarization and inversion
+    cv::threshold(small_image, small_image, 128, 255, cv::THRESH_BINARY_INV);
+
+    TEST_CYCLE()
+    {
+         GuoHallThinning(small_image, output);
+    }
+    SANITY_CHECK(output,1 + 1e-6);
+}
+
+//BGR2GRAY_BT709
+#define IMAGES testing::Values( std::string("./bin/testdata/sla.png"),\
+                                std::string("./bin/testdata/page.png"),\
+                                std::string("./bin/testdata/schedule.png") )
+
+typedef perf::TestBaseWithParam<std::string> ImageName;
+
+PERF_TEST_P(ImageName, BGR2GRAY_BT709, IMAGES)
+{
+    Mat input = cv::imread(GetParam());
+
+    // Add code here
+
+    declare.iterations(10);
+    declare.time(300);
+
+    Mat output;
+
+    TEST_CYCLE()
+    {
+         ConvertColor_BGR2GRAY_BT709(input, output);
+    }
+    SANITY_CHECK(output,1 + 1e-6);
+}
