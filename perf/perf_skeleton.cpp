@@ -62,18 +62,26 @@ PERF_TEST_P(Size_Only, ImageResize, testing::Values(MAT_SIZES))
 // Test(s) for the skeletonize function
 //
 
-// #define IMAGES testing::Values( std::string("./bin/testdata/sla.png"),\
-//                                 std::string("./bin/testdata/page.png"),\
-//                                 std::string("./bin/testdata/schedule.png") )
-//
-// typedef perf::TestBaseWithParam<std::string> ImageName;
-//
-// PERF_TEST_P(ImageName, skeletonize, IMAGES)
-// {
-//     Mat input = cv::imread(GetParam());
-//
-//     // Add code here
-// }
+#define IMAGES testing::Values( std::string("./bin/testdata/sla.png"),\
+                                std::string("./bin/testdata/page.png"),\
+                                std::string("./bin/testdata/schedule.png") )
+
+typedef perf::TestBaseWithParam<std::string> ImageName;
+
+PERF_TEST_P(ImageName, skeletonize, IMAGES)
+{
+    Mat input = cv::imread(GetParam());
+    Mat output(input.size(), CV_8UC1);
+
+    declare.in(input).out(output);
+
+    TEST_CYCLE()
+    {
+        skeletonize(input, output, false);
+    }
+
+    SANITY_CHECK_NOTHING();
+}
 
 void Invert(const Mat& src, Mat& dst)
 {
