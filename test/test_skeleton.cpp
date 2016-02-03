@@ -45,8 +45,28 @@ TEST(skeleton, cvtcolor_matches_opencv)
 
 TEST(skeleton, 2_plus_2_equals_4)
 {
-   EXPECT_EQ(4, 2 + 2);
+    EXPECT_EQ(4, 2 + 2);
 }
+
+TEST(skeleton, no_resize_in_convertcolor)
+{
+    Mat bgr(5, 5, CV_8UC3);
+    randu(bgr, Scalar::all(0), Scalar::all(255));
+
+    Mat result;
+    ConvertColor_BGR2GRAY_BT709(bgr, result);
+    EXPECT_EQ(bgr.size(), result.size());
+}    
+
+TEST(skeleton, no_resize_in_guo_hall_thinning)
+{
+    Mat src(5, 5, CV_8UC1);
+    randu(src, Scalar::all(0), Scalar::all(255));
+
+    Mat result;
+    GuoHallThinning(src, result);
+    EXPECT_EQ(src.size(), result.size());
+}    
 
 TEST(skeleton, resize_matches_opencv)
 {
