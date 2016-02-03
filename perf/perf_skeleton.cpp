@@ -15,15 +15,21 @@ using std::tr1::get;
 
 #define PATH "./bin/testdata"
 
+#define IMAGES testing::Values( std::string(PATH"/sla.png"),\
+                                std::string(PATH"/page.png"),\
+                                std::string(PATH"/schedule.png") )
+
+typedef perf::TestBaseWithParam<std::string> ImageName;
+
 //
 // Test(s) for the ConvertColor_BGR2GRAY_BT709 function
 //
 
-PERF_TEST(skeleton, ConvertColor_BGR2GRAY_BT709)
+PERF_TEST_P(ImageName, ConvertColor_BGR2GRAY_BT709, IMAGES)
 {
-	Mat input = cv::imread(PATH"/sla.png");
+	Mat input = cv::imread(GetParam());
 	Mat result(input.size(), CV_8UC1);
-	declare.in(input).out(result);
+	declare.in(input, WARMUP_RNG).out(result).time(500).iterations(10);
 
 	TEST_CYCLE()
 	{
@@ -60,19 +66,11 @@ PERF_TEST_P(Size_Only, ImageResize, testing::Values(MAT_SIZES))
 // Test(s) for the skeletonize function
 //
 
-
-#define IMAGES testing::Values( std::string(PATH"/sla.png"),\
-                                std::string(PATH"/page.png"),\
-                                std::string(PATH"/schedule.png") )
-
-
-typedef perf::TestBaseWithParam<std::string> ImageName;
-
 PERF_TEST_P(ImageName, skeletonize_without_saving, IMAGES)
 {
 	Mat input = cv::imread(GetParam());
 	Mat result(input.size(), CV_8UC1);
-	declare.in(input, WARMUP_RNG).out(result).time(100).iterations(100);
+	declare.in(input, WARMUP_RNG).out(result).time(500).iterations(10);
 
 	TEST_CYCLE()
     {
@@ -86,7 +84,7 @@ PERF_TEST_P(ImageName, skeletonize_with_saving, IMAGES)
 {
 	Mat input = cv::imread(GetParam());
 	Mat result(input.size(), CV_8UC1);
-	declare.in(input, WARMUP_RNG).out(result).time(200).iterations(100);
+	declare.in(input, WARMUP_RNG).out(result).time(500).iterations(10);
 
 	TEST_CYCLE()
     {
@@ -103,7 +101,7 @@ PERF_TEST_P(Size_Only, GuoHallThinning, testing::Values(MAT_SIZES))
     Mat input(sz_input, CV_8UC1);
 	randu(input, Scalar(0), Scalar(255));
 	Mat result(input.size(), CV_8UC1);
-	declare.in(input, WARMUP_RNG).out(result).iterations(100).time(200);
+	declare.in(input, WARMUP_RNG).out(result).time(500).iterations(10);
 
     TEST_CYCLE()
     {
