@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include "skeleton_filter.hpp"
+#include "opencv2/highgui/highgui.hpp"
 
 using namespace std;
 using namespace perf;
@@ -14,29 +15,38 @@ using std::tr1::get;
 // Test(s) for the ConvertColor_BGR2GRAY_BT709 function
 //
 
-// PERF_TEST(skeleton, ConvertColor_BGR2GRAY_BT709)
-// {
-//     Mat input = cv::imread("./bin/testdata/sla.png");
-//
-//     // Add code here
-// }
+PERF_TEST(skeleton, ConvertColor_BGR2GRAY_BT709)
+{
+	Mat input = cv::imread("./bin/testdata/sla.png"), output(input.size(), CV_8UC1);
+
+	 declare.in(input)
+			.out(output);
+
+	 TEST_CYCLE()
+	 {
+		 ConvertColor_BGR2GRAY_BT709(input, output);
+	 }
+
+	 SANITY_CHECK(output);
+}
 
 //
 // Test(s) for the ImageResize function
 //
 
-#define MAT_SIZES  ::perf::szVGA, ::perf::sz720p, ::perf::sz1080p
+#define MAT_SIZES testing::Values(::perf::szVGA, ::perf::sz720p, ::perf::sz1080p)
 
 typedef perf::TestBaseWithParam<Size> Size_Only;
 
-PERF_TEST_P(Size_Only, ImageResize, testing::Values(MAT_SIZES))
+PERF_TEST_P(Size_Only, ImageResize, MAT_SIZES)
 {
     Size sz = GetParam();
     Size sz_to(sz.width / 2, sz.height / 2);
 
-    cv::Mat src(sz, CV_8UC1);
-    cv::Mat dst(Size(sz_to), CV_8UC1);
-    declare.in(src, WARMUP_RNG).out(dst);
+    cv::Mat src(sz, CV_8UC1), dst(Size(sz_to), CV_8UC1);
+
+    declare.in(src, WARMUP_RNG)
+		   .out(dst);
 
     cv::RNG rng(234231412);
     rng.fill(src, CV_8UC1, 0, 255);
@@ -53,24 +63,33 @@ PERF_TEST_P(Size_Only, ImageResize, testing::Values(MAT_SIZES))
 // Test(s) for the skeletonize function
 //
 
-// #define IMAGES testing::Values( std::string("./bin/testdata/sla.png"),\
-//                                 std::string("./bin/testdata/page.png"),\
-//                                 std::string("./bin/testdata/schedule.png") )
+#define IMAGES testing::Values( std::string("./bin/testdata/sla.png"),\
+                                 std::string("./bin/testdata/page.png"),\
+                                 std::string("./bin/testdata/schedule.png") )
+
+typedef perf::TestBaseWithParam<std::string> ImageName;
 //
-// typedef perf::TestBaseWithParam<std::string> ImageName;
-//
-// PERF_TEST_P(ImageName, skeletonize, IMAGES)
-// {
-//     Mat input = cv::imread(GetParam());
-//
-//     // Add code here
-// }
+PERF_TEST_P(ImageName, skeletonize, IMAGES)
+{
+     Mat input = cv::imread(GetParam()), output(Size(input.cols / 1.5, input.rows / 1.5), CV_8UC1);
+
+	 declare.in(input)
+			.out(output)
+			.time(40);
+
+	 TEST_CYCLE()
+	 {
+		 skeletonize(input, output, false);
+	 }
+
+	  SANITY_CHECK(output);
+}
 
 //
 // Test(s) for the Thinning function
 //
 
-PERF_TEST_P(Size_Only, Thinning, testing::Values(MAT_SIZES))
+PERF_TEST_P(Size_Only, Thinning, MAT_SIZES)
 {
     Size sz = GetParam();
 
