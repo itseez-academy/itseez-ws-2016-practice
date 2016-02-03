@@ -9,6 +9,7 @@ static void GuoHallIteration(cv::Mat& im, int iter)
     {
         for (int j = 1; j < im.cols-1; j++)
         {
+
             uchar p2 = im.at<uchar>(i-1, j);
             uchar p3 = im.at<uchar>(i-1, j+1);
             uchar p4 = im.at<uchar>(i, j+1);
@@ -27,6 +28,7 @@ static void GuoHallIteration(cv::Mat& im, int iter)
 
             if (C == 1 && (N >= 2 && N <= 3) & (m == 0))
                 marker.at<uchar>(i,j) = 1;
+			
         }
     }
 
@@ -66,6 +68,8 @@ static void GuoHallIteration_optimized(cv::Mat& im, int iter)
     {
         for (int j = 1; j < im.cols-1; j++)
         {
+			if(im.at<uchar>(i,j) != 0)
+			{
             uchar p2 = im.at<uchar>(i-1, j);
             uchar p3 = im.at<uchar>(i-1, j+1);
             uchar p4 = im.at<uchar>(i, j+1);
@@ -84,6 +88,7 @@ static void GuoHallIteration_optimized(cv::Mat& im, int iter)
 
             if (C == 1 && (N >= 2 && N <= 3) & (m == 0))
                 marker.at<uchar>(i,j) = 1;
+			}
         }
     }
 
