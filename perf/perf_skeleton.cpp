@@ -27,7 +27,7 @@ PERF_TEST(skeleton, ConvertColor_BGR2GRAY_BT709)
 		 ConvertColor_BGR2GRAY_BT709(input, output);
 	 }
 
-	 SANITY_CHECK(output);
+	 SANITY_CHECK(output, 1 + 1e-6);
 }
 
 //
@@ -43,19 +43,15 @@ PERF_TEST_P(Size_Only, ImageResize, MAT_SIZES)
     Size sz = GetParam();
     Size sz_to(sz.width / 2, sz.height / 2);
 
-    cv::Mat src(sz, CV_8UC1);
-    cv::Mat dst(Size(sz_to), CV_8UC1);
+    cv::Mat src(sz, CV_8UC1), dst(Size(sz_to), CV_8UC1);
     declare.in(src, WARMUP_RNG).out(dst);
-
-    cv::RNG rng(234231412);
-    rng.fill(src, CV_8UC1, 0, 255);
 
     TEST_CYCLE()
     {
         ImageResize(src, dst, sz_to);
     }
 
-    SANITY_CHECK(dst);
+    SANITY_CHECK(dst, 1 + 1e-6);
 }
 
 //
@@ -67,7 +63,7 @@ PERF_TEST_P(Size_Only, ImageResize, MAT_SIZES)
                                  std::string("testdata/schedule.png") )
 
 typedef perf::TestBaseWithParam<std::string> ImageName;
-
+//
 PERF_TEST_P(ImageName, skeletonize, IMAGES)
 {
      Mat input = cv::imread(GetParam()), output(Size(input.cols / 1.5, input.rows / 1.5), CV_8UC1);
