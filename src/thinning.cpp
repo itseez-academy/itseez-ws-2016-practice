@@ -58,47 +58,36 @@ void GuoHallThinning(const cv::Mat& src, cv::Mat& dst)
 // Place optimized version here
 //
 
-#define MACRO_THINNINH_CPP_GUOHALLGENERATEMASKTABLE__(i)\
-    const int \
-        p2 = ((i & (int)1) >> 0),\
-        p3 = ((i & (int)2) >> 1),\
-        p4 = ((i & (int)4) >> 2),\
-        p5 = ((i & (int)8) >> 3),\
-        p6 = ((i & (int)16) >> 4),\
-        p7 = ((i & (int)32) >> 5),\
-        p8 = ((i & (int)64) >> 6),\
-        p9 = ((i & (int)128) >> 7);\
-    int C  = (!p2 & (p3 | p4)) + (!p4 & (p5 | p6)) +\
-        (!p6 & (p7 | p8)) + (!p8 & (p9 | p2));\
-    int N1 = (p9 | p2) + (p3 | p4) + (p5 | p6) + (p7 | p8);\
-    int N2 = (p2 | p3) + (p4 | p5) + (p6 | p7) + (p8 | p9);\
-    int N  = N1 < N2 ? N1 : N2
-
-void GuoHallGenerateMaskTable(uchar* maskTable, int iter)
+void GuoHallGenerateMaskTable(uchar* maskTable)
 {
-    if (iter)
+    for (int i = 0; i < 256; ++i)
     {
-        for (int i = 0; i < 256; ++i)
-        {
-            MACRO_THINNINH_CPP_GUOHALLGENERATEMASKTABLE__(i);
-            int m = (p2 | p3 | !p5) & p4;
-            maskTable[i] = (C == 1 && (N >= 2 && N <= 3) & (m == 0)) ? 1 : 0;
-        }
-    }
-    else
-    {
-        for (int i = 0; i < 256; ++i)
-        {
-            MACRO_THINNINH_CPP_GUOHALLGENERATEMASKTABLE__(i);
-            int m = (p6 | p7 | !p9) & p8;
-            maskTable[i] = (C == 1 && (N >= 2 && N <= 3) & (m == 0)) ? 1 : 0;
-        }
+        const int
+            p2 = ((i & (int)1) >> 0),
+            p3 = ((i & (int)2) >> 1),
+            p4 = ((i & (int)4) >> 2),
+            p5 = ((i & (int)8) >> 3),
+            p6 = ((i & (int)16) >> 4),
+            p7 = ((i & (int)32) >> 5),
+            p8 = ((i & (int)64) >> 6),
+            p9 = ((i & (int)128) >> 7);
+        int C  = (!p2 & (p3 | p4)) + (!p4 & (p5 | p6)) +
+            (!p6 & (p7 | p8)) + (!p8 & (p9 | p2));
+        int N1 = (p9 | p2) + (p3 | p4) + (p5 | p6) + (p7 | p8);
+        int N2 = (p2 | p3) + (p4 | p5) + (p6 | p7) + (p8 | p9);
+        int N  = N1 < N2 ? N1 : N2;
+        bool b0 = C == 1;
+        int b = (N >= 2 && N <= 3);
+        maskTable[i] = (b0 && b & (((p6 | p7 | !p9) & p8) == 0)) ? 1 : 0;
+        if (b0 && b & (((p2 | p3 | !p5) & p4) == 0))
+            maskTable[i] |= (uchar)2;
     }
 }
 
-#undef MACRO_THINNINH_CPP_GUOHALLGENERATEMASKTABLE__
-
-static void GuoHallIteration_optimized(cv::Mat& im, const uchar* maskTable)
+static void GuoHallIteration_optimized(cv::Mat& im,
+                                       const uchar* maskTable,
+                                       char m1,
+                                       char m2)
 {
     cv::Mat marker = cv::Mat::zeros(im.size(), CV_8UC1);
 
@@ -117,7 +106,7 @@ static void GuoHallIteration_optimized(cv::Mat& im, const uchar* maskTable)
                 uchar p6 = im.at<uchar>(i+1, j);
                 uchar p5 = im.at<uchar>(i+1, j+1);
 
-                const int index = 
+                const int index =
                     (int)p2 * 1 +
                     (int)p3 * 2 +
                     (int)p4 * 4 +
@@ -126,8 +115,9 @@ static void GuoHallIteration_optimized(cv::Mat& im, const uchar* maskTable)
                     (int)p7 * 32 +
                     (int)p8 * 64 +
                     (int)p9 * 128;
-                
-                marker.at<uchar>(i,j) |= maskTable[index];
+
+                if (maskTable[index] == m1 || maskTable[index] == m2)
+                    marker.at<uchar>(i, j) = 1;
             }
         }
     }
@@ -144,16 +134,14 @@ void GuoHallThinning_optimized(const cv::Mat& src, cv::Mat& dst)
     cv::Mat prev = cv::Mat::zeros(src.size(), CV_8UC1);
     cv::Mat diff;
 
-    uchar maskTable0[256];
-    uchar maskTable1[256];
+    uchar maskTable[256];
 
-    GuoHallGenerateMaskTable(maskTable0, 0);
-    GuoHallGenerateMaskTable(maskTable1, 1);
+    GuoHallGenerateMaskTable(maskTable);
 
     do
     {
-        GuoHallIteration_optimized(dst, maskTable0);
-        GuoHallIteration_optimized(dst, maskTable1);
+        GuoHallIteration_optimized(dst, maskTable, 1, 3);
+        GuoHallIteration_optimized(dst, maskTable, 2, 3);
         cv::absdiff(dst, prev, diff);
         dst.copyTo(prev);
     }
