@@ -62,32 +62,33 @@ void GuoHallThinning(const cv::Mat& src, cv::Mat& dst)
 void createTable(uchar*& table, int iter)
 {
 	table = new uchar[256];
-	uchar p2 = 0;
-	uchar p3 = 0;
-	uchar p4 = 0;
-	uchar p5 = 0;
-	uchar p6 = 0;
-	uchar p7 = 0;
-	uchar p8 = 0;
-	uchar p9 = 0;
+	uchar p2, p3, p4, p5, p6, p7, p8, p9;
 	for(int i = 0; i < 256; i++)
 	{
+		p2 = 0;
+		p3 = 0;
+		p4 = 0;
+		p5 = 0;
+		p6 = 0;
+		p7 = 0;
+		p8 = 0;
+		p9 = 0;
 		table[i] = 0;
-		if(i & 1 != 0)
+		if((i & 1) != 0)
 			p2 = 1;
-		if(i & 2 != 0)
+		if((i & 2) != 0)
 			p3 = 1;
-		if(i & 4 != 0)
+		if((i & 4) != 0)
 			p4 = 1;
-		if(i & 8 != 0)
+		if((i & 8) != 0)
 			p5 = 1;
-		if(i & 16 != 0)
+		if((i & 16) != 0)
 			p6 = 1;
-		if(i & 32 != 0)
+		if((i & 32) != 0)
 			p7 = 1;
-		if(i & 64 != 0)
+		if((i & 64) != 0)
 			p8 = 1;
-		if(i & 128 != 0)
+		if((i & 128) != 0)
 			p9 = 1;
 
 		int C  = (!p2 & (p3 | p4)) + (!p4 & (p5 | p6)) +
@@ -99,7 +100,7 @@ void createTable(uchar*& table, int iter)
 
 			if (C == 1 && (N >= 2 && N <= 3) & (m == 0))
 				table[i] = 1;
-			std::cout<<"table["<<i<<"]="<<table[i]<<std::endl;
+			//std::cout<<"table["<<i<<"]="<<table[i]<<std::endl;
 	}
 }
 
