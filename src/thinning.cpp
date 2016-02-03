@@ -62,32 +62,90 @@ static void GuoHallIteration_optimized(cv::Mat& im, int iter)
 {
     cv::Mat marker = cv::Mat::zeros(im.size(), CV_8UC1);
 
-    for (int i = 1; i < im.rows-1; i++)
+    int rows = im.rows;
+    int cols = im.cols;
+
+    if (iter != 0)
     {
-        for (int j = 1; j < im.cols-1; j++)
+        for (int row = 1; row < rows-1; row++)
         {
-            uchar p2 = im.at<uchar>(i-1, j);
-            uchar p3 = im.at<uchar>(i-1, j+1);
-            uchar p4 = im.at<uchar>(i, j+1);
-            uchar p5 = im.at<uchar>(i+1, j+1);
-            uchar p6 = im.at<uchar>(i+1, j);
-            uchar p7 = im.at<uchar>(i+1, j-1);
-            uchar p8 = im.at<uchar>(i, j-1);
-            uchar p9 = im.at<uchar>(i-1, j-1);
+            const unsigned char* predRow = im.ptr<unsigned char>(row-1);
+            const unsigned char* thisRow = im.ptr<unsigned char>(row-0);
+            const unsigned char* nextRow = im.ptr<unsigned char>(row+1);
 
-            int C  = (!p2 & (p3 | p4)) + (!p4 & (p5 | p6)) +
-                     (!p6 & (p7 | p8)) + (!p8 & (p9 | p2));
-            int N1 = (p9 | p2) + (p3 | p4) + (p5 | p6) + (p7 | p8);
-            int N2 = (p2 | p3) + (p4 | p5) + (p6 | p7) + (p8 | p9);
-            int N  = N1 < N2 ? N1 : N2;
-            int m  = iter == 0 ? ((p6 | p7 | !p9) & p8) : ((p2 | p3 | !p5) & p4);
+            unsigned char* markRow = marker.ptr<unsigned char>(row);
 
-            if (C == 1 && (N >= 2 && N <= 3) & (m == 0))
-                marker.at<uchar>(i,j) = 1;
+            for (int col = 1; col < cols-1; col++)
+            {
+                uchar p9 = predRow[col-1];
+                uchar p2 = predRow[col+0];
+                uchar p3 = predRow[col+1];
+
+                uchar p8 = thisRow[col-1];
+                uchar p4 = thisRow[col+1];
+
+                uchar p7 = nextRow[col-1];
+                uchar p6 = nextRow[col+0];
+                uchar p5 = nextRow[col+1];
+
+                int C  = (!p2 & (p3 | p4)) + (!p4 & (p5 | p6)) +
+                         (!p6 & (p7 | p8)) + (!p8 & (p9 | p2));
+                int N1 = (p9 | p2) + (p3 | p4) + (p5 | p6) + (p7 | p8);
+                int N2 = (p2 | p3) + (p4 | p5) + (p6 | p7) + (p8 | p9);
+                int N  = N1 < N2 ? N1 : N2;
+                int m  = (p2 | p3 | !p5) & p4;
+
+                if (C == 1 && (N >= 2 && N <= 3) & (m == 0))
+                {
+                    markRow[col] = 1;
+                }
+            }
         }
+
+        im &= ~marker;
+        return;
     }
 
-    im &= ~marker;
+    if (iter == 0)
+    {
+        for (int row = 1; row < rows-1; row++)
+        {
+            const unsigned char* predRow = im.ptr<unsigned char>(row-1);
+            const unsigned char* thisRow = im.ptr<unsigned char>(row-0);
+            const unsigned char* nextRow = im.ptr<unsigned char>(row+1);
+
+            unsigned char* markRow = marker.ptr<unsigned char>(row);
+
+            for (int col = 1; col < cols-1; col++)
+            {
+                uchar p9 = predRow[col-1];
+                uchar p2 = predRow[col+0];
+                uchar p3 = predRow[col+1];
+
+                uchar p8 = thisRow[col-1];
+                uchar p4 = thisRow[col+1];
+
+                uchar p7 = nextRow[col-1];
+                uchar p6 = nextRow[col+0];
+                uchar p5 = nextRow[col+1];
+
+                int C  = (!p2 & (p3 | p4)) + (!p4 & (p5 | p6)) +
+                         (!p6 & (p7 | p8)) + (!p8 & (p9 | p2));
+                int N1 = (p9 | p2) + (p3 | p4) + (p5 | p6) + (p7 | p8);
+                int N2 = (p2 | p3) + (p4 | p5) + (p6 | p7) + (p8 | p9);
+                int N  = N1 < N2 ? N1 : N2;
+                int m  = (p6 | p7 | !p9) & p8;
+
+                if (C == 1 && (N >= 2 && N <= 3) & (m == 0))
+                {
+                    markRow[col] = 1;
+                }
+            }
+        }
+
+        im &= ~marker;
+        return;
+    }
 }
 
 void GuoHallThinning_optimized(const cv::Mat& src, cv::Mat& dst)
