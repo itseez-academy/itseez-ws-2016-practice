@@ -14,12 +14,17 @@ using std::tr1::get;
 // Test(s) for the ConvertColor_BGR2GRAY_BT709 function
 //
 
-// PERF_TEST(skeleton, ConvertColor_BGR2GRAY_BT709)
-// {
-//     Mat input = cv::imread("./bin/testdata/sla.png");
-//
-//     // Add code here
-// }
+ PERF_TEST(skeleton, ConvertColor_BGR2GRAY_BT709)
+ {
+     cv::Mat input(1024, 2048, CV_8UC3);
+	 cv::Mat gray_image(1024, 2048, CV_8UC1);
+	 declare.in(input, WARMUP_NONE).out(gray_image);
+	 TEST_CYCLE()
+	 {
+		 ConvertColor_BGR2GRAY_BT709(input, gray_image);
+	 }
+	 SANITY_CHECK(gray_image, 1 + 1e-6);
+ }
 
 //
 // Test(s) for the ImageResize function
