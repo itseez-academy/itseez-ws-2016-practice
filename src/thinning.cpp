@@ -58,7 +58,31 @@ void GuoHallThinning(const cv::Mat& src, cv::Mat& dst)
 // Place optimized version here
 //
 
-static void GuoHallIteration_optimized(cv::Mat& im, int iter)
+void SomeStrangeSh(uchar* look_up_table,int iter)
+{
+	for (int i = 0; i < 256; ++i)
+     {
+       int p2 = ((i & (int)1) >> 0);
+       int p3 = ((i & (int)2) >> 1);
+       int p4 = ((i & (int)4) >> 2);
+       int p5 = ((i & (int)8) >> 3);
+       int p6 = ((i & (int)16) >> 4);
+       int p7 = ((i & (int)32) >> 5);
+       int p8 = ((i & (int)64) >> 6);
+       int p9 = ((i & (int)128) >> 7);
+	
+	 int C  = (!p2 & (p3 | p4)) + (!p4 & (p5 | p6)) +
+                     (!p6 & (p7 | p8)) + (!p8 & (p9 | p2));
+     int N1 = (p9 | p2) + (p3 | p4) + (p5 | p6) + (p7 | p8);
+     int N2 = (p2 | p3) + (p4 | p5) + (p6 | p7) + (p8 | p9);
+     int N  = N1 < N2 ? N1 : N2;
+     int m  = iter == 0 ? ((p6 | p7 | !p9) & p8) : ((p2 | p3 | !p5) & p4);
+
+     look_up_table[i] = (C == 1 && (N >= 2 && N <= 3) & (m == 0)) ? 1 : 0;
+	}
+}
+
+static void GuoHallIteration_optimized(cv::Mat& im, int iter, const uchar* look_up_table)
 {
     cv::Mat marker = cv::Mat::zeros(im.size(), CV_8UC1);
 
@@ -68,6 +92,7 @@ static void GuoHallIteration_optimized(cv::Mat& im, int iter)
         {
             if (im.at<uchar>(i,j)==0)
 				continue;
+
 			uchar p2 = im.at<uchar>(i-1, j);
             uchar p3 = im.at<uchar>(i-1, j+1);
             uchar p4 = im.at<uchar>(i, j+1);
@@ -76,22 +101,16 @@ static void GuoHallIteration_optimized(cv::Mat& im, int iter)
             uchar p7 = im.at<uchar>(i+1, j-1);
             uchar p8 = im.at<uchar>(i, j-1);
             uchar p9 = im.at<uchar>(i-1, j-1);
-			
-            int C  = (!p2 & (p3 | p4)) + (!p4 & (p5 | p6)) +
-                     (!p6 & (p7 | p8)) + (!p8 & (p9 | p2));
-            int N1 = (p9 | p2) + (p3 | p4) + (p5 | p6) + (p7 | p8);
-            int N2 = (p2 | p3) + (p4 | p5) + (p6 | p7) + (p8 | p9);
-            int N  = N1 < N2 ? N1 : N2;
-            int m  = iter == 0 ? ((p6 | p7 | !p9) & p8) : ((p2 | p3 | !p5) & p4);
 
-            if (C == 1 && (N >= 2 && N <= 3) & (m == 0))
-                marker.at<uchar>(i,j) = 1;
-			
+			uchar code = p2 * 1 + p3 * 2 + p4 * 4 + p5 * 8 + p6 * 16 + p7 * 32 + p8 * 64 + p9 * 128;
+			marker.at<uchar>(i,j) = SomeStrangeSh(); 
         }
     }
 
     im &= ~marker;
 }
+
+
 
 void GuoHallThinning_optimized(const cv::Mat& src, cv::Mat& dst)
 {
