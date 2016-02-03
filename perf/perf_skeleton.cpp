@@ -11,20 +11,26 @@ using namespace cv;
 using std::tr1::make_tuple;
 using std::tr1::get;
 
+
+#define MAT_SIZES  ::perf::szVGA, ::perf::sz720p, ::perf::sz1080p
+
+typedef perf::TestBaseWithParam<Size> Size_Only;
+
 //
 // Test(s) for the ConvertColor_BGR2GRAY_BT709 function
 //
 
-PERF_TEST(skeleton, ConvertColor_BGR2GRAY_BT709)
+PERF_TEST_P(Size_Only, ConvertColor_BGR2GRAY_BT709, testing::Values(MAT_SIZES))
 {
-    Mat input = cv::imread("./bin/testdata/schedule.png");
-    Mat output(input.size(), CV_8UC1);
+    Size sz = GetParam();
+    Mat src(sz, CV_8UC3);
+    Mat dst(sz, CV_8UC1);
 
-    declare.in(input).out(output);
+    declare.in(src, WARMUP_RNG).out(dst);
 
     TEST_CYCLE()
     {
-        ConvertColor_BGR2GRAY_BT709(input, output);
+        ConvertColor_BGR2GRAY_BT709(src, dst);
     }
 
     SANITY_CHECK_NOTHING();
@@ -33,10 +39,6 @@ PERF_TEST(skeleton, ConvertColor_BGR2GRAY_BT709)
 //
 // Test(s) for the ImageResize function
 //
-
-#define MAT_SIZES  ::perf::szVGA, ::perf::sz720p, ::perf::sz1080p
-
-typedef perf::TestBaseWithParam<Size> Size_Only;
 
 PERF_TEST_P(Size_Only, ImageResize, testing::Values(MAT_SIZES))
 {
