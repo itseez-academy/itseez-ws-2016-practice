@@ -55,7 +55,6 @@ PERF_TEST_P(Size_Only, ImageResize, testing::Values(MAT_SIZES))
 
     SANITY_CHECK(dst, 1 + 1e-6);
 	//SANITY_CHECK_NOTHING();
-
 }
 
 //
@@ -105,6 +104,7 @@ PERF_TEST_P(Size_Only, Thinning, testing::Values(MAT_SIZES))
 
     SANITY_CHECK(image);
 }
+
 
  #define IMAGES testing::Values( std::string("./bin/testdata/sla.png"),\
                                  std::string("./bin/testdata/page.png"),\
