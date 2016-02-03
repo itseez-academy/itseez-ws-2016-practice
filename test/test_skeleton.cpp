@@ -60,3 +60,60 @@ TEST(skeleton, resize_matches_opencv)
     // std::cout << "Difference:\n" << reference - result << std::endl;
     EXPECT_LT(maxDifference(reference, result), 2);
 }
+
+TEST(skeleton, 2_plus_2_equals_4)
+{
+	EXPECT_EQ(4, 2 + 2);
+}
+
+TEST(skeleton, ConvertColor_BGR2GRAY_BT709_fixed_size)
+{
+	Mat bgr(5, 5, CV_8UC3);
+	randu(bgr, Scalar::all(0), Scalar::all(255));
+	Mat gray;
+	ConvertColor_BGR2GRAY_BT709(bgr, gray);
+	EXPECT_EQ(bgr.size(), gray.size());
+}
+
+TEST(skeleton, GuoHallThinning_fixed_size)
+{
+	Mat src(5, 5, CV_8UC1);
+	randu(src, Scalar::all(0), Scalar::all(255));
+	Mat dst;
+	GuoHallThinning(src, dst);
+	EXPECT_EQ(src.size(), dst.size());
+}
+
+TEST(skeleton, ImageResize_correct)
+{
+	Mat src(5, 5, CV_8UC1);
+	randu(src, Scalar::all(0), Scalar::all(255));
+	Mat dst;
+	Size S(20, 25);
+	ImageResize(src, dst, S);
+	EXPECT_EQ(dst.size().height, S.height);
+	EXPECT_EQ(dst.size().width, S.width);
+}
+
+TEST(skeleton, BGR2GRAY_one_color_image_to_one_color_image)
+{
+	Scalar color(123, 32, 203);
+	Mat src(5, 5, CV_8UC3, color);
+	Mat dst;
+	ConvertColor_BGR2GRAY_BT709(src, dst);
+	Mat expectedDst(5, 5, CV_8UC1, dst.at<uchar>(0, 0));
+	Mat match = abs(expectedDst - dst);
+	EXPECT_EQ(0, countNonZero(match));
+}
+
+//TEST(skeleton, ImageResize_one_color_image_to_one_color_image)
+//{
+//	Scalar color(123, 32, 203);
+//	Mat src(5, 5, CV_8UC1, color);
+//	Mat dst;
+//	Size S(20, 25);
+//	ImageResize(src, dst, S);
+//	Mat expectedDst(20, 25, CV_8UC1, src.at<uchar>(0, 0));
+//	Mat match = abs(expectedDst - dst);
+//	EXPECT_EQ(0, countNonZero(match));
+//}

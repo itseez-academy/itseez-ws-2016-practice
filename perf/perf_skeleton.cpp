@@ -3,6 +3,8 @@
 #include <iostream>
 
 #include "skeleton_filter.hpp"
+#include "opencv2/imgproc/imgproc.hpp"
+#include "opencv2/highgui/highgui.hpp"
 
 using namespace std;
 using namespace perf;
@@ -14,12 +16,21 @@ using std::tr1::get;
 // Test(s) for the ConvertColor_BGR2GRAY_BT709 function
 //
 
-// PERF_TEST(skeleton, ConvertColor_BGR2GRAY_BT709)
-// {
-//     Mat input = cv::imread("./bin/testdata/sla.png");
-//
-//     // Add code here
-// }
+ PERF_TEST(skeleton, ConvertColor_BGR2GRAY_BT709)
+ {
+     Mat input = cv::imread("./bin/testdata/sla.png");
+	 Mat output;
+	 output = input.clone();
+
+     declare.in(input).out(output);
+
+	 TEST_CYCLE()
+	 {
+		 ConvertColor_BGR2GRAY_BT709(input, output);
+	 }
+
+	 SANITY_CHECK(output, 1 + 1e-6);
+ }
 
 //
 // Test(s) for the ImageResize function
@@ -49,15 +60,25 @@ PERF_TEST_P(Size_Only, ImageResize, testing::Values(MAT_SIZES))
 // Test(s) for the skeletonize function
 //
 
-// #define IMAGES testing::Values( std::string("./bin/testdata/sla.png"),\
-//                                 std::string("./bin/testdata/page.png"),\
-//                                 std::string("./bin/testdata/schedule.png") )
-//
-// typedef perf::TestBaseWithParam<std::string> ImageName;
-//
-// PERF_TEST_P(ImageName, skeletonize, IMAGES)
-// {
-//     Mat input = cv::imread(GetParam());
-//
-//     // Add code here
-// }
+
+ #define IMAGES testing::Values( std::string("./bin/testdata/sla.png"),\
+                                 std::string("./bin/testdata/page.png"),\
+                                 std::string("./bin/testdata/schedule.png") )
+
+ typedef perf::TestBaseWithParam<std::string> ImageName;
+
+ PERF_TEST_P(ImageName, skeletonize, IMAGES)
+ {
+     Mat input = cv::imread(GetParam());
+     Mat output = input.clone();
+
+	 declare.in(input).out(output);
+	 declare.time(100);
+
+	 TEST_CYCLE()
+	 {
+		 skeletonize(input, output, 0);
+	 }
+
+	 SANITY_CHECK(output, 1 + 1e-6);
+ }
