@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <algorithm>
+#include <utility>
 
 static void GuoHallIteration(cv::Mat& im, int iter)
 {
@@ -80,28 +81,28 @@ static void decode(uchar area, uchar* p2, uchar* p3, uchar* p4,
     uchar* p5, uchar* p6, uchar* p7,
     uchar* p8, uchar* p9)
 {
-    *p2 = (bool) (area & 1  );
-    *p3 = (bool) (area & 2  );
-    *p4 = (bool) (area & 4  );
-    *p5 = (bool) (area & 8  );
-    *p6 = (bool) (area & 16 );
-    *p7 = (bool) (area & 32 );
-    *p8 = (bool) (area & 64 );
+    *p2 = (bool) (area &   1);
+    *p3 = (bool) (area &   2);
+    *p4 = (bool) (area &   4);
+    *p5 = (bool) (area &   8);
+    *p6 = (bool) (area &  16);
+    *p7 = (bool) (area &  32);
+    *p8 = (bool) (area &  64);
     *p9 = (bool) (area & 128);
 }
 
-static void GuoHallIteration_optimized(cv::Mat& im, const std::vector<uchar>& table)
+static void GuoHallIteration_optimized(cv::Mat& prev, const cv::Mat& dest, const std::vector<uchar>& table0, const std::vector<uchar>& table1)
 {
-    cv::Mat marker = cv::Mat::zeros(im.size(), CV_8UC1);
+    cv::Mat marker(dest.size(), CV_8UC1, cv::Scalar(1));
 
-    int rows = im.rows;
-    int cols = im.cols;
+    int rows = dest.rows;
+    int cols = dest.cols;
 
     for (int row = 1; row < rows-1; row++)
     {
-        const unsigned char* predRow = im.ptr<unsigned char>(row-1);
-        const unsigned char* thisRow = im.ptr<unsigned char>(row-0);
-        const unsigned char* nextRow = im.ptr<unsigned char>(row+1);
+        const unsigned char* predRow = dest.ptr<unsigned char>(row-1);
+        const unsigned char* thisRow = dest.ptr<unsigned char>(row-0);
+        const unsigned char* nextRow = dest.ptr<unsigned char>(row+1);
 
         unsigned char* markRow = marker.ptr<unsigned char>(row);
 
@@ -121,17 +122,48 @@ static void GuoHallIteration_optimized(cv::Mat& im, const std::vector<uchar>& ta
             uchar p5 = nextRow[col+1];
 
             int code = encode(p2, p3 ,p4, p5, p6, p7, p8, p9);
-            markRow[col] = table[code];
+            markRow[col] = table0[code];
         }
     }
 
-    im &= ~marker;
+    prev = dest & marker;
+    marker = cv::Mat(dest.size(), CV_8UC1, cv::Scalar(1));
+
+    for (int row = 1; row < rows-1; row++)
+    {
+        const unsigned char* predRow = prev.ptr<unsigned char>(row-1);
+        const unsigned char* thisRow = prev.ptr<unsigned char>(row-0);
+        const unsigned char* nextRow = prev.ptr<unsigned char>(row+1);
+
+        unsigned char* markRow = marker.ptr<unsigned char>(row);
+
+        for (int col = 1; col < cols-1; col++)
+        {
+            if (thisRow[col] == 0) continue;
+
+            uchar p9 = predRow[col-1];
+            uchar p2 = predRow[col+0];
+            uchar p3 = predRow[col+1];
+
+            uchar p8 = thisRow[col-1];
+            uchar p4 = thisRow[col+1];
+
+            uchar p7 = nextRow[col-1];
+            uchar p6 = nextRow[col+0];
+            uchar p5 = nextRow[col+1];
+
+            int code = encode(p2, p3 ,p4, p5, p6, p7, p8, p9);
+            markRow[col] = table1[code];
+        }
+    }
+
+    prev &= marker;
 }
 
 static std::vector<unsigned char> fillTable(int iter)
 {
     const int nVariants = 256;
-    std::vector<unsigned char> table(256, 0);
+    std::vector<unsigned char> table(256, 1);
     for (int variant = 0; variant < nVariants; variant++)
     {
         unsigned char p2, p3, p4, p5, p6, p7, p8, p9;
@@ -146,18 +178,18 @@ static std::vector<unsigned char> fillTable(int iter)
 
         if (C == 1 && (N >= 2 && N <= 3) & (m == 0))
         {
-            table[variant] = 1;
+            table[variant] = 0;
         }
     }
 
     return table;
 }
 
-void GuoHallThinning_optimized(const cv::Mat& src, cv::Mat& dst)
+void GuoHallThinning_optimized(const cv::Mat& src, cv::Mat& dest)
 {
     CV_Assert(CV_8UC1 == src.type());
 
-    dst = src / 255;
+    dest = src / 255;
 
     cv::Mat prev = cv::Mat::zeros(src.size(), CV_8UC1);
     cv::Mat diff;
@@ -167,14 +199,13 @@ void GuoHallThinning_optimized(const cv::Mat& src, cv::Mat& dst)
 
     do
     {
-        GuoHallIteration_optimized(dst, table0);
-        GuoHallIteration_optimized(dst, table1);
-        cv::absdiff(dst, prev, diff);
-        dst.copyTo(prev);
+        GuoHallIteration_optimized(prev, dest, table0, table1);
+        cv::absdiff(dest, prev, diff);
+        std::swap(prev, dest);
     }
-    while (cv::countNonZero(diff) > 0);
+    while (0 < cv::countNonZero(diff));
 
-    dst *= 255;
+    dest *= 255;
 }
 
 //
