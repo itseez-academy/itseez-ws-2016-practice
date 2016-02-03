@@ -56,6 +56,20 @@ void GuoHallThinning(const cv::Mat& src, cv::Mat& dst)
     dst *= 255;
 }
 
+int* Form_table()
+{
+	int  p2, p3, p4, p5, p6, p7, p8, p9;
+	int* table = new int[256];
+	    for (int i = 0; i < 256; i++)
+		{
+			// Form table
+			table[i] = p2 * 1 + p3 * 2 + p4 * 4 + p5 * 8 + p6 * 16 + p7 * 32 + p8 * 64 + p9 * 128;
+		}
+
+		return table;
+}
+
+
 //
 // Place optimized version here
 //
@@ -63,6 +77,13 @@ void GuoHallThinning(const cv::Mat& src, cv::Mat& dst)
 static void GuoHallIteration_optimized(cv::Mat& im, int iter)
 {
     cv::Mat marker = cv::Mat::zeros(im.size(), CV_8UC1);
+	int* table = new int[256];
+	table = Form_table();
+
+	// Pixel neighbourhood structure
+	// p9 p2 p3
+	// p8 p1 p4
+	// p7 p6 p5
 
     for (int i = 1; i < im.rows-1; i++)
     {
@@ -78,6 +99,10 @@ static void GuoHallIteration_optimized(cv::Mat& im, int iter)
             uchar p7 = im.at<uchar>(i+1, j-1);
             uchar p8 = im.at<uchar>(i, j-1);
             uchar p9 = im.at<uchar>(i-1, j-1);
+
+			// Encode neghbourhood pixel values to byte
+			int code = p2 * 1 + p3 * 2 + p4 * 4 + p5 * 8 + p6 * 16 + p7 * 32 + p8 * 64 + p9 * 128;
+			
 
             int C  = (!p2 & (p3 | p4)) + (!p4 & (p5 | p6)) +
                      (!p6 & (p7 | p8)) + (!p8 & (p9 | p2));
