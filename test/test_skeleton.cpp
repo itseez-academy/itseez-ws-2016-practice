@@ -21,7 +21,7 @@ int maxDifference(const cv::Mat &m1, const cv::Mat &m2)
     minMaxLoc(diff, 0, &max_diff);
 
     return (int)max_diff;
-}
+}		
 
 TEST(skeleton, 2_plus_2_equals_4)
 {
