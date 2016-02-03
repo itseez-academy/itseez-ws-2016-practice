@@ -7,14 +7,20 @@ compiler:
   - clang
 addons:
   apt:
+    sources:
+    - ubuntu-toolchain-r-test
     packages:
     - libopencv-dev
     - xvfb
+    - gcc-4.8
+    - g++-4.8
 before_script:
   # For headless testing of the sample application (cv::imshow)
   - "export DISPLAY=:99.0"
   - "sh -e /etc/init.d/xvfb start"
   - sleep 3 # give xvfb some time to start
+  # Use newer gcc and g++
+  - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
 script:
   # Run CMake in order to generate makefile
   - mkdir ../build
