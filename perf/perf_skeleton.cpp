@@ -61,9 +61,9 @@ PERF_TEST_P(Size_Only, ImageResize, testing::Values(MAT_SIZES))
 //
 
 
- #define IMAGES testing::Values( std::string("./testdata/sla.png"),\
-                                 std::string("./testdata/page.png"),\
-                                 std::string("./testdata/schedule.png") )
+ #define IMAGES testing::Values( std::string("./bin/testdata/sla.png"),\
+                                 std::string("./bin/testdata/page.png"),\
+                                 std::string("./bin/testdata/schedule.png") )
 
  typedef perf::TestBaseWithParam<std::string> ImageName;
 
