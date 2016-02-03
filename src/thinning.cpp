@@ -58,7 +58,51 @@ void GuoHallThinning(const cv::Mat& src, cv::Mat& dst)
 // Place optimized version here
 //
 
-static void GuoHallIteration_optimized(cv::Mat& im, int iter)
+static uchar GetIndex(uchar p2, uchar p3, uchar p4, uchar p5, uchar p6, uchar p7, uchar p8, uchar p9)
+{
+	// Pixel neighbourhood structure
+	// p9 p2 p3
+	// p8 p1 p4
+	// p7 p6 p5
+
+	// Encode neghbourhood pixel values to byte
+	uchar code = p2 * 1 +
+		   p3 * 2 +
+		   p4 * 4 +
+		   p5 * 8 +
+		   p6 * 16 +
+		   p7 * 32 +
+		   p8 * 64 +
+		   p9 * 128;
+
+	return code;
+}
+
+static uchar CountIJ(int iter, uchar p2, uchar p3, uchar p4, uchar p5, uchar p6, uchar p7, uchar p8, uchar p9, uchar *p23456789)
+{
+	uchar index = GetIndex(p2,p3,p4,p5,p6,p7,p8,p9);
+
+	int res = p23456789[index];
+	if (res != 2) 
+		return res;
+
+	res = 0;
+
+	int C  = (!p2 & (p3 | p4)) + (!p4 & (p5 | p6)) +
+			(!p6 & (p7 | p8)) + (!p8 & (p9 | p2));
+	int N1 = (p9 | p2) + (p3 | p4) + (p5 | p6) + (p7 | p8);
+	int N2 = (p2 | p3) + (p4 | p5) + (p6 | p7) + (p8 | p9);
+	int N  = N1 < N2 ? N1 : N2;
+	int m  = iter == 0 ? ((p6 | p7 | !p9) & p8) : ((p2 | p3 | !p5) & p4);
+
+	if (C == 1 && (N >= 2 && N <= 3) & (m == 0))
+		res = 1;
+
+	p23456789[index] = res;
+	return res;
+}
+
+static void GuoHallIteration_optimized(cv::Mat& im, int iter, uchar *p23456789)
 {
     cv::Mat marker = cv::Mat::zeros(im.size(), CV_8UC1);
 
@@ -77,15 +121,7 @@ static void GuoHallIteration_optimized(cv::Mat& im, int iter)
             uchar p8 = im.at<uchar>(i, j-1);
             uchar p9 = im.at<uchar>(i-1, j-1);
 
-            int C  = (!p2 & (p3 | p4)) + (!p4 & (p5 | p6)) +
-                     (!p6 & (p7 | p8)) + (!p8 & (p9 | p2));
-            int N1 = (p9 | p2) + (p3 | p4) + (p5 | p6) + (p7 | p8);
-            int N2 = (p2 | p3) + (p4 | p5) + (p6 | p7) + (p8 | p9);
-            int N  = N1 < N2 ? N1 : N2;
-            int m  = iter == 0 ? ((p6 | p7 | !p9) & p8) : ((p2 | p3 | !p5) & p4);
-
-            if (C == 1 && (N >= 2 && N <= 3) & (m == 0))
-                marker.at<uchar>(i,j) = 1;
+			marker.at<uchar>(i,j) = CountIJ(iter, p2,p3,p4,p5,p6,p7,p8,p9, p23456789);
         }
     }
 
@@ -101,10 +137,13 @@ void GuoHallThinning_optimized(const cv::Mat& src, cv::Mat& dst)
     cv::Mat prev = cv::Mat::zeros(src.size(), CV_8UC1);
     cv::Mat diff;
 
+	uchar *p23456789_0 = new uchar[256];	for (int i=0; i<256; i++) p23456789_0[i] = 2;
+	uchar *p23456789_1 = new uchar[256];	for (int i=0; i<256; i++) p23456789_1[i] = 2;
+
     do
     {
-        GuoHallIteration_optimized(dst, 0);
-        GuoHallIteration_optimized(dst, 1);
+        GuoHallIteration_optimized(dst, 0, p23456789_0);
+        GuoHallIteration_optimized(dst, 1, p23456789_1);
         cv::absdiff(dst, prev, diff);
         dst.copyTo(prev);
     }
