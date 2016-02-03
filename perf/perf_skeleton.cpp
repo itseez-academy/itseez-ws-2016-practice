@@ -50,8 +50,8 @@ PERF_TEST_P(Size_Only, ImageResize, testing::Values(MAT_SIZES))
 PERF_TEST(skeleton, ConvertColor_BGR2GRAY_BT709)
  {
 	
-	cv::Mat input(640,480, CV_8UC3);
-	cv::Mat output(640,480, CV_8UC1);
+	cv::Mat input(1024,768, CV_8UC3);
+	cv::Mat output(1024,768, CV_8UC1);
 	declare.in(input, WARMUP_NONE).out(output);
 	
     TEST_CYCLE()
