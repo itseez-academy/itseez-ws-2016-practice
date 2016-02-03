@@ -60,14 +60,19 @@ void GuoHallThinning(const cv::Mat& src, cv::Mat& dst)
 // Place optimized version here
 //
 namespace {
-    int guo_c[256];
-    int guo_N1[256];
-    int guo_N2[256];
-    int guo_lm[256];
-    int guo_rm[256];
+
+    uchar new_value_0[256];
+    uchar new_value_1[256];
 
     struct Initializer {
         Initializer() {
+
+            int guo_c[256];
+            int guo_N1[256];
+            int guo_N2[256];
+            int guo_lm[256];
+            int guo_rm[256];
+
             for (uchar i = 0; i <= uchar(254); ++i) {
                 uchar p[8];
                 uchar ti = i;
@@ -82,6 +87,21 @@ namespace {
                 guo_N2[i] = (p[0] | p[1]) + (p[2] | p[3]) + (p[4] | p[5]) + (p[6] | p[7]);
                 guo_lm[i] = (p[4] | p[5] | !p[7]) & p[6];
                 guo_rm[i] = (p[0] | p[1] | !p[3]) & p[2];
+
+
+                int N = guo_N1[i] < guo_N2[i] ? guo_N1[i] : guo_N2[i];
+                int m_0 = guo_lm[i];
+                int m_1 = guo_rm[i];
+
+                if (guo_c[i] == 1 && (N >= 2 && N <= 3) & (m_0 == 0))
+                    new_value_0[i] = 1;
+                else
+                    new_value_0[i] = 0;
+
+                if (guo_c[i] == 1 && (N >= 2 && N <= 3) & (m_1 == 0))
+                    new_value_1[i] = 1;
+                else
+                    new_value_1[i] = 0;
             }
             uchar i = 255;
             uchar p[8];
@@ -97,6 +117,21 @@ namespace {
             guo_N2[i] = (p[0] | p[1]) + (p[2] | p[3]) + (p[4] | p[5]) + (p[6] | p[7]);
             guo_lm[i] = (p[4] | p[5] | !p[7]) & p[6];
             guo_rm[i] = (p[0] | p[1] | !p[3]) & p[2];
+
+
+            int N = guo_N1[i] < guo_N2[i] ? guo_N1[i] : guo_N2[i];
+            int m_0 = guo_lm[i];
+            int m_1 = guo_rm[i];
+
+            if (guo_c[i] == 1 && (N >= 2 && N <= 3) & (m_0 == 0))
+                new_value_0[i] = 1;
+            else
+                new_value_0[i] = 0;
+
+            if (guo_c[i] == 1 && (N >= 2 && N <= 3) & (m_1 == 0))
+                new_value_1[i] = 1;
+            else
+                new_value_1[i] = 0;
         }
     };
 
@@ -120,11 +155,9 @@ static void GuoHallIteration_optimized(cv::Mat& im, int iter)
                             (im.at<uchar>(i, j - 1) << 1) |
                             im.at<uchar>(i - 1, j - 1);
 
-                int N = guo_N1[idx] < guo_N2[idx] ? guo_N1[idx] : guo_N2[idx];
-                int m = iter == 0 ? guo_lm[idx] : guo_rm[idx];
-
-                if (guo_c[idx] == 1 && (N >= 2 && N <= 3) & (m == 0))
-                    marker.at<uchar>(i, j) = 1;
+                marker.at<uchar>(i,j) = (iter == 0)
+                                        ? new_value_0[idx]
+                                        : new_value_1[idx];
             }
         }
     }
