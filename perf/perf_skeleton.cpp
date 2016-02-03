@@ -22,7 +22,6 @@ using std::tr1::get;
      // Add code here
 	 Mat dst = input.clone();
 	 declare.in(input, WARMUP_RNG).out(dst);
-
     TEST_CYCLE()
     {
 		ConvertColor_BGR2GRAY_BT709(input, dst);
