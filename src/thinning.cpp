@@ -59,23 +59,23 @@ void GuoHallThinning(const cv::Mat& src, cv::Mat& dst)
 // Place optimized version here
 //
 
-static void Decode(uchar* p, int code)
+static void Decode(uchar* p, uchar code)
 {
-        p[0] = (int)(code & 1) > 0 ? 1 : 0;//p2
-        p[1] = (int)(code & 2) > 0 ? 1 : 0;//p3
-        p[2] = (int)(code & 4) >0 ? 1 : 0;//p4
-        p[3] = (int)(code & 8) >0 ? 1 : 0;//p5
-        p[4] = (int)(code & 16) > 0 ? 1 : 0;//p6
-        p[5] = (int)(code & 32) > 0 ? 1 : 0;//p7
-        p[6] = (int)(code & 64) > 0 ? 1 : 0;//p8
-        p[7] = (int)(code & 128) > 0 ? 1 : 0;//p9
+    p[0] = code & 1 && 1;//p2
+    p[1] = code & 2 && 1;//p3
+    p[2] = code & 4 && 1;//p4
+    p[3] = code & 8 && 1;//p5
+    p[4] = code & 16 && 1;//p6
+    p[5] = code & 32 && 1;//p7
+    p[6] = code & 64 && 1;//p8
+    p[7] = code & 128 && 1;//p9
 }
 
-static int Encode(uchar* p)
+static uchar Encode(uchar* p)
 {
-    char code = p[0] * 1 + p[1] * 2 + p[2] * 4 +
+    uchar code = p[0] * 1 + p[1] * 2 + p[2] * 4 +
        p[3] * 8 + p[4] * 16 + p[5] * 32 + p[6] * 64 + p[7] * 128;
-    return static_cast<int>(code);
+    return code;
 }
 
 static void GuoHallIteration_optimized(cv::Mat& im, uchar* neighbours_to_value)
@@ -109,16 +109,10 @@ static void GuoHallIteration_optimized(cv::Mat& im, uchar* neighbours_to_value)
 static void calculateTables(uchar* neighbours_to_value_zero, uchar* neighbours_to_value_one)
 {
     uchar p[8];
-    int  C, N1, N2, N, m_zero, m_one;
-    for(int code = 0; code < 256; code++)
+    uchar  C, N1, N2, N, m_zero, m_one;
+    for(uchar code = 0; code < 255; code++)
     {
         Decode(p, code);
-        // cout<<endl;
-        // for(int j =0; j < 8; j++)
-        // {
-        //     cout<<static_cast<int>(p[j]);
-        // }
-        // cout<<endl;
         C  = (!p[0] & (p[1] | p[2])) + (!p[2] & (p[3] | p[4])) +
                      (!p[4] & (p[5] | p[6])) + (!p[6] & (p[7] | p[0]));
         N1 = (p[7] | p[0]) + (p[1] | p[2]) + (p[3] | p[4]) + (p[5] | p[6]);
