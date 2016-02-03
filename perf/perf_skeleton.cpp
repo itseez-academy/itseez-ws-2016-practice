@@ -81,14 +81,14 @@ PERF_TEST_P(ImageName, skeletonize, IMAGES)
 		 skeletonize(input, output, false);
 	 }
 
-	  SANITY_CHECK(output, 1 + 1e-6);
+	  SANITY_CHECK(output);
 }
 
 //
 // Test(s) for the Thinning function
 //
 
-PERF_TEST_P(Size_Only, Thinning, testing::Values(MAT_SIZES))
+PERF_TEST_P(Size_Only, Thinning, MAT_SIZES)
 {
     Size sz = GetParam();
 
