@@ -1,6 +1,7 @@
 #include "skeleton_filter.hpp"
 #include <opencv2/imgproc/imgproc.hpp>
 
+#include <vector>
 #include <algorithm>
 
 static void GuoHallIteration(cv::Mat& im, int iter)
@@ -60,7 +61,36 @@ void GuoHallThinning(const cv::Mat& src, cv::Mat& dst)
 // Place optimized version here
 //
 
-static void GuoHallIteration_optimized(cv::Mat& im, int iter)
+static int encode(uchar p2, uchar p3, uchar p4,
+    uchar p5, uchar p6, uchar p7,
+    uchar p8, uchar p9)
+{
+    return
+       p2 *   1 +
+       p3 *   2 +
+       p4 *   4 +
+       p5 *   8 +
+       p6 *  16 +
+       p7 *  32 +
+       p8 *  64 +
+       p9 * 128;
+}
+
+static void decode(uchar area, uchar* p2, uchar* p3, uchar* p4,
+    uchar* p5, uchar* p6, uchar* p7,
+    uchar* p8, uchar* p9)
+{
+    *p2 = (bool) (area & 1  );
+    *p3 = (bool) (area & 2  );
+    *p4 = (bool) (area & 4  );
+    *p5 = (bool) (area & 8  );
+    *p6 = (bool) (area & 16 );
+    *p7 = (bool) (area & 32 );
+    *p8 = (bool) (area & 64 );
+    *p9 = (bool) (area & 128);
+}
+
+static void GuoHallIteration_optimized(cv::Mat& im, const std::vector<uchar>& table)
 {
     cv::Mat marker = cv::Mat::zeros(im.size(), CV_8UC1);
 
@@ -90,21 +120,37 @@ static void GuoHallIteration_optimized(cv::Mat& im, int iter)
             uchar p6 = nextRow[col+0];
             uchar p5 = nextRow[col+1];
 
-            int C  = (!p2 & (p3 | p4)) + (!p4 & (p5 | p6)) +
-                     (!p6 & (p7 | p8)) + (!p8 & (p9 | p2));
-            int N1 = (p9 | p2) + (p3 | p4) + (p5 | p6) + (p7 | p8);
-            int N2 = (p2 | p3) + (p4 | p5) + (p6 | p7) + (p8 | p9);
-            int N  = std::min(N1, N2);
-            int m  = (1-iter)*((p6 | p7 | !p9) & p8)+iter*((p2 | p3 | !p5) & p4);
-
-            if (C == 1 && (N >= 2 && N <= 3) & (m == 0))
-            {
-                markRow[col] = 1;
-            }
+            int code = encode(p2, p3 ,p4, p5, p6, p7, p8, p9);
+            markRow[col] = table[code];
         }
     }
 
     im &= ~marker;
+}
+
+static std::vector<unsigned char> fillTable(int iter)
+{
+    const int nVariants = 256;
+    std::vector<unsigned char> table(256, 0);
+    for (int variant = 0; variant < nVariants; variant++)
+    {
+        unsigned char p2, p3, p4, p5, p6, p7, p8, p9;
+        decode(variant, &p2, &p3, &p4, &p5, &p6, &p7, &p8, &p9);
+
+        int C  = (!p2 & (p3 | p4)) + (!p4 & (p5 | p6)) +
+                 (!p6 & (p7 | p8)) + (!p8 & (p9 | p2));
+        int N1 = (p9 | p2) + (p3 | p4) + (p5 | p6) + (p7 | p8);
+        int N2 = (p2 | p3) + (p4 | p5) + (p6 | p7) + (p8 | p9);
+        int N  = std::min(N1, N2);
+        int m  = (1-iter)*((p6 | p7 | !p9) & p8)+iter*((p2 | p3 | !p5) & p4);
+
+        if (C == 1 && (N >= 2 && N <= 3) & (m == 0))
+        {
+            table[variant] = 1;
+        }
+    }
+
+    return table;
 }
 
 void GuoHallThinning_optimized(const cv::Mat& src, cv::Mat& dst)
@@ -116,10 +162,13 @@ void GuoHallThinning_optimized(const cv::Mat& src, cv::Mat& dst)
     cv::Mat prev = cv::Mat::zeros(src.size(), CV_8UC1);
     cv::Mat diff;
 
+    const std::vector<uchar> table0 = fillTable(0);
+    const std::vector<uchar> table1 = fillTable(1);
+
     do
     {
-        GuoHallIteration_optimized(dst, 0);
-        GuoHallIteration_optimized(dst, 1);
+        GuoHallIteration_optimized(dst, table0);
+        GuoHallIteration_optimized(dst, table1);
         cv::absdiff(dst, prev, diff);
         dst.copyTo(prev);
     }
