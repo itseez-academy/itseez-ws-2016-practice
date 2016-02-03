@@ -75,6 +75,9 @@ static uchar GetIndex(uchar p2, uchar p3, uchar p4, uchar p5, uchar p6, uchar p7
 		   p8 * 64 +
 		   p9 * 128;
 
+	if (code == 15)
+		printf("123");
+
 	return code;
 }
 
@@ -128,6 +131,38 @@ static void GuoHallIteration_optimized(cv::Mat& im, int iter, uchar *p23456789)
     im &= ~marker;
 }
 
+static void FillP(uchar *p23456789, int iter)
+{
+	for (int code=0; code<256; code++)
+	{
+		uchar res = 0;
+
+		uchar p2 = (bool)(code & 1);
+		uchar p3 = (bool)(code & 2);
+		uchar p4 = (bool)(code & 4);
+		uchar p5 = (bool)(code & 8);
+		uchar p6 = (bool)(code & 16);
+		uchar p7 = (bool)(code & 32);
+		uchar p8 = (bool)(code & 64);
+		uchar p9 = (bool)(code & 128);
+
+		if (code == 15)
+			printf("123");
+
+		int C  = (!p2 & (p3 | p4)) + (!p4 & (p5 | p6)) +
+			(!p6 & (p7 | p8)) + (!p8 & (p9 | p2));
+		int N1 = (p9 | p2) + (p3 | p4) + (p5 | p6) + (p7 | p8);
+		int N2 = (p2 | p3) + (p4 | p5) + (p6 | p7) + (p8 | p9);
+		int N  = N1 < N2 ? N1 : N2;
+		int m  = iter == 0 ? ((p6 | p7 | !p9) & p8) : ((p2 | p3 | !p5) & p4);
+
+		if (C == 1 && (N >= 2 && N <= 3) & (m == 0))
+			res = 1;
+
+		p23456789[code] = res;
+	}
+}
+
 void GuoHallThinning_optimized(const cv::Mat& src, cv::Mat& dst)
 {
     CV_Assert(CV_8UC1 == src.type());
@@ -137,8 +172,8 @@ void GuoHallThinning_optimized(const cv::Mat& src, cv::Mat& dst)
     cv::Mat prev = cv::Mat::zeros(src.size(), CV_8UC1);
     cv::Mat diff;
 
-	uchar *p23456789_0 = new uchar[256];	for (int i=0; i<256; i++) p23456789_0[i] = 2;
-	uchar *p23456789_1 = new uchar[256];	for (int i=0; i<256; i++) p23456789_1[i] = 2;
+	uchar *p23456789_0 = new uchar[256]; FillP(p23456789_0, 0);//for (int i=0; i<256; i++) p23456789_0[i] = 2;
+	uchar *p23456789_1 = new uchar[256]; FillP(p23456789_1, 0);//for (int i=0; i<256; i++) p23456789_1[i] = 2;
 
     do
     {
@@ -148,6 +183,16 @@ void GuoHallThinning_optimized(const cv::Mat& src, cv::Mat& dst)
         dst.copyTo(prev);
     }
     while (cv::countNonZero(diff) > 0);
+
+	//printf("DIFF:\n");
+	//uchar *p23456789_00 = new uchar[256]; FillP(p23456789_00, 0);	
+	//uchar *p23456789_11 = new uchar[256]; FillP(p23456789_11, 1);
+	//for (int i=0; i<256; i++)
+	//{
+	//	if (p23456789_0[i]!=2 && p23456789_00[i] != p23456789_0[i]) printf("0) Wrong in %i: %i %i\n", i, +p23456789_0[i], +p23456789_00[i]);
+	//	if (p23456789_1[i]!=2 && p23456789_11[i] != p23456789_1[i]) printf("1) Wrong in %i: %i %i\n", i, +p23456789_1[i], +p23456789_11[i]);
+	//}
+	//printf("END\n");
 
     dst *= 255;
 }
