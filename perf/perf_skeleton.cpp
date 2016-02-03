@@ -27,7 +27,7 @@ PERF_TEST(skeleton, ConvertColor_BGR2GRAY_BT709)
 		 ConvertColor_BGR2GRAY_BT709(input, output);
 	 }
 
-	 SANITY_CHECK(output, 1 + 1e-6);
+	 SANITY_CHECK(output);
 }
 
 //
@@ -44,14 +44,19 @@ PERF_TEST_P(Size_Only, ImageResize, MAT_SIZES)
     Size sz_to(sz.width / 2, sz.height / 2);
 
     cv::Mat src(sz, CV_8UC1), dst(Size(sz_to), CV_8UC1);
-    declare.in(src, WARMUP_RNG).out(dst);
+
+    declare.in(src, WARMUP_RNG)
+		   .out(dst);
+
+    cv::RNG rng(234231412);
+    rng.fill(src, CV_8UC1, 0, 255);
 
     TEST_CYCLE()
     {
         ImageResize(src, dst, sz_to);
     }
 
-    SANITY_CHECK(dst, 1 + 1e-6);
+    SANITY_CHECK(dst);
 }
 
 //
