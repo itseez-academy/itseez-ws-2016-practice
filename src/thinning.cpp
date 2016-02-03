@@ -87,47 +87,53 @@ void GuoHallGenerateMaskTable(uchar* maskTable)
 static int GuoHallIteration_optimized(cv::Mat& im,
                                       const uchar* maskTable,
                                       char m1,
-                                      char m2)
+                                      char m2,
+                                      uchar* top,
+                                      uchar* topNext)
 {
-    cv::Mat marker = cv::Mat::zeros(im.size(), CV_8UC1);
     int dif = 0;
-
+    memcpy(top, im.data, im.cols);
     for (int i = 1; i < im.rows - 1; ++i)
     {
+        memcpy(topNext, im.data + i * im.cols, im.cols);
+        uchar left = im.at<uchar>(i, 0);
         for (int j = 1; j < im.cols - 1; ++j)
         {
             if (im.at<uchar>(i, j))
             {
-                uchar p8 = im.at<uchar>(i, j-1);
                 uchar p4 = im.at<uchar>(i, j+1);
-                uchar p9 = im.at<uchar>(i-1, j-1);
-                uchar p2 = im.at<uchar>(i-1, j);
-                uchar p3 = im.at<uchar>(i-1, j+1);
                 uchar p7 = im.at<uchar>(i+1, j-1);
                 uchar p6 = im.at<uchar>(i+1, j);
                 uchar p5 = im.at<uchar>(i+1, j+1);
+                uchar p9 = top[j - 1];
+                uchar p2 = top[j];
+                uchar p3 = top[j + 1];
+                uchar p8 = left;
 
                 const int index =
-                    (int)p2 * 1 +
+                    ((int)p2 * 1 +
                     (int)p3 * 2 +
                     (int)p4 * 4 +
                     (int)p5 * 8 +
                     (int)p6 * 16 +
                     (int)p7 * 32 +
                     (int)p8 * 64 +
-                    (int)p9 * 128;
+                    (int)p9 * 128) / 255;
 
+                left = im.at<uchar>(i, j);
                 if (maskTable[index] == m1 || maskTable[index] == m2)
                 {
-                    marker.at<uchar>(i, j) = 1;
+                    im.at<uchar>(i, j) = 0;
                     dif = 1;
                 }
             }
+            else
+            {
+                left = 0;
+            }
         }
+        std::swap(top, topNext);
     }
-
-    if (dif > 0)
-        im &= ~marker;
     return dif;
 }
 
@@ -135,39 +141,39 @@ void GuoHallThinning_optimized(const cv::Mat& src, cv::Mat& dst)
 {
     CV_Assert(CV_8UC1 == src.type());
 
-    dst = src / 255;
+    dst = src.clone();
 
+    uchar* top = (uchar*)malloc(src.cols * 2);
+    uchar* topNext = top + src.cols;
     uchar maskTable[256];
     GuoHallGenerateMaskTable(maskTable);
     int dif = 0;
     do
     {
-        dif = GuoHallIteration_optimized(dst, maskTable, 1, 3);
-        dif += GuoHallIteration_optimized(dst, maskTable, 2, 3);
+        dif = GuoHallIteration_optimized(dst, maskTable, 1, 3, top, topNext);
+        dif += GuoHallIteration_optimized(dst, maskTable, 2, 3, top, topNext);
     }
     while (dif > 0);
-
-    dst *= 255;
+    free(top);
 }
-
 
 // Geometric mean
 
 //          Name of Test
 
-//                                   perf        perf        perf        perf        perf       perf       perf
-//                                    res         res         res         res        res        res        res
-//                                     0           1           2           3          1          2          3
-//                                               luts         fix         fix        luts       fix        fix
-//                                                and          2        copying      and         2       copying
-//                                               zeros       luts                   zeros       luts        vs
-//                                                                                    vs         vs
+//                                   perf        perf        perf        perf        perf        perf       perf       perf       perf
+//                                    res         res         res         res         res        res        res        res        res
+//                                     0           1           2           3           4          1          2          3          4
+//                                               luts         fix         fix         fix        luts       fix        fix        fix
+//                                                and          2        copying     marker       and         2       copying     marker
+//                                               zeros       luts                               zeros       luts        vs         vs
+//                                                                                                vs         vs
 
-//                                                                                                         perf
-//                                                                                   perf       perf       res
-//                                                                                   res        res         0
-//                                                                                    0          0      (x-factor)
-//                                                                                (x-factor) (x-factor)
-// Thinning::Size_Only::640x480   928.535 ms  549.163 ms  481.489 ms  464.392 ms     1.69       1.93       2.00
-// Thinning::Size_Only::1280x720  2304.949 ms 1410.921 ms 1284.146 ms 1254.155 ms    1.63       1.79       1.84
-// Thinning::Size_Only::1920x1080 6655.387 ms 4048.845 ms 3577.448 ms 3386.069 ms    1.64       1.86       1.97
+//                                                                                                                     perf       perf
+//                                                                                               perf       perf       res        res
+//                                                                                               res        res         0          0
+//                                                                                                0          0      (x-factor) (x-factor)
+//                                                                                            (x-factor) (x-factor)
+// Thinning::Size_Only::640x480   928.535 ms  549.163 ms  481.489 ms  464.392 ms  350.819 ms     1.69       1.93       2.00       2.65
+// Thinning::Size_Only::1280x720  2304.949 ms 1410.921 ms 1284.146 ms 1254.155 ms 880.699 ms     1.63       1.79       1.84       2.62
+// Thinning::Size_Only::1920x1080 6655.387 ms 4048.845 ms 3577.448 ms 3386.069 ms 2447.177 ms    1.64       1.86       1.97       2.72
