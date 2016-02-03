@@ -43,6 +43,11 @@ TEST(skeleton, cvtcolor_matches_opencv)
     EXPECT_EQ(0, numberOfDifferentPixels(reference, result));
 }
 
+TEST(skeleton, 2_plus_2_equals_4)
+{
+   EXPECT_EQ(4, 2 + 2);
+}
+
 TEST(skeleton, resize_matches_opencv)
 {
     // Arrange
