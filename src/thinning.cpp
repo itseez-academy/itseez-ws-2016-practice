@@ -84,16 +84,17 @@ void GuoHallGenerateMaskTable(uchar* maskTable)
     }
 }
 
-static void GuoHallIteration_optimized(cv::Mat& im,
-                                       const uchar* maskTable,
-                                       char m1,
-                                       char m2)
+static int GuoHallIteration_optimized(cv::Mat& im,
+                                      const uchar* maskTable,
+                                      char m1,
+                                      char m2)
 {
     cv::Mat marker = cv::Mat::zeros(im.size(), CV_8UC1);
+    int dif = 0;
 
-    for (int i = 1; i < im.rows-1; i++)
+    for (int i = 1; i < im.rows - 1; ++i)
     {
-        for (int j = 1; j < im.cols-1; j++)
+        for (int j = 1; j < im.cols - 1; ++j)
         {
             if (im.at<uchar>(i, j))
             {
@@ -117,12 +118,17 @@ static void GuoHallIteration_optimized(cv::Mat& im,
                     (int)p9 * 128;
 
                 if (maskTable[index] == m1 || maskTable[index] == m2)
+                {
                     marker.at<uchar>(i, j) = 1;
+                    dif = 1;
+                }
             }
         }
     }
 
-    im &= ~marker;
+    if (dif > 0)
+        im &= ~marker;
+    return dif;
 }
 
 void GuoHallThinning_optimized(const cv::Mat& src, cv::Mat& dst)
@@ -131,21 +137,15 @@ void GuoHallThinning_optimized(const cv::Mat& src, cv::Mat& dst)
 
     dst = src / 255;
 
-    cv::Mat prev = cv::Mat::zeros(src.size(), CV_8UC1);
-    cv::Mat diff;
-
     uchar maskTable[256];
-
     GuoHallGenerateMaskTable(maskTable);
-
+    int dif = 0;
     do
     {
-        GuoHallIteration_optimized(dst, maskTable, 1, 3);
-        GuoHallIteration_optimized(dst, maskTable, 2, 3);
-        cv::absdiff(dst, prev, diff);
-        dst.copyTo(prev);
+        dif = GuoHallIteration_optimized(dst, maskTable, 1, 3);
+        dif += GuoHallIteration_optimized(dst, maskTable, 2, 3);
     }
-    while (cv::countNonZero(diff) > 0);
+    while (dif > 0);
 
     dst *= 255;
 }
