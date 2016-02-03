@@ -40,25 +40,6 @@ PERF_TEST(skeleton, ConvertColor_BGR2GRAY_BT709_sla)
 
 typedef perf::TestBaseWithParam<Size> Size_Only;
 
-PERF_TEST(skeleton, perf_ImageResize_sla)
-{
-	//Mat input = cv::imread("testdata/sla.png");
-	Mat input = cv::imread("./bin/testdata/sla.png"); //TRAVIS
-	ConvertColor_BGR2GRAY_BT709(input, input);
-
-	Size newSize(input.size().width, input.size().height);
-	Mat source(input);
-	Mat destination(Size(newSize), CV_8UC1);
-
-    declare.in(source).out(destination);
-    TEST_CYCLE()
-    {
-		ImageResize(source, destination, newSize);
-    }
-
-    SANITY_CHECK_NOTHING();
- }
-
 PERF_TEST_P(Size_Only, ImageResize, testing::Values(MAT_SIZES))
 {
     Size sz = GetParam();
@@ -81,7 +62,11 @@ PERF_TEST_P(Size_Only, ImageResize, testing::Values(MAT_SIZES))
 
 #define IMAGES testing::Values( std::string("./bin/testdata/sla.png"),\
                                 std::string("./bin/testdata/page.png"),\
-                                std::string("./bin/testdata/schedule.png") )
+                                std::string("./bin/testdata/schedule.png") ) //TRAVIS
+
+//#define IMAGES testing::Values( std::string("testdata/sla.png"),\
+                                std::string("testdata/page.png"),\
+                                std::string("testdata/schedule.png") ) //local
 
 typedef perf::TestBaseWithParam<std::string> ImageName;
 
@@ -96,3 +81,22 @@ PERF_TEST_P(ImageName, skeletonize, IMAGES)
     }
 	SANITY_CHECK_NOTHING();
 }
+
+PERF_TEST_P(ImageName, perf_ImageResize, IMAGES)
+{
+	//Mat input = cv::imread("testdata/sla.png");
+	//Mat input = cv::imread("./bin/testdata/sla.png"); //TRAVIS
+	Mat input = cv::imread(GetParam());
+	ConvertColor_BGR2GRAY_BT709(input, input);
+
+	Size newSize(input.size().width, input.size().height);
+	Mat source(input);
+	Mat destination(Size(newSize), CV_8UC1);
+
+    declare.in(source).out(destination);
+    TEST_CYCLE()
+    {
+		ImageResize(source, destination, newSize);
+    }
+    SANITY_CHECK_NOTHING();
+ }
