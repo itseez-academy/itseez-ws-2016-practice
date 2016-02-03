@@ -3,7 +3,6 @@
 #include <iostream>
 
 #include "skeleton_filter.hpp"
-#include <opencv\highgui.h>
 
 using namespace std;
 using namespace perf;
