@@ -67,91 +67,44 @@ static void GuoHallIteration_optimized(cv::Mat& im, int iter)
     int rows = im.rows;
     int cols = im.cols;
 
-    if (iter != 0)
+    for (int row = 1; row < rows-1; row++)
     {
-        for (int row = 1; row < rows-1; row++)
+        const unsigned char* predRow = im.ptr<unsigned char>(row-1);
+        const unsigned char* thisRow = im.ptr<unsigned char>(row-0);
+        const unsigned char* nextRow = im.ptr<unsigned char>(row+1);
+
+        unsigned char* markRow = marker.ptr<unsigned char>(row);
+
+        for (int col = 1; col < cols-1; col++)
         {
-            const unsigned char* predRow = im.ptr<unsigned char>(row-1);
-            const unsigned char* thisRow = im.ptr<unsigned char>(row-0);
-            const unsigned char* nextRow = im.ptr<unsigned char>(row+1);
+            if (thisRow[col] == 0) continue;
 
-            unsigned char* markRow = marker.ptr<unsigned char>(row);
+            uchar p9 = predRow[col-1];
+            uchar p2 = predRow[col+0];
+            uchar p3 = predRow[col+1];
 
-            for (int col = 1; col < cols-1; col++)
+            uchar p8 = thisRow[col-1];
+            uchar p4 = thisRow[col+1];
+
+            uchar p7 = nextRow[col-1];
+            uchar p6 = nextRow[col+0];
+            uchar p5 = nextRow[col+1];
+
+            int C  = (!p2 & (p3 | p4)) + (!p4 & (p5 | p6)) +
+                     (!p6 & (p7 | p8)) + (!p8 & (p9 | p2));
+            int N1 = (p9 | p2) + (p3 | p4) + (p5 | p6) + (p7 | p8);
+            int N2 = (p2 | p3) + (p4 | p5) + (p6 | p7) + (p8 | p9);
+            int N  = std::min(N1, N2);
+            int m  = (1-iter)*((p6 | p7 | !p9) & p8)+iter*((p2 | p3 | !p5) & p4);
+
+            if (C == 1 && (N >= 2 && N <= 3) & (m == 0))
             {
-                if (thisRow[col] == 0) continue;
-
-                uchar p9 = predRow[col-1];
-                uchar p2 = predRow[col+0];
-                uchar p3 = predRow[col+1];
-
-                uchar p8 = thisRow[col-1];
-                uchar p4 = thisRow[col+1];
-
-                uchar p7 = nextRow[col-1];
-                uchar p6 = nextRow[col+0];
-                uchar p5 = nextRow[col+1];
-
-                int C  = (!p2 & (p3 | p4)) + (!p4 & (p5 | p6)) +
-                         (!p6 & (p7 | p8)) + (!p8 & (p9 | p2));
-                int N1 = (p9 | p2) + (p3 | p4) + (p5 | p6) + (p7 | p8);
-                int N2 = (p2 | p3) + (p4 | p5) + (p6 | p7) + (p8 | p9);
-                int N  = std::min(N1, N2);
-                int m  = (p2 | p3 | !p5) & p4;
-
-                if (C == 1 && (N >= 2 && N <= 3) & (m == 0))
-                {
-                    markRow[col] = 1;
-                }
+                markRow[col] = 1;
             }
         }
-
-        im &= ~marker;
-        return;
     }
 
-    if (iter == 0)
-    {
-        for (int row = 1; row < rows-1; row++)
-        {
-            const unsigned char* predRow = im.ptr<unsigned char>(row-1);
-            const unsigned char* thisRow = im.ptr<unsigned char>(row-0);
-            const unsigned char* nextRow = im.ptr<unsigned char>(row+1);
-
-            unsigned char* markRow = marker.ptr<unsigned char>(row);
-
-            for (int col = 1; col < cols-1; col++)
-            {
-                if (thisRow[col] == 0) continue;
-
-                uchar p9 = predRow[col-1];
-                uchar p2 = predRow[col+0];
-                uchar p3 = predRow[col+1];
-
-                uchar p8 = thisRow[col-1];
-                uchar p4 = thisRow[col+1];
-
-                uchar p7 = nextRow[col-1];
-                uchar p6 = nextRow[col+0];
-                uchar p5 = nextRow[col+1];
-
-                int C  = (!p2 & (p3 | p4)) + (!p4 & (p5 | p6)) +
-                         (!p6 & (p7 | p8)) + (!p8 & (p9 | p2));
-                int N1 = (p9 | p2) + (p3 | p4) + (p5 | p6) + (p7 | p8);
-                int N2 = (p2 | p3) + (p4 | p5) + (p6 | p7) + (p8 | p9);
-                int N  = std::min(N1, N2);
-                int m  = (p6 | p7 | !p9) & p8;
-
-                if (C == 1 && (N >= 2 && N <= 3) & (m == 0))
-                {
-                    markRow[col] = 1;
-                }
-            }
-        }
-
-        im &= ~marker;
-        return;
-    }
+    im &= ~marker;
 }
 
 void GuoHallThinning_optimized(const cv::Mat& src, cv::Mat& dst)
