@@ -150,13 +150,24 @@ void GuoHallThinning_optimized(const cv::Mat& src, cv::Mat& dst)
     dst *= 255;
 }
 
-//
-// Sample performance report
-//
-//           Name of Test               base          1           2          1          2
-//                                                                           vs         vs
-//                                                                          base       base
-//                                                                       (x-factor) (x-factor)
-// Thinning::Size_Only::640x480      333.442 ms  216.775 ms  142.484 ms     1.54       2.34
-// Thinning::Size_Only::1280x720     822.569 ms  468.958 ms  359.877 ms     1.75       2.29
-// Thinning::Size_Only::1920x1080    2438.715 ms 1402.072 ms 1126.428 ms    1.74       2.16
+
+// Geometric mean
+
+//          Name of Test
+
+//                                   perf        perf        perf        perf        perf       perf       perf
+//                                    res         res         res         res        res        res        res
+//                                     0           1           2           3          1          2          3
+//                                               luts         fix         fix        luts       fix        fix
+//                                                and          2        copying      and         2       copying
+//                                               zeros       luts                   zeros       luts        vs
+//                                                                                    vs         vs
+
+//                                                                                                         perf
+//                                                                                   perf       perf       res
+//                                                                                   res        res         0
+//                                                                                    0          0      (x-factor)
+//                                                                                (x-factor) (x-factor)
+// Thinning::Size_Only::640x480   928.535 ms  549.163 ms  481.489 ms  464.392 ms     1.69       1.93       2.00
+// Thinning::Size_Only::1280x720  2304.949 ms 1410.921 ms 1284.146 ms 1254.155 ms    1.63       1.79       1.84
+// Thinning::Size_Only::1920x1080 6655.387 ms 4048.845 ms 3577.448 ms 3386.069 ms    1.64       1.86       1.97
