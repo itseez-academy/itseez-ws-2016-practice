@@ -1,4 +1,5 @@
 #include "opencv_ptest/include/opencv2/ts/ts.hpp"
+#include "opencv2/opencv.hpp"
 
 #include <iostream>
 
@@ -14,12 +15,20 @@ using std::tr1::get;
 // Test(s) for the ConvertColor_BGR2GRAY_BT709 function
 //
 
-// PERF_TEST(skeleton, ConvertColor_BGR2GRAY_BT709)
-// {
-//     Mat input = cv::imread("./bin/testdata/sla.png");
-//
-//     // Add code here
-// }
+PERF_TEST(skeleton, ConvertColor_BGR2GRAY_BT709)
+{
+    Mat input = cv::imread("./bin/testdata/schedule.png");
+    Mat output(input.size(), CV_8UC1);
+
+    declare.in(input).out(output);
+
+    TEST_CYCLE()
+    {
+        ConvertColor_BGR2GRAY_BT709(input, output);
+    }
+
+    SANITY_CHECK_NOTHING();
+}
 
 //
 // Test(s) for the ImageResize function
@@ -87,4 +96,4 @@ PERF_TEST_P(Size_Only, Invert, testing::Values(MAT_SIZES))
     }
 
     SANITY_CHECK(dst);
-} 
+}
