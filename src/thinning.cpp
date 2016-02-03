@@ -1,5 +1,6 @@
 #include "skeleton_filter.hpp"
 #include <opencv2/imgproc/imgproc.hpp>
+#include <iostream>
 
 static void GuoHallIteration(cv::Mat& im, int iter)
 {
@@ -58,8 +59,56 @@ void GuoHallThinning(const cv::Mat& src, cv::Mat& dst)
 // Place optimized version here
 //
 
+void createTable(uchar*& table, int iter)
+{
+	table = new uchar[256];
+	uchar p2 = 0;
+	uchar p3 = 0;
+	uchar p4 = 0;
+	uchar p5 = 0;
+	uchar p6 = 0;
+	uchar p7 = 0;
+	uchar p8 = 0;
+	uchar p9 = 0;
+	for(int i = 0; i < 256; i++)
+	{
+		table[i] = 0;
+		if(i & 1 != 0)
+			p2 = 1;
+		if(i & 2 != 0)
+			p3 = 1;
+		if(i & 4 != 0)
+			p4 = 1;
+		if(i & 8 != 0)
+			p5 = 1;
+		if(i & 16 != 0)
+			p6 = 1;
+		if(i & 32 != 0)
+			p7 = 1;
+		if(i & 64 != 0)
+			p8 = 1;
+		if(i & 128 != 0)
+			p9 = 1;
+
+		int C  = (!p2 & (p3 | p4)) + (!p4 & (p5 | p6)) +
+				(!p6 & (p7 | p8)) + (!p8 & (p9 | p2));
+			int N1 = (p9 | p2) + (p3 | p4) + (p5 | p6) + (p7 | p8);
+			int N2 = (p2 | p3) + (p4 | p5) + (p6 | p7) + (p8 | p9);
+			int N  = N1 < N2 ? N1 : N2;
+			int m  = iter == 0 ? ((p6 | p7 | !p9) & p8) : ((p2 | p3 | !p5) & p4);
+
+			if (C == 1 && (N >= 2 && N <= 3) & (m == 0))
+				table[i] = 1;
+			std::cout<<"table["<<i<<"]="<<table[i]<<std::endl;
+	}
+}
+
+
 static void GuoHallIteration_optimized(cv::Mat& im, int iter)
 {
+	uchar* table = NULL;
+	createTable(table, iter);
+
 	cv::Mat marker = cv::Mat::zeros(im.size(), CV_8UC1);
 
 	for (int i = 1; i < im.rows-1; i++)
@@ -77,15 +126,28 @@ static void GuoHallIteration_optimized(cv::Mat& im, int iter)
 				uchar p8 = im.at<uchar>(i, j-1);
 				uchar p9 = im.at<uchar>(i-1, j-1);
 
-				int C  = (!p2 & (p3 | p4)) + (!p4 & (p5 | p6)) +
+				uchar code = p2 * 1 +
+							p3 * 2 +
+							p4 * 4 +
+							p5 * 8 +
+							p6 * 16 +
+							p7 * 32 +
+							p8 * 64 +
+							p9 * 128;
+
+				
+				/*int C  = (!p2 & (p3 | p4)) + (!p4 & (p5 | p6)) +
 					(!p6 & (p7 | p8)) + (!p8 & (p9 | p2));
 				int N1 = (p9 | p2) + (p3 | p4) + (p5 | p6) + (p7 | p8);
 				int N2 = (p2 | p3) + (p4 | p5) + (p6 | p7) + (p8 | p9);
 				int N  = N1 < N2 ? N1 : N2;
 				int m  = iter == 0 ? ((p6 | p7 | !p9) & p8) : ((p2 | p3 | !p5) & p4);
-
+				
 				if (C == 1 && (N >= 2 && N <= 3) & (m == 0))
+					marker.at<uchar>(i,j) = 1;*/
+				if(table[code] != 0)
 					marker.at<uchar>(i,j) = 1;
+				
 			}
 		}
 	}
