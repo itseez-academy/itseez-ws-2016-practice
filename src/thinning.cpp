@@ -66,6 +66,7 @@ static void GuoHallIteration_optimized(cv::Mat& im, int iter)
     {
         for (int j = 1; j < im.cols-1; j++)
         {
+			if (im.at<uchar>(i,j) == 0) continue;
             uchar p2 = im.at<uchar>(i-1, j);
             uchar p3 = im.at<uchar>(i-1, j+1);
             uchar p4 = im.at<uchar>(i, j+1);
