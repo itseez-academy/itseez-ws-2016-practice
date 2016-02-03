@@ -38,9 +38,9 @@ TEST(skeleton, test_resize_equal)
     ImageResize(bgr, result, SIZE_TO_SET);
 
     // Assert
-    std::cout << bgr << std::endl;
-    std::cout << result << std::endl;
-    std::cout << maxDifference(bgr, result) << std::endl;
+//    std::cout << bgr << std::endl;
+//    std::cout << result << std::endl;
+//    std::cout << maxDifference(bgr, result) << std::endl;
     EXPECT_LT(maxDifference(bgr, result), 0.00001f);
 }
 
@@ -189,7 +189,7 @@ TEST(skeleton, test_guo_hall_black_pixel_count)
 
     // Act
     Mat result;
-    GuoHallThinning(bgr, result);
+    GuoHallThinning_optimized(bgr, result);
 
     // Assert
 /*
