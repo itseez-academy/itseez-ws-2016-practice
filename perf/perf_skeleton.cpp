@@ -17,13 +17,13 @@ using std::tr1::get;
 
 PERF_TEST(skeleton, ConvertColor_BGR2GRAY_BT709_sla)
 {
-	//Mat input = cv::imread("testdata/sla.png");
-	Mat input = cv::imread("./bin/testdata/sla.png"); //TRAVIS
-	Mat source(input);
-	Mat destination(input);
+    //Mat input = cv::imread("testdata/sla.png");
+    Mat input = cv::imread("./bin/testdata/sla.png"); //TRAVIS
+    Mat source(input);
+    Mat destination(input);
 
     declare.in(source).out(destination);
-	declare.time(30);
+    declare.time(30);
     TEST_CYCLE()
     {
         ConvertColor_BGR2GRAY_BT709(source, destination);
@@ -73,30 +73,30 @@ typedef perf::TestBaseWithParam<std::string> ImageName;
 PERF_TEST_P(ImageName, skeletonize, IMAGES)
 {
     Mat input = cv::imread(GetParam());
-	Mat dst(input);
-	declare.in(input).out(dst);
-	TEST_CYCLE()
+    Mat dst(input);
+    declare.in(input).out(dst);
+    TEST_CYCLE()
     {
         skeletonize(input, dst, false);
     }
-	SANITY_CHECK_NOTHING();
+    SANITY_CHECK_NOTHING();
 }
 
 PERF_TEST_P(ImageName, perf_ImageResize, IMAGES)
 {
-	//Mat input = cv::imread("testdata/sla.png");
-	//Mat input = cv::imread("./bin/testdata/sla.png"); //TRAVIS
-	Mat input = cv::imread(GetParam());
-	ConvertColor_BGR2GRAY_BT709(input, input);
+    //Mat input = cv::imread("testdata/sla.png");
+    //Mat input = cv::imread("./bin/testdata/sla.png"); //TRAVIS
+    Mat input = cv::imread(GetParam());
+    ConvertColor_BGR2GRAY_BT709(input, input);
 
-	Size newSize(input.size().width, input.size().height);
-	Mat source(input);
-	Mat destination(Size(newSize), CV_8UC1);
-
+    Size newSize(input.size().width, input.size().height);
+    Mat source(input);
+    Mat destination(Size(newSize), CV_8UC1);
+        
     declare.in(source).out(destination);
     TEST_CYCLE()
     {
-		ImageResize(source, destination, newSize);
+        ImageResize(source, destination, newSize);
     }
     SANITY_CHECK_NOTHING();
  }
