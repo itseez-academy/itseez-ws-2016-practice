@@ -20,7 +20,7 @@ int main(int argc, const char** argv)
     CommandLineParser parser(argc, argv, options);
 
     // If help option is given, print help message and exit
-    if (parser.get<bool>("help"))
+    if (parser.get<bool>("help") || argc == 1)
     {
         parser.printParams();
         return 0;
