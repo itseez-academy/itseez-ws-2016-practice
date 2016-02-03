@@ -16,6 +16,7 @@ using std::tr1::get;
 // Test(s) for the ConvertColor_BGR2GRAY_BT709 function
 //
 
+/*
  PERF_TEST(skeleton, ConvertColor_BGR2GRAY_BT709)
  {
      Mat input = cv::imread("./testdata/sla.png");
@@ -29,10 +30,9 @@ using std::tr1::get;
     {
         ConvertColor_BGR2GRAY_BT709(input, result);
     }
-
-
 	 SANITY_CHECK(result, 1 + 1e-6);
  }
+ */
 
 //
 // Test(s) for the ImageResize function
