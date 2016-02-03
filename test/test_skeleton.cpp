@@ -107,11 +107,15 @@ TEST(skeleton, ImageResizeSavesColor)
 	Mat srcMtx(20, 16, CV_8UC1, Scalar(0));
 	Mat dstMtx;
 	Mat expectedMtx(4, 5, CV_8UC1, Scalar(0));
-	Mat diffMtx(4, 5, CV_8UC1, Scalar(0));
 	Size sz(4, 5);
 
 	ImageResize(srcMtx, dstMtx, sz);
 
-	compare(dstMtx, expectedMtx, diffMtx, CMP_NE);
-	EXPECT_EQ(0, countNonZero(diffMtx));
+	double srcMin, srcMax;
+	minMaxLoc(srcMtx, &srcMin, &srcMax);
+	double dstMin, dstMax;
+	minMaxLoc(dstMtx, &dstMin, &dstMax);
+	EXPECT_EQ(dstMin, dstMax);
+	EXPECT_EQ(srcMin, dstMin);
+	EXPECT_EQ(srcMax, dstMax);
 }
