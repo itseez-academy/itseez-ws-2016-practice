@@ -17,12 +17,10 @@ void skeletonize(const cv::Mat &input, cv::Mat &output, bool save_images)
     if (save_images) cv::imwrite("0-input.png", input);
     time_logger << TE(imwrite_0);
 
-
     // Convert to grayscale
 	cv::Mat gray_image;
 	TS(convert_color_bgr2gray_bt709);
     ConvertColor_BGR2GRAY_BT709(input, gray_image);
-
 	time_logger << TE(convert_color_bgr2gray_bt709);
 	TS(imwrite_1);
     if (save_images) cv::imwrite("1-convertcolor.png", gray_image);
@@ -45,7 +43,6 @@ void skeletonize(const cv::Mat &input, cv::Mat &output, bool save_images)
 	TS(imwrite_3);
     if (save_images) cv::imwrite("3-threshold.png", small_image);
 	time_logger << TE(imwrite_3);
-
 	
     // Thinning
     cv::Mat thinned_image;
@@ -56,7 +53,6 @@ void skeletonize(const cv::Mat &input, cv::Mat &output, bool save_images)
 	if (save_images) cv::imwrite("4-thinning.png", thinned_image);
 	time_logger << TE(imwrite_4);
 
-	
     // Back inversion
 	output = 255 - thinned_image;
 	TS(imwrite_5);
