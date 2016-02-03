@@ -53,7 +53,7 @@ int main(int argc, const char** argv)
 	//imshow("Output image", output);
 	//waitKey(1000);
 
-	namedWindow("Input image", WINDOW_NORMAL);
+	//namedWindow("Input image", WINDOW_NORMAL);
 	imshow("Input image", input);
 	waitKey(1);
 	/*...*/
