@@ -58,30 +58,45 @@ void GuoHallThinning(const cv::Mat& src, cv::Mat& dst)
 // Place optimized version here
 //
 
+#define MACRO_THINNINH_CPP_GUOHALLGENERATEMASKTABLE__(i)\
+    const int \
+        p2 = ((i & (int)1) >> 0),\
+        p3 = ((i & (int)2) >> 1),\
+        p4 = ((i & (int)4) >> 2),\
+        p5 = ((i & (int)8) >> 3),\
+        p6 = ((i & (int)16) >> 4),\
+        p7 = ((i & (int)32) >> 5),\
+        p8 = ((i & (int)64) >> 6),\
+        p9 = ((i & (int)128) >> 7);\
+    int C  = (!p2 & (p3 | p4)) + (!p4 & (p5 | p6)) +\
+        (!p6 & (p7 | p8)) + (!p8 & (p9 | p2));\
+    int N1 = (p9 | p2) + (p3 | p4) + (p5 | p6) + (p7 | p8);\
+    int N2 = (p2 | p3) + (p4 | p5) + (p6 | p7) + (p8 | p9);\
+    int N  = N1 < N2 ? N1 : N2
+
 void GuoHallGenerateMaskTable(uchar* maskTable, int iter)
 {
-    for (int i = 0; i < 256; ++i)
+    if (iter)
     {
-        const int 
-            p2 = ((i & (int)1) >> 0),
-            p3 = ((i & (int)2) >> 1),
-            p4 = ((i & (int)4) >> 2),
-            p5 = ((i & (int)8) >> 3),
-            p6 = ((i & (int)16) >> 4),
-            p7 = ((i & (int)32) >> 5),
-            p8 = ((i & (int)64) >> 6),
-            p9 = ((i & (int)128) >> 7);
-
-        int C  = (!p2 & (p3 | p4)) + (!p4 & (p5 | p6)) +
-            (!p6 & (p7 | p8)) + (!p8 & (p9 | p2));
-        int N1 = (p9 | p2) + (p3 | p4) + (p5 | p6) + (p7 | p8);
-        int N2 = (p2 | p3) + (p4 | p5) + (p6 | p7) + (p8 | p9);
-        int N  = N1 < N2 ? N1 : N2;
-        int m  = iter == 0 ? ((p6 | p7 | !p9) & p8) : ((p2 | p3 | !p5) & p4);
-
-        maskTable[i] = (C == 1 && (N >= 2 && N <= 3) & (m == 0)) ? 1 : 0;
+        for (int i = 0; i < 256; ++i)
+        {
+            MACRO_THINNINH_CPP_GUOHALLGENERATEMASKTABLE__(i);
+            int m = (p2 | p3 | !p5) & p4;
+            maskTable[i] = (C == 1 && (N >= 2 && N <= 3) & (m == 0)) ? 1 : 0;
+        }
+    }
+    else
+    {
+        for (int i = 0; i < 256; ++i)
+        {
+            MACRO_THINNINH_CPP_GUOHALLGENERATEMASKTABLE__(i);
+            int m = (p6 | p7 | !p9) & p8;
+            maskTable[i] = (C == 1 && (N >= 2 && N <= 3) & (m == 0)) ? 1 : 0;
+        }
     }
 }
+
+#undef MACRO_THINNINH_CPP_GUOHALLGENERATEMASKTABLE__
 
 static void GuoHallIteration_optimized(cv::Mat& im, const uchar* maskTable)
 {
@@ -93,24 +108,24 @@ static void GuoHallIteration_optimized(cv::Mat& im, const uchar* maskTable)
         {
             if (im.at<uchar>(i, j))
             {
+                uchar p8 = im.at<uchar>(i, j-1);
+                uchar p4 = im.at<uchar>(i, j+1);
+                uchar p9 = im.at<uchar>(i-1, j-1);
                 uchar p2 = im.at<uchar>(i-1, j);
                 uchar p3 = im.at<uchar>(i-1, j+1);
-                uchar p4 = im.at<uchar>(i, j+1);
-                uchar p5 = im.at<uchar>(i+1, j+1);
-                uchar p6 = im.at<uchar>(i+1, j);
                 uchar p7 = im.at<uchar>(i+1, j-1);
-                uchar p8 = im.at<uchar>(i, j-1);
-                uchar p9 = im.at<uchar>(i-1, j-1);
+                uchar p6 = im.at<uchar>(i+1, j);
+                uchar p5 = im.at<uchar>(i+1, j+1);
 
                 const int index = 
-                    (int)(p2 ? 1 : 0) * 1 +
-                    (int)(p3 ? 1 : 0) * 2 +
-                    (int)(p4 ? 1 : 0) * 4 +
-                    (int)(p5 ? 1 : 0) * 8 +
-                    (int)(p6 ? 1 : 0) * 16 +
-                    (int)(p7 ? 1 : 0) * 32 +
-                    (int)(p8 ? 1 : 0) * 64 +
-                    (int)(p9 ? 1 : 0) * 128;
+                    (int)p2 * 1 +
+                    (int)p3 * 2 +
+                    (int)p4 * 4 +
+                    (int)p5 * 8 +
+                    (int)p6 * 16 +
+                    (int)p7 * 32 +
+                    (int)p8 * 64 +
+                    (int)p9 * 128;
                 
                 marker.at<uchar>(i,j) |= maskTable[index];
             }
