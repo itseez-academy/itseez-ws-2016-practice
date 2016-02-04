@@ -52,18 +52,26 @@ void ImageResize_optimized(const cv::Mat &src, cv::Mat &dst, const cv::Size sz)
 
     const int src_rows = src.rows;
     const int src_cols = src.cols;
+    const int src_rows_1 = src.rows - 1;
+    const int src_cols_1 = src.cols - 1;
 
     const int dst_rows = sz.height;
     const int dst_cols = sz.width;
 
-    for (int row = 0; row < dst_rows; row++)
+    const float dw = ((float)sz_src.width) / sz.width;
+    const float bw = .5f*dw - .5f;
+
+    const float dh = ((float)sz_src.height) / sz.height;
+    const float bh = .5f*dh - .5f;
+
+    for (int row = 0; row < dst_rows; ++row)
     {
         uchar *ptr_dst = dst.ptr<uchar>(row);
 
-        for (int col = 0; col < dst_cols; col++)
+        for (int col = 0; col < dst_cols; ++col)
         {
-            const float x = (((float)col) + .5f) * sz_src.width  / sz.width  - .5f;
-            const float y = (((float)row) + .5f) * sz_src.height / sz.height - .5f;
+            const float x = (float)col * dw + bw;
+            const float y = (float)row * dh + bh;
 
             const int ix = (int)floor(x);
             const int iy = (int)floor(y);
@@ -71,12 +79,12 @@ void ImageResize_optimized(const cv::Mat &src, cv::Mat &dst, const cv::Size sz)
             int x1(0), x2(0), y1(0), y2(0);
             if (ix >= 0) {
                 if (ix >= src_cols) {
-                    x1 = src_cols - 1;
-                    x2 = src_cols - 1;
+                    x1 = src_cols_1;
+                    x2 = src_cols_1;
                 } else {
                     x1 = ix;
-                    if (ix == src_cols - 1) {
-                        x2 = src_cols - 1;
+                    if (ix == src_cols_1) {
+                        x2 = src_cols_1;
                     } else {
                         x2 = ix + 1;
                     }
@@ -84,12 +92,12 @@ void ImageResize_optimized(const cv::Mat &src, cv::Mat &dst, const cv::Size sz)
             }
             if (iy >= 0) {
                 if (iy >= src_rows) {
-                    y1 = src_rows - 1;
-                    y2 = src_rows - 1;
+                    y1 = src_rows_1;
+                    y2 = src_rows_1;
                 } else {
                     y1 = iy;
-                    if (iy == src_rows - 1) {
-                        y2 = src_rows - 1;
+                    if (iy == src_rows_1) {
+                        y2 = src_rows_1;
                     } else {
                         y2 = iy + 1;
                     }
