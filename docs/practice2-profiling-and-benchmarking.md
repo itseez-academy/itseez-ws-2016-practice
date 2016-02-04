@@ -1,5 +1,7 @@
 # Практика 2: Профилирование и бенчмаркинг
 
+[![Feedback](feedback.png)][feedback_day2]
+
 ## Цели
 
 __Цель данной работы__ — познакомиться с source-level подходом к профилированию,
@@ -259,3 +261,4 @@ OpenCV.
 
 [writing-perf-tests]: https://github.com/Itseez/opencv/wiki/HowToWritePerfTests
 [using-perf-tests]:   https://github.com/Itseez/opencv/wiki/HowToUsePerfTests
+[feedback_day2]:      https://docs.google.com/forms/d/1UI3w6KDxHnz5-R50_4L1JZZN4XI8zu8EjmoL2ly82Jg/viewform
