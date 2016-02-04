@@ -60,19 +60,23 @@ void ImageResize_optimized(const cv::Mat &src, cv::Mat &dst, const cv::Size sz)
     {
         uchar *ptr_dst = dst.ptr<uchar>(row);
 
+        const float y = (((float)row) + .5f) * sz_src.height / sz.height - .5f;
+        const int iy = (int)floor(y);
+        const int y1 = (iy < 0) ? 0 : ((iy >= src_rows) ? src_rows - 1 : iy);
+        const int y2 = (iy < 0) ? 0 : ((iy >= src_rows - 1) ? src_rows - 1 : iy + 1);
+
+
         for (int col = 0; col < dst_cols; col++)
         {
             const float x = (((float)col) + .5f) * sz_src.width  / sz.width  - .5f;
-            const float y = (((float)row) + .5f) * sz_src.height / sz.height - .5f;
+
 
             const int ix = (int)floor(x);
-            const int iy = (int)floor(y);
+        
 
             const int x1 = (ix < 0) ? 0 : ((ix >= src_cols) ? src_cols - 1 : ix);
             const int x2 = (ix < 0) ? 0 : ((ix >= src_cols - 1) ? src_cols - 1 : ix + 1);
-            const int y1 = (iy < 0) ? 0 : ((iy >= src_rows) ? src_rows - 1 : iy);
-            const int y2 = (iy < 0) ? 0 : ((iy >= src_rows - 1) ? src_rows - 1 : iy + 1);
-
+        
             const uchar q11 = src.at<uchar>(y1, x1);
             const uchar q12 = src.at<uchar>(y2, x1);
             const uchar q21 = src.at<uchar>(y1, x2);
