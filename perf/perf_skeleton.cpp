@@ -1,4 +1,5 @@
 #include "opencv_ptest/include/opencv2/ts/ts.hpp"
+#include "opencv2/opencv.hpp"
 
 #include <iostream>
 
@@ -10,24 +11,34 @@ using namespace cv;
 using std::tr1::make_tuple;
 using std::tr1::get;
 
-//
-// Test(s) for the ConvertColor_BGR2GRAY_BT709 function
-//
-
-// PERF_TEST(skeleton, ConvertColor_BGR2GRAY_BT709)
-// {
-//     Mat input = cv::imread("./bin/testdata/sla.png");
-//
-//     // Add code here
-// }
-
-//
-// Test(s) for the ImageResize function
-//
 
 #define MAT_SIZES  ::perf::szVGA, ::perf::sz720p, ::perf::sz1080p
 
 typedef perf::TestBaseWithParam<Size> Size_Only;
+
+//
+// Test(s) for the ConvertColor_BGR2GRAY_BT709 function
+//
+
+PERF_TEST_P(Size_Only, ConvertColor_BGR2GRAY_BT709, testing::Values(MAT_SIZES))
+{
+    Size sz = GetParam();
+    Mat src(sz, CV_8UC3);
+    Mat dst(sz, CV_8UC1);
+
+    declare.in(src, WARMUP_RNG).out(dst);
+
+    TEST_CYCLE()
+    {
+        ConvertColor_BGR2GRAY_BT709(src, dst);
+    }
+
+    SANITY_CHECK_NOTHING();
+}
+
+//
+// Test(s) for the ImageResize function
+//
 
 PERF_TEST_P(Size_Only, ImageResize, testing::Values(MAT_SIZES))
 {
@@ -60,18 +71,53 @@ PERF_TEST_P(Size_Only, ImageResize, testing::Values(MAT_SIZES))
 // Test(s) for the skeletonize function
 //
 
-// #define IMAGES testing::Values( std::string("./bin/testdata/sla.png"),\
-//                                 std::string("./bin/testdata/page.png"),\
-//                                 std::string("./bin/testdata/schedule.png") )
-//
-// typedef perf::TestBaseWithParam<std::string> ImageName;
-//
-// PERF_TEST_P(ImageName, skeletonize, IMAGES)
-// {
-//     Mat input = cv::imread(GetParam());
-//
-//     // Add code here
-// }
+#define IMAGES testing::Values( std::string("./bin/testdata/sla.png"),\
+                                std::string("./bin/testdata/page.png"),\
+                                std::string("./bin/testdata/schedule.png") )
+
+typedef perf::TestBaseWithParam<std::string> ImageName;
+
+PERF_TEST_P(ImageName, skeletonize, IMAGES)
+{
+    Mat input = cv::imread(GetParam());
+    Mat output(input.size(), CV_8UC1);
+
+    declare.in(input).out(output);
+
+    TEST_CYCLE()
+    {
+        skeletonize(input, output, false);
+    }
+
+    SANITY_CHECK_NOTHING();
+}
+
+void Invert(const Mat& src, Mat& dst)
+{
+    for (int y = 0; y < src.rows; ++y)
+    {
+        for (int x = 0; x < src.cols; ++x)
+        {
+            dst.at<uchar>(y, x) = 255 - src.at<uchar>(y, x);
+        }
+    }
+}
+
+PERF_TEST_P(Size_Only, Invert, testing::Values(MAT_SIZES))
+{
+    Size sz = GetParam();
+    Mat src(sz, CV_8UC1);
+    Mat dst(sz, CV_8UC1);
+
+    declare.in(src, WARMUP_RNG).out(dst);
+
+    TEST_CYCLE()
+    {
+        Invert(src, dst);
+    }
+
+    SANITY_CHECK(dst);
+}
 
 //
 // Test(s) for the Thinning function
@@ -83,7 +129,8 @@ PERF_TEST_P(Size_Only, Thinning, testing::Values(MAT_SIZES))
 
     cv::Mat image(sz, CV_8UC1);
     declare.in(image, WARMUP_RNG).out(image);
-    declare.time(40);
+    declare.time(240);
+    declare.iterations(10);
 
     cv::RNG rng(234231412);
     rng.fill(image, CV_8UC1, 0, 255);
@@ -101,4 +148,26 @@ PERF_TEST_P(Size_Only, Thinning, testing::Values(MAT_SIZES))
     ASSERT_EQ(0, cv::countNonZero(diff));
 
     SANITY_CHECK(image);
+}
+
+//
+// Test(s) for the Thinning function
+//
+
+PERF_TEST_P(Size_Only, BaseThinning, testing::Values(MAT_SIZES))
+{
+    Size sz = GetParam();
+    Mat src(sz, CV_8UC1);
+    Mat dst(sz, CV_8UC1);
+
+    declare.in(src, WARMUP_RNG).out(dst);
+    declare.time(240);
+    declare.iterations(10);
+
+    TEST_CYCLE()
+    {
+        GuoHallThinning(src, dst);
+    }
+
+    SANITY_CHECK_NOTHING();
 }

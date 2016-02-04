@@ -19,8 +19,8 @@ void ImageResize(const cv::Mat &src, cv::Mat &dst, const cv::Size sz)
 
         for (int col = 0; col < dst_cols; col++)
         {
-            const float x = ((float)col + .5f) * sz_src.width  / sz.width  - .5f;
-            const float y = ((float)row + .5f) * sz_src.height / sz.height - .5f;
+            const float x = ((float)col + .5f) * src_cols  / dst_cols - .5f;
+            const float y = ((float)row + .5f) * src_rows / dst_rows - .5f;
 
             const int ix = (int)floor(x);
             const int iy = (int)floor(y);
