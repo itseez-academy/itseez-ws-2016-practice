@@ -171,3 +171,17 @@ TEST(skeleton, optim_thinning_blacks_count)
 
     EXPECT_LT(countNonZero(dst), countNonZero(src));
 }
+
+TEST(skeleton, optim_thinning)
+{
+    Mat src(5, 5, CV_8UC1);
+    randu(src, 0, 255);
+
+    Mat dst;
+    GuoHallThinning_optimized(src, dst);
+
+    Mat target;
+    GuoHallThinning(src, target);
+
+    EXPECT_EQ(countNonZero(dst != target), 0);
+}
