@@ -120,18 +120,24 @@ static void GuoHallIteration_optimized(cv::Mat& im, uchar* neighbours_to_value)
     uchar code = 0;
     for (int i = 1; i < im.rows-1; i++)
     {
+        uchar* prev_row = im.ptr<uchar>(i-1);
+        uchar* cur_row = im.ptr<uchar>(i);
+        uchar* next_row = im.ptr<uchar>(i+1);
         for (int j = 1; j < im.cols-1; j++)
         {
-            if(im.at<uchar>(i, j) > 0)
+            if(cur_row[j] > 0)
             {
-                p[0] = im.at<uchar>(i-1, j);
-                p[1] = im.at<uchar>(i-1, j+1);
-                p[2] = im.at<uchar>(i, j+1);
-                p[3] = im.at<uchar>(i+1, j+1);
-                p[4] = im.at<uchar>(i+1, j);
-                p[5] = im.at<uchar>(i+1, j-1);
-                p[6] = im.at<uchar>(i, j-1);
-                p[7] = im.at<uchar>(i-1, j-1);
+                p[6] = cur_row[j-1];
+                p[2] = cur_row[j+1];
+
+                p[7] = prev_row[j-1];
+                p[0] = prev_row[j];
+                p[1] = prev_row[j+1];
+
+                p[5] = next_row[j-1];
+                p[3] = next_row[j+1];
+                p[4] = next_row[j];
+                
                 code = Encode(p);
                 marker.at<uchar>(i,j) = neighbours_to_value[code];
             }
