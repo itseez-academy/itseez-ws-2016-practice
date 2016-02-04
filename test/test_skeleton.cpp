@@ -60,3 +60,92 @@ TEST(skeleton, resize_matches_opencv)
     // std::cout << "Difference:\n" << reference - result << std::endl;
     EXPECT_LT(maxDifference(reference, result), 2);
 }
+
+TEST(skeleton, 2_plus_2_equals_4)
+{
+    EXPECT_EQ(2 + 2, 4);
+}
+
+TEST(skeleton, cvt_color_match_size)
+{
+    Mat src(5, 5, CV_8UC3);
+    randu(src, Scalar::all(0), Scalar::all(255));
+
+    Mat dst;
+    ConvertColor_BGR2GRAY_BT709(src, dst);
+
+    EXPECT_EQ(src.size(), dst.size());
+}
+
+TEST(skeleton, thinning_match_size)
+{
+    Mat src(5, 5, CV_8UC1);
+    randu(src, 0, 255);
+
+    Mat dst;
+    GuoHallThinning(src, dst);
+
+    EXPECT_EQ(src.size(), dst.size());
+}
+
+TEST(skeleton, resize_match_size)
+{
+    Mat src(3, 3, CV_8UC1);
+    randu(src, 0, 255);
+
+    Mat dst;
+    Size size;
+    for (size.height = src.rows * 2; size.height > 0; --size.height)
+    {
+        for (size.width = src.cols * 2; size.width > 0; --size.width)
+        {
+            ImageResize(src, dst, size);
+            ASSERT_EQ(dst.size(), size);
+        }
+    }
+}
+
+TEST(skeleton, resize_match_color)
+{
+    Mat src(3, 3, CV_8UC1);
+    uchar color = 123;
+    src.setTo(color);
+
+    Mat dst;
+    Size size;
+    for (size.height = src.rows * 2; size.height > 0; --size.height)
+    {
+        for (size.width = src.cols * 2; size.width > 0; --size.width)
+        {
+            ImageResize(src, dst, size);
+            ASSERT_EQ(countNonZero(dst != color), 0);
+        }
+    }
+}
+
+TEST(skeleton, cvt_color_match_monochrome)
+{
+    Mat src(5, 5, CV_8UC1);
+    randu(src, Scalar::all(0), Scalar::all(255));
+
+    Mat src_multi_channel;
+    std::vector<Mat> mat_vec(3);
+    mat_vec[0] = mat_vec[1] = mat_vec[2] = src;
+    merge(mat_vec, src_multi_channel);
+
+    Mat dst;
+    ConvertColor_BGR2GRAY_BT709(src_multi_channel, dst);
+
+    EXPECT_EQ(countNonZero(dst != src), 0);
+}
+
+TEST(skeleton, thinning_blacks_count)
+{
+    Mat src(5, 5, CV_8UC1);
+    randu(src, 0, 255);
+
+    Mat dst;
+    GuoHallThinning(src, dst);
+
+    EXPECT_LT(countNonZero(dst), countNonZero(src));
+}
