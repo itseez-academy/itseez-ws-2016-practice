@@ -7,8 +7,8 @@ void ImageResize(const cv::Mat &src, cv::Mat &dst, const cv::Size sz)
     cv::Size sz_src = src.size();
     dst.create(sz, src.type());
 
-    const int src_rows = src.rows;
-    const int src_cols = src.cols;
+    const int src_rows = sz_src.height;
+    const int src_cols = sz_src.width;
 
     const int dst_rows = sz.height;
     const int dst_cols = sz.width;
@@ -35,8 +35,10 @@ void ImageResize(const cv::Mat &src, cv::Mat &dst, const cv::Size sz)
             const uchar q21 = src.at<uchar>(y1, x2);
             const uchar q22 = src.at<uchar>(y2, x2);
 
-            const int temp = (x1 == x2) ? (int)(q11 * (y2 - y) + q22 * (y - y1)) :
-                            ((y1 == y2) ? (int)(q11 * (x2 - x) + q22 * (x - x1)) : (int)(q11 * (x2 - x) * (y2 - y) + q21 * (x - x1) * (y2 - y) + q12 * (x2 - x) * (y - y1) + q22 * (x - x1) * (y - y1)));
+            const int temp = (x1 == x2 && y1 == y2) ? q11 :
+                                (x1 == x2) ? (int)(q11 * (y2 - y) + q22 * (y - y1)) :
+                                    ((y1 == y2) ? (int)(q11 * (x2 - x) + q22 * (x - x1)) :
+                                        (int)(q11 * (x2 - x) * (y2 - y) + q21 * (x - x1) * (y2 - y) + q12 * (x2 - x) * (y - y1) + q22 * (x - x1) * (y - y1)));
             ptr_dst[col] = (temp < 0) ? uchar(0) : ((temp > 255) ? uchar(255) : (uchar)temp);
         }
     }

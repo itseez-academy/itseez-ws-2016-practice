@@ -24,6 +24,26 @@ int maxDifference(const cv::Mat &m1, const cv::Mat &m2)
     return (int)max_diff;
 }
 
+
+// Task 2.1
+TEST(skeleton, test_resize_equal)
+{
+    // Arrange
+    Mat bgr(5, 5, CV_8UC1);
+    randu(bgr, Scalar::all(0), Scalar::all(255));
+    const cv::Size SIZE_TO_SET(5, 5);
+
+    // Act
+    Mat result;
+    ImageResize(bgr, result, SIZE_TO_SET);
+
+    // Assert
+//    std::cout << bgr << std::endl;
+//    std::cout << result << std::endl;
+//    std::cout << maxDifference(bgr, result) << std::endl;
+    EXPECT_LT(maxDifference(bgr, result), 0.00001f);
+}
+
 TEST(skeleton, cvtcolor_matches_opencv)
 {
     // Arrange
@@ -169,10 +189,10 @@ TEST(skeleton, test_guo_hall_black_pixel_count)
 
     // Act
     Mat result;
-    GuoHallThinning(bgr, result);
+    GuoHallThinning_optimized(bgr, result);
 
     // Assert
-    /*
+/*
     std::cout << "********* Source **********" << std::endl;
     std::copy(bgr.begin<uchar>(), bgr.end<uchar>(), std::ostream_iterator<uchar>(std::cout, " "));
     std::cout << std::endl;
@@ -184,7 +204,7 @@ TEST(skeleton, test_guo_hall_black_pixel_count)
     std::cout << std::endl;
     std::cout << "Black size: " << std::count(result.begin<uchar>(), result.end<uchar>(), 0) << std::endl;
     std::cout << "White size: " << std::count(result.begin<uchar>(), result.end<uchar>(), 255) << std::endl;
-     */
+*/
 
     ASSERT_LE(std::count(bgr.begin<uchar>(), bgr.end<uchar>(), 0),
               std::count(result.begin<uchar>(), result.end<uchar>(), 0));
