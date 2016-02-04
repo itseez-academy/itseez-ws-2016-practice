@@ -76,51 +76,32 @@ static void GuoHallIteration_optimized(cv::Mat& im, int iter)
 	uchar p8 = 0;
 	uchar p9 = 0;
 
-	int q2 = 0;
-	int q3 = 0;
-	int q4 = 0;
-	int q5 = 0;
-	int q6 = 0;
-	int q7 = 0;
-	int q8 = 0;
-	int q9 = 0;
-
 	for (int i = 0; i < 256; i++)
 	{
 		code = i;
 
-		q2 = code & 1;
-		q3 = (code & 2) - 1;
-		q4 = (code & 4) - 3;
-		q5 = (code & 8) - 7;
-		q6 = (code & 16) - 15;
-		q7 = (code & 32) - 31;
-		q8 = (code & 64) - 63;
-		q9 = (code & 128) - 127;
+		p2 = (code & 1);
 
-		if (q2 < 0) p2 = 1;
-		else		p2 = 0;
+		if ((code & 2) - 1 < 0) p3 = 0;
+		else p3 = 1;
 
-		if (q3 < 0) p3 = 1;
-		else		p3 = 0;
+		if ((code & 4) - 3 < 0) p4 = 0;
+		else p4 = 1;
 
-		if (q4 < 0) p4 = 1;
-		else		p4 = 0;
+		if ((code & 8) - 7 < 0) p5 = 0;
+		else p5 = 1;
 
-		if (q5 < 0) p5 = 1;
-		else		p5 = 0;
+		if ((code & 16) - 15 < 0) p6 = 0;
+		else p6 = 1;
 
-		if (q6 < 0) p6 = 1;
-		else		p6 = 0;
+		if ((code & 32) - 31 < 0) p7 = 0;
+		else p7 = 1;
 
-		if (q7 < 0) p7 = 1;
-		else		p7 = 0;
+		if ((code & 64) - 63 < 0) p8 = 0;
+		else p8 = 1;
 
-		if (q8 < 0) p8 = 1;
-		else		p8 = 0;
-
-		if (q9 < 0) p9 = 1;
-		else		p9 = 0;
+		if ((code & 128) - 127 < 0) p9 = 0;
+		else p9 = 1;
 
 
 		int C  = (!p2 & (p3 | p4)) + (!p4 & (p5 | p6)) +
@@ -143,17 +124,16 @@ static void GuoHallIteration_optimized(cv::Mat& im, int iter)
         {
 			if (im.at<uchar>(i,j) != 0)
 			{
-				p2 = im.at<uchar>(i-1, j);
-				p3 = im.at<uchar>(i-1, j+1);
-				p4 = im.at<uchar>(i, j+1);
-				p5 = im.at<uchar>(i+1, j+1);
-				p6 = im.at<uchar>(i+1, j);
-				p7 = im.at<uchar>(i+1, j-1);
-				p8 = im.at<uchar>(i, j-1);
-				p9 = im.at<uchar>(i-1, j-1);
+				uchar q2 = im.at<uchar>(i-1, j);
+				uchar q3 = im.at<uchar>(i-1, j+1);
+				uchar q4 = im.at<uchar>(i, j+1);
+				uchar q5 = im.at<uchar>(i+1, j+1);
+				uchar q6 = im.at<uchar>(i+1, j);
+				uchar q7 = im.at<uchar>(i+1, j-1);
+				uchar q8 = im.at<uchar>(i, j-1);
+				uchar q9 = im.at<uchar>(i-1, j-1);
 
-				encode = p2*1 + p3*2 + p4*4 + p5*8 + p6*16 + p7*32 + p8*64 + p9*128;
-
+				encode = q2*1 + q3*2 + q4*4 + q5*8 + q6*16 + q7*32 + q8*64 + q9*128;
 				
 				if (encode != 255)
 					x = x + 1;
