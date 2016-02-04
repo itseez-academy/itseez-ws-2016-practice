@@ -58,7 +58,32 @@ void GuoHallThinning(const cv::Mat& src, cv::Mat& dst)
 // Place optimized version here
 //
 
-static void GuoHallIteration_optimized(cv::Mat& im, int iter)
+void getLookUpTable(uchar *&table, int iter)
+{
+	for (int i = 0; i < 256; i++)
+	{
+		uchar p2 = (bool)(i & 1);
+		uchar p3 = (bool)(i & 2);
+		uchar p4 = (bool)(i & 4);
+		uchar p5 = (bool)(i & 8);
+		uchar p6 = (bool)(i & 16);
+		uchar p7 = (bool)(i & 32);
+		uchar p8 = (bool)(i & 64);
+		uchar p9 = (bool)(i & 128);
+		int C  = (!p2 & (p3 | p4)) + (!p4 & (p5 | p6)) +
+				 (!p6 & (p7 | p8)) + (!p8 & (p9 | p2));
+		int N1 = (p9 | p2) + (p3 | p4) + (p5 | p6) + (p7 | p8);
+		int N2 = (p2 | p3) + (p4 | p5) + (p6 | p7) + (p8 | p9);
+		int N  = N1 < N2 ? N1 : N2;
+		int m  = iter == 0 ? ((p6 | p7 | !p9) & p8) : ((p2 | p3 | !p5) & p4);
+
+		if (C == 1 && (N >= 2 && N <= 3) & (m == 0))
+			table[i] = 1;
+		else table[i] = 0;
+	}
+}
+
+static void GuoHallIteration_optimized(cv::Mat& im, uchar *&table)
 {
     cv::Mat marker = cv::Mat::zeros(im.size(), CV_8UC1);
 
@@ -66,6 +91,7 @@ static void GuoHallIteration_optimized(cv::Mat& im, int iter)
     {
         for (int j = 1; j < im.cols-1; j++)
         {
+			if (im.at<uchar>(i,j) == 0) continue;
             uchar p2 = im.at<uchar>(i-1, j);
             uchar p3 = im.at<uchar>(i-1, j+1);
             uchar p4 = im.at<uchar>(i, j+1);
@@ -75,18 +101,18 @@ static void GuoHallIteration_optimized(cv::Mat& im, int iter)
             uchar p8 = im.at<uchar>(i, j-1);
             uchar p9 = im.at<uchar>(i-1, j-1);
 
-            int C  = (!p2 & (p3 | p4)) + (!p4 & (p5 | p6)) +
-                     (!p6 & (p7 | p8)) + (!p8 & (p9 | p2));
-            int N1 = (p9 | p2) + (p3 | p4) + (p5 | p6) + (p7 | p8);
-            int N2 = (p2 | p3) + (p4 | p5) + (p6 | p7) + (p8 | p9);
-            int N  = N1 < N2 ? N1 : N2;
-            int m  = iter == 0 ? ((p6 | p7 | !p9) & p8) : ((p2 | p3 | !p5) & p4);
+			uchar code = p2 * 1 +
+						 p3 * 2 +
+						 p4 * 4 +
+						 p5 * 8 +
+						 p6 * 16 +
+						 p7 * 32 +
+						 p8 * 64 +
+						 p9 * 128;
 
-            if (C == 1 && (N >= 2 && N <= 3) & (m == 0))
-                marker.at<uchar>(i,j) = 1;
+			marker.at<uchar>(i,j) = table[code];
         }
     }
-
     im &= ~marker;
 }
 
@@ -99,16 +125,23 @@ void GuoHallThinning_optimized(const cv::Mat& src, cv::Mat& dst)
     cv::Mat prev = cv::Mat::zeros(src.size(), CV_8UC1);
     cv::Mat diff;
 
+	uchar* table0 = new uchar [256]; 
+	uchar* table1 = new uchar [256];
+	getLookUpTable(table0, 0);
+	getLookUpTable(table1, 1);
+
     do
     {
-        GuoHallIteration_optimized(dst, 0);
-        GuoHallIteration_optimized(dst, 1);
+        GuoHallIteration_optimized(dst, table0);
+        GuoHallIteration_optimized(dst, table1);
         cv::absdiff(dst, prev, diff);
         dst.copyTo(prev);
     }
     while (cv::countNonZero(diff) > 0);
 
     dst *= 255;
+	delete table0;
+	delete table1;
 }
 
 //
