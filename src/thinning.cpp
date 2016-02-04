@@ -1,8 +1,8 @@
 #include "skeleton_filter.hpp"
 #include <opencv2/imgproc/imgproc.hpp>
-//#include <vector>;
-//#include <map>;
-//#include <cmath>;
+//#include <vector>
+//#include <map>
+//#include <cmath>
 
 static void GuoHallIteration(cv::Mat& im, int iter)
 {
@@ -63,7 +63,7 @@ void GuoHallThinning(const cv::Mat& src, cv::Mat& dst)
 // Place optimized version here
 //
 
-static void GuoHallIteration_optimized(cv::Mat& im, int iter)
+static void GuoHallIteration_optimized1(cv::Mat& im, int iter)
 {
     cv::Mat marker = cv::Mat::zeros(im.size(), CV_8UC1);
 
@@ -98,136 +98,135 @@ static void GuoHallIteration_optimized(cv::Mat& im, int iter)
     im &= ~marker;
 }
 
-//static uchar createByte(std::vector<uchar> p)
-//{
-//	uchar res = 0;
-//	int pow2 = 1;
-//	for(int i = 0; i < 8; i++)
-//	{
-//		res += p[i] * pow2;
-//		pow2 *= 2;
-//	}
-//	return res;
-//}
-//static std::vector<std::vector<uchar>> table(2,std::vector<uchar>(256,0));
+static uchar createByte(std::vector<uchar> p)
+{
+	uchar res = 0;
+	int pow2 = 1;
+	for(int i = 0; i < 8; i++)
+	{
+		res += p[i] * pow2;
+		pow2 *= 2;
+	}
+	return res;
+}
+static std::vector<std::vector<uchar>> table(2,std::vector<uchar>(256,0));
 
 
-//static void createTable(int iter)
-//{
-//	for(int i = 0; i < 256 ;  i++)
-//	{
-//		uchar p2 = i & 1;
-//		uchar p3 = i & 2;
-//		uchar p4 = i & 4;
-//		uchar p5 = i & 8;
-//		uchar p6 = i & 16;
-//		uchar p7 = i & 32;
-//		uchar p8 = i & 64;
-//		uchar p9 = i & 128;
-//
-//		p2 = (!p2 ? 1 : 0);
-//		p3 = (!p3 ? 1 : 0);
-//		p4 = (!p4 ? 1 : 0);
-//		p5 = (!p5 ? 1 : 0);
-//		p6 = (!p6 ? 1 : 0);
-//		p7 = (!p7 ? 1 : 0);
-//		p8 = (!p8 ? 1 : 0);
-//		p9 = (!p9 ? 1 : 0);
-//		
-//		int C  = (!p2 & (p3 | p4)) + (!p4 & (p5 | p6)) +
-//					(!p6 & (p7 | p8)) + (!p8 & (p9 | p2));
-//		int N1 = (p9 | p2) + (p3 | p4) + (p5 | p6) + (p7 | p8);
-//		int N2 = (p2 | p3) + (p4 | p5) + (p6 | p7) + (p8 | p9);
-//		int N  = N1 < N2 ? N1 : N2;
-//		int m  = iter == 0 ? ((p6 | p7 | !p9) & p8) : ((p2 | p3 | !p5) & p4);
-//		if (C == 1 && (N >= 2 && N <= 3) & (m == 0))
-//						table[iter][i] = 1;
-//	}
-//	
-//}
+static void createTable(int iter)
+{
+	for(int i = 0; i < 256 ;  i++)
+	{
+		uchar p2 = i & 1;
+		uchar p3 = i & 2;
+		uchar p4 = i & 4;
+		uchar p5 = i & 8;
+		uchar p6 = i & 16;
+		uchar p7 = i & 32;
+		uchar p8 = i & 64;
+		uchar p9 = i & 128;
 
-
-
-
-//static std::map<int,std::map<uchar,uchar>> table;
+		p2 = (!p2 ? 1 : 0);
+		p3 = (!p3 ? 1 : 0);
+		p4 = (!p4 ? 1 : 0);
+		p5 = (!p5 ? 1 : 0);
+		p6 = (!p6 ? 1 : 0);
+		p7 = (!p7 ? 1 : 0);
+		p8 = (!p8 ? 1 : 0);
+		p9 = (!p9 ? 1 : 0);
+		
+		int C  = (!p2 & (p3 | p4)) + (!p4 & (p5 | p6)) +
+					(!p6 & (p7 | p8)) + (!p8 & (p9 | p2));
+		int N1 = (p9 | p2) + (p3 | p4) + (p5 | p6) + (p7 | p8);
+		int N2 = (p2 | p3) + (p4 | p5) + (p6 | p7) + (p8 | p9);
+		int N  = N1 < N2 ? N1 : N2;
+		int m  = iter == 0 ? ((p6 | p7 | !p9) & p8) : ((p2 | p3 | !p5) & p4);
+		if (C == 1 && (N >= 2 && N <= 3) & (m == 0))
+						table[iter][i] = 1;
+	}
+	
+}
 
 
 
-//static bool writer = true;
-//
-//static void writeTable(int iter)
-//{
-//	if (writer)
-//	{
-//		for(int i = 0; i <  256; i++)
-//			printf("%d",table[iter][i]);
-//		printf("\n");
-//	}
-//	writer = false;
-//	
-//}
 
-//static void GuoHallIteration_optimized(cv::Mat& im, int iter)
-//{
-//	
-//    cv::Mat marker = cv::Mat::zeros(im.size(), CV_8UC1);
-//
-//    for (int i = 1; i < im.rows-1; i++)
-//    {
-//        for (int j = 1; j < im.cols-1; j++)
-//        {
-//			if (im.at<uchar>(i, j))
-//			{
-//				std::vector<uchar> p(8);
-//				p[0] = im.at<uchar>(i-1, j);
-//				p[1] = im.at<uchar>(i-1, j+1);
-//				p[2] = im.at<uchar>(i, j+1);
-//				p[3] = im.at<uchar>(i+1, j+1);
-//				p[4] = im.at<uchar>(i+1, j);
-//				p[5] = im.at<uchar>(i+1, j-1);
-//				p[6] = im.at<uchar>(i, j-1);
-//				p[7] = im.at<uchar>(i-1, j-1);
-//
-//				uchar hash = createByte(p);
-//				marker.at<uchar>(i,j) = table[iter][hash];
-//				
-//				//if (table[iter][hash] == 0)
-//				//{
-//				//	/*int C  = (!p2 & (p3 | p4)) + (!p4 & (p5 | p6)) +
-//				//	(!p6 & (p7 | p8)) + (!p8 & (p9 | p2));
-//				//int N1 = (p9 | p2) + (p3 | p4) + (p5 | p6) + (p7 | p8);
-//				//int N2 = (p2 | p3) + (p4 | p5) + (p6 | p7) + (p8 | p9);
-//				//int N  = N1 < N2 ? N1 : N2;
-//				//int m  = iter == 0 ? ((p6 | p7 | !p9) & p8) : ((p2 | p3 | !p5) & p4);*/
-//
-//				//	int C  = (!p[0] & (p[1] | p[2])) + (!p[2] & (p[3] | p[4])) +
-//				//		(!p[4] & (p[5] | p[6])) + (!p[6] & (p[7] | p[0]));
-//				//	int N1 = (p[7] | p[0]) + (p[1] | p[2]) + (p[3] | p[4]) + (p[5] | p[6]);
-//				//	int N2 = (p[0] | p[1]) + (p[2] | p[3]) + (p[4] | p[5]) + (p[6] | p[7]);
-//				//	int N  = N1 < N2 ? N1 : N2;
-//				//	int m  = iter == 0 ? ((p[4] | p[5] | !p[7]) & p[6]) : ((p[0] | p[1] | !p[3]) & p[2]);
-//
-//				//	if (C == 1 && (N >= 2 && N <= 3) & (m == 0))
-//				//	{
-//				//		marker.at<uchar>(i,j) = 1;
-//				//		table[iter][hash] = 2;
-//				//	}
-//				//	else
-//				//	{
-//				//		table[iter][hash] = 1;
-//				//	}
-//
-//				//}
-//				//else
-//				//if (table[iter][hash] == 2) marker.at<uchar>(i,j) = 1;
-//				
-//			}
-//			
-//        }
-//    }
-//
-//    im &= ~marker;
-//}
+
+
+
+static bool writer = true;
+
+static void writeTable(int iter)
+{
+	if (writer)
+	{
+		for(int i = 0; i <  256; i++)
+			printf("%d",table[iter][i]);
+		printf("\n");
+	}
+	writer = false;
+	
+}
+
+static void GuoHallIteration_optimized(cv::Mat& im, int iter)
+{
+	
+    cv::Mat marker = cv::Mat::zeros(im.size(), CV_8UC1);
+
+    for (int i = 1; i < im.rows-1; i++)
+    {
+        for (int j = 1; j < im.cols-1; j++)
+        {
+			if (im.at<uchar>(i, j))
+			{
+				std::vector<uchar> p(8);
+				p[0] = im.at<uchar>(i-1, j);
+				p[1] = im.at<uchar>(i-1, j+1);
+				p[2] = im.at<uchar>(i, j+1);
+				p[3] = im.at<uchar>(i+1, j+1);
+				p[4] = im.at<uchar>(i+1, j);
+				p[5] = im.at<uchar>(i+1, j-1);
+				p[6] = im.at<uchar>(i, j-1);
+				p[7] = im.at<uchar>(i-1, j-1);
+
+				uchar hash = createByte(p);
+				marker.at<uchar>(i,j) = table[iter][hash];
+				
+				//if (table[iter][hash] == 0)
+				//{
+				//	/*int C  = (!p2 & (p3 | p4)) + (!p4 & (p5 | p6)) +
+				//	(!p6 & (p7 | p8)) + (!p8 & (p9 | p2));
+				//int N1 = (p9 | p2) + (p3 | p4) + (p5 | p6) + (p7 | p8);
+				//int N2 = (p2 | p3) + (p4 | p5) + (p6 | p7) + (p8 | p9);
+				//int N  = N1 < N2 ? N1 : N2;
+				//int m  = iter == 0 ? ((p6 | p7 | !p9) & p8) : ((p2 | p3 | !p5) & p4);*/
+
+				//	int C  = (!p[0] & (p[1] | p[2])) + (!p[2] & (p[3] | p[4])) +
+				//		(!p[4] & (p[5] | p[6])) + (!p[6] & (p[7] | p[0]));
+				//	int N1 = (p[7] | p[0]) + (p[1] | p[2]) + (p[3] | p[4]) + (p[5] | p[6]);
+				//	int N2 = (p[0] | p[1]) + (p[2] | p[3]) + (p[4] | p[5]) + (p[6] | p[7]);
+				//	int N  = N1 < N2 ? N1 : N2;
+				//	int m  = iter == 0 ? ((p[4] | p[5] | !p[7]) & p[6]) : ((p[0] | p[1] | !p[3]) & p[2]);
+
+				//	if (C == 1 && (N >= 2 && N <= 3) & (m == 0))
+				//	{
+				//		marker.at<uchar>(i,j) = 1;
+				//		table[iter][hash] = 2;
+				//	}
+				//	else
+				//	{
+				//		table[iter][hash] = 1;
+				//	}
+
+				//}
+				//else
+				//if (table[iter][hash] == 2) marker.at<uchar>(i,j) = 1;
+				
+			}
+			
+        }
+    }
+
+    im &= ~marker;
+}
 
 void GuoHallThinning_optimized(const cv::Mat& src, cv::Mat& dst)
 {
@@ -238,8 +237,8 @@ void GuoHallThinning_optimized(const cv::Mat& src, cv::Mat& dst)
     cv::Mat prev = cv::Mat::zeros(src.size(), CV_8UC1);
     cv::Mat diff;
 
-	/*createTable(0);
-	createTable(1);*/
+	createTable(0);
+	createTable(1);
 
 	//writeTable(0);
 	
