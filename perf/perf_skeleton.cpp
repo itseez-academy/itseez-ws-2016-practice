@@ -160,6 +160,8 @@ PERF_TEST_P(Size_Only, Thinning_base, testing::Values(MAT_SIZES))
     Mat dst(sz, CV_8UC1);
 
     declare.in(src, WARMUP_RNG).out(dst);
+    declare.time(60);
+    declare.iterations(30);
 
     TEST_CYCLE()
     {
