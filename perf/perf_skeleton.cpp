@@ -60,6 +60,20 @@ PERF_TEST_P(Size_Only, ImageResize, testing::Values(MAT_SIZES))
 // Test(s) for the skeletonize function
 //
 
+//<<<<<<< HEAD
+ #define IMAGES testing::Values( std::string("./bin/testdata/sla.png"),\
+                                 std::string("./bin/testdata/page.png"),\
+                                 std::string("./bin/testdata/schedule.png") )
+
+ typedef perf::TestBaseWithParam<std::string> ImageName;
+
+ //PERF_TEST_P(ImageName, skeletonize, IMAGES)
+ //{
+ //    Mat input = cv::imread(GetParam());
+
+ //    // Add code here
+ //}
+//=======
 // #define IMAGES testing::Values( std::string("./bin/testdata/sla.png"),\
 //                                 std::string("./bin/testdata/page.png"),\
 //                                 std::string("./bin/testdata/schedule.png") )
@@ -83,7 +97,7 @@ PERF_TEST_P(Size_Only, Thinning, testing::Values(MAT_SIZES))
 
     cv::Mat image(sz, CV_8UC1);
     declare.in(image, WARMUP_RNG).out(image);
-    declare.time(40);
+    declare.time(60);
 
     cv::RNG rng(234231412);
     rng.fill(image, CV_8UC1, 0, 255);
@@ -102,3 +116,4 @@ PERF_TEST_P(Size_Only, Thinning, testing::Values(MAT_SIZES))
 
     SANITY_CHECK(image);
 }
+//>>>>>>> 957b2ec1d79263fb46b3320256314e063895b9a3
