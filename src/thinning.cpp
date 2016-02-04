@@ -100,32 +100,40 @@ static void GuoHallIteration_optimized(cv::Mat& im, int iter,
 {
     cv::Mat marker = cv::Mat::zeros(im.size(), CV_8UC1);
 
+     const uchar* row_up = im.ptr<uchar>(0);
+     const uchar* row_middle = im.ptr<uchar>(1);
+     const uchar* row_down = 0;
+     uchar* marker_row = 0;
     for (int i = 1; i < im.rows-1; i++)
     {
+        marker_row = marker.ptr<uchar>(i);
+        row_down = im.ptr<uchar>(i + 1);
         for (int j = 1; j < im.cols-1; j++)
         {
-            if (im.at<uchar>(i, j) != 0)
+            if (row_middle[j] != 0)
             {
-                uchar code = im.at<uchar>(i-1, j) +
-                             2 * im.at<uchar>(i-1, j+1) +
-                             4 * im.at<uchar>(i, j+1) +
-                             8 * im.at<uchar>(i+1, j+1) +
-                             16 * im.at<uchar>(i+1, j) +
-                             32 * im.at<uchar>(i+1, j-1) +
-                             64 * im.at<uchar>(i, j-1) +
-                             128 * im.at<uchar>(i-1, j-1);
+                unsigned code = row_up[j] +
+                                2 * row_up[j + 1] +
+                                4 * row_middle[j + 1] +
+                                8 * row_down[j + 1] +
+                                16 * row_down[j] +
+                                32 * row_down[j - 1] +
+                                64 * row_middle[j - 1] +
+                                128 * row_up[j - 1];
                 if (iter != 0)
                 {
                     if (table_iter1[code])
-                        marker.at<uchar>(i,j) = 1;
+                        marker_row[j] = table_iter1[code];
                 }
                 else
                 {
                     if (table_iter0[code])
-                        marker.at<uchar>(i,j) = 1;
+                        marker_row[j] = table_iter0[code];
                 }                    
             }
         }
+        row_up = row_middle;
+        row_middle = row_down;
     }
 
     im &= ~marker;
