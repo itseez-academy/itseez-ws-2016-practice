@@ -35,8 +35,11 @@ void ImageResize(const cv::Mat &src, cv::Mat &dst, const cv::Size sz)
             const uchar q21 = src.at<uchar>(y1, x2);
             const uchar q22 = src.at<uchar>(y2, x2);
 
-            const int temp = (x1 == x2) ? (int)(q11 * (y2 - y) + q22 * (y - y1)) :
-                            ((y1 == y2) ? (int)(q11 * (x2 - x) + q22 * (x - x1)) : (int)(q11 * (x2 - x) * (y2 - y) + q21 * (x - x1) * (y2 - y) + q12 * (x2 - x) * (y - y1) + q22 * (x - x1) * (y - y1)));
+            const int temp = ((x1 == x2) && (y1 == y2)) ? (int)q11 :
+                             ( (x1 == x2) ? (int)(q11 * (y2 - y) + q22 * (y - y1)) :
+                               ( (y1 == y2) ? (int)(q11 * (x2 - x) + q22 * (x - x1)) : 
+                                 (int)(q11 * (x2 - x) * (y2 - y) + q21 * (x - x1) * (y2 - y) + q12 * (x2 - x) * (y - y1) + q22 * (x - x1) * (y - y1))));
+
             ptr_dst[col] = (temp < 0) ? 0 : ((temp > 255) ? 255 : (uchar)temp);
         }
     }
