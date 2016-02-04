@@ -59,34 +59,69 @@ void ImageResize_optimized(const cv::Mat &src, cv::Mat &dst, const cv::Size sz)
 	float xscale = (float)sz_src.width  / sz.width;
 	float yscale = (float)sz_src.height / sz.height;
 
-    for (int row = 0; row < dst_rows; row++)
-    {
-        uchar *ptr_dst = dst.ptr<uchar>(row);
+	if ((dst_rows < src_rows) && (dst_cols < src_cols))
+	{
+		for (int row = 0; row < dst_rows; row++)
+		{
+		    uchar *ptr_dst = dst.ptr<uchar>(row);
+			float y = (((float)row) + .5f) * yscale - .5f;
+			int iy = (y > 0) ? (int)y : (int)floor(y);
+			int y1 = iy; 
+		    int y2 = (iy >= src_rows - 1) ? src_rows - 1 : iy + 1;
 
-        for (int col = 0; col < dst_cols; col++)
-        {
-            float x = (((float)col) + .5f) * xscale  - .5f;
-            float y = (((float)row) + .5f) * yscale - .5f;
+		    for (int col = 0; col < dst_cols; col++)
+		    {
+		        float x = (((float)col) + .5f) * xscale  - .5f;
 
-            int ix = (x > 0) ? (int)x : (int)floor(x);
-            int iy = (y > 0) ? (int)y : (int)floor(y);
+		        int ix = (int)x;
 
-            int x1 = ix;
-            int x2 = (ix >= src_cols - 1) ? src_cols - 1 : ix + 1;
-            int y1 = iy; 
-            int y2 = (iy >= src_rows - 1) ? src_rows - 1 : iy + 1;
+		        int x1 = ix;
+		        int x2 = (ix >= src_cols - 1) ? src_cols - 1 : ix + 1;
 
-            int q11 = src.at<uchar>(y1, x1);
-            int q12 = src.at<uchar>(y2, x1);
-            int q21 = src.at<uchar>(y1, x2);
-            int q22 = src.at<uchar>(y2, x2);
+		        int q11 = src.at<uchar>(y1, x1);
+		        int q12 = src.at<uchar>(y2, x1);
+		        int q21 = src.at<uchar>(y1, x2);
+		        int q22 = src.at<uchar>(y2, x2);
 
-           int temp = ((x1 == x2) && (y1 == y2)) ? q11 :
-                             ( (x1 == x2) ? (q11 * (y2 - y) + q22 * (y - y1)) :
-                               ( (y1 == y2) ? (q11 * (x2 - x) + q22 * (x - x1)) : 
-                                 (q11 * (x2 - x) * (y2 - y) + q21 * (x - x1) * (y2 - y) + q12 * (x2 - x) * (y - y1) + q22 * (x - x1) * (y - y1))));
+		       int temp =  (x1 == x2) ? (q11 * (y2 - y) + q22 * (y - y1)) :
+		                           ( (y1 == y2) ? (q11 * (x2 - x) + q22 * (x - x1)) : 
+		                             (q11 * (x2 - x) * (y2 - y) + q21 * (x - x1) * (y2 - y) + q12 * (x2 - x) * (y - y1) + q22 * (x - x1) * (y - y1)));
 
-            ptr_dst[col] = (uchar)temp;
-        }
-    }
+		        ptr_dst[col] = (uchar)temp;
+		    }
+		}
+	}
+	else
+	{
+		for (int row = 0; row < dst_rows; row++)
+		{
+		    uchar *ptr_dst = dst.ptr<uchar>(row);
+			float y = (((float)row) + .5f) * yscale - .5f;
+			int iy = (y > 0) ? (int)y : (int)floor(y);
+			int y1 = (iy < 0) ? 0 : ((iy >= src_rows) ? src_rows - 1 : iy); 
+		    int y2 = (iy < 0) ? 0 : ((iy >= src_rows - 1) ? src_rows - 1 : iy + 1);
+
+		    for (int col = 0; col < dst_cols; col++)
+		    {
+		        float x = (((float)col) + .5f) * xscale  - .5f;
+
+		        int ix = (x > 0) ? (int)x : (int)floor(x);
+
+		        int x1 = (ix < 0) ? 0 : ((ix >= src_cols) ? src_cols - 1 : ix);
+		        int x2 = (ix < 0) ? 0 : ((ix >= src_cols - 1) ? src_cols - 1 : ix + 1);
+
+		        int q11 = src.at<uchar>(y1, x1);
+		        int q12 = src.at<uchar>(y2, x1);
+		        int q21 = src.at<uchar>(y1, x2);
+		        int q22 = src.at<uchar>(y2, x2);
+
+		       int temp = ((x1 == x2) && (y1 == y2)) ? q11 :
+		                         ( (x1 == x2) ? (q11 * (y2 - y) + q22 * (y - y1)) :
+		                           ( (y1 == y2) ? (q11 * (x2 - x) + q22 * (x - x1)) : 
+		                             (q11 * (x2 - x) * (y2 - y) + q21 * (x - x1) * (y2 - y) + q12 * (x2 - x) * (y - y1) + q22 * (x - x1) * (y - y1))));
+
+		        ptr_dst[col] = (uchar)temp;
+		    }
+		}
+	}
 }
