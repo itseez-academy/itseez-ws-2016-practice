@@ -151,14 +151,13 @@ PERF_TEST_P(Size_Only, ConvertColor_simd, testing::Values(MAT_SIZES))
     cv::Mat diff1; cv::threshold(diff, diff1, 1, 0, cv::THRESH_TOZERO);
     ASSERT_EQ(0, cv::countNonZero(diff1));
 
-    // even if it is 1-off error there should be no mo than 20% of such pixels
+    // Even if it is 1-off error there should be no more than 20% of such pixels
     ASSERT_LT(cv::countNonZero(diff), sz.width*sz.height*20/100);
 
     SANITY_CHECK(dst);
 }
 
-
-// accuracy test by the way...
+// Accuracy test by the way...
 TEST(CompleteColorSpace, ConvertColor_fpt)
 {
     Size sz(4096, 4096);

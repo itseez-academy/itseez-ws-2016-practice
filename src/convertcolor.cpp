@@ -8,8 +8,9 @@
 #include <string>
 #include <sstream>
 
+// Function for debug prints
 template <typename T>
-std::string __m128i_toString(const __m128i var) // function for debug prints
+std::string __m128i_toString(const __m128i var)
 {
     std::stringstream sstr;
     const T* values = (const T*) &var;
@@ -98,7 +99,7 @@ void ConvertColor_BGR2GRAY_BT709_simd(const cv::Mat& src, cv::Mat& dst)
         int x = 0;
 
 #ifdef HAVE_SSE
-        // here is 16 times unrolled loop for vector processing
+        // Here is 16 times unrolled loop for vector processing
         for (; x <= sz.width - 16; x += 16)
         {
             __m128i chunk0 = _mm_loadu_si128((const __m128i*)(psrc + x*3 + 16*0));
@@ -107,7 +108,7 @@ void ConvertColor_BGR2GRAY_BT709_simd(const cv::Mat& src, cv::Mat& dst)
 
             __m128i red = _mm_or_si128(_mm_or_si128(_mm_shuffle_epi8(chunk0, ssse3_red_indices_0),
                                                     _mm_shuffle_epi8(chunk1, ssse3_red_indices_1)),
-                                       _mm_shuffle_epi8(chunk2, ssse3_red_indices_2));
+                                                    _mm_shuffle_epi8(chunk2, ssse3_red_indices_2));
 
             /* ??? */
 
@@ -115,12 +116,13 @@ void ConvertColor_BGR2GRAY_BT709_simd(const cv::Mat& src, cv::Mat& dst)
         }
 #endif
 
-        // process leftover pixels
+        // Process leftover pixels
         for (; x < sz.width; x++)
         {
             /* ??? */
         }
     }
 
-    ConvertColor_BGR2GRAY_BT709_fpt(src, dst); // !remove this!
+    // ! Remove this before writing your optimizations !
+    ConvertColor_BGR2GRAY_BT709_fpt(src, dst);
 }
