@@ -148,3 +148,23 @@ PERF_TEST_P(Size_Only, Thinning, testing::Values(MAT_SIZES))
 
     SANITY_CHECK(image);
 }
+
+//
+// Test(s) for the Thinning function
+//
+
+PERF_TEST_P(Size_Only, Thinning_base, testing::Values(MAT_SIZES))
+{
+    Size sz = GetParam();
+    Mat src(sz, CV_8UC1);
+    Mat dst(sz, CV_8UC1);
+
+    declare.in(src, WARMUP_RNG).out(dst);
+
+    TEST_CYCLE()
+    {
+        GuoHallThinning(src, dst);
+    }
+
+    SANITY_CHECK_NOTHING();
+}
