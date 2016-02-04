@@ -68,10 +68,10 @@ void ImageResize_optimized(const cv::Mat &src, cv::Mat &dst, const cv::Size sz)
 			int x1 = (ix < 0) ? 0 : ix, x2 = x1 + 1;
             int y1 = (iy < 0) ? 0 : iy, y2 = y1 + 1;
 
-            const uchar q11 = ((const char*)(src.data + src.step.p[0] * y1))[x1];
-			const uchar q21 = ((const char*)(src.data + src.step.p[0] * y1))[x2];
-            const uchar q12 = ((const char*)(src.data + src.step.p[0] * y2))[x1];
-            const uchar q22 = ((const char*)(src.data + src.step.p[0] * y2))[x2];
+            const uchar q11 = src.data[src.step.p[0] * y1 + x1];
+			const uchar q21 = src.data[src.step.p[0] * y1 + x2];
+            const uchar q12 = src.data[src.step.p[0] * y2 + x1];
+            const uchar q22 = src.data[src.step.p[0] * y2 + x2];
 
 			const float y2y = (y2 - y);
 			const float x2x = (x2 - x);
@@ -83,7 +83,7 @@ void ImageResize_optimized(const cv::Mat &src, cv::Mat &dst, const cv::Size sz)
                              ((y1 == y2) ? (int)(q11 * x2x + q22 * xx1) : 
                               (int)(q11 * x2x * y2y + y2y * xx1 * q21 + q12 * x2x * yy1 + yy1 * q22 * xx1)));
 
-           ((char*)(dst.data + dst.step.p[0] * row))[col] = (uchar)temp;
+           dst.data[dst.step.p[0] * row + col] = (uchar)temp;
         }
     }
 }
