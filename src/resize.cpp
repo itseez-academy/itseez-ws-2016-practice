@@ -68,18 +68,44 @@ void ImageResize_optimized(const cv::Mat &src, cv::Mat &dst, const cv::Size sz)
             const int ix = (int)floor(x);
             const int iy = (int)floor(y);
 
-            const int x1 = (ix < 0) ? 0 : ((ix >= src_cols) ? src_cols - 1 : ix);
-            const int x2 = (ix < 0) ? 0 : ((ix >= src_cols - 1) ? src_cols - 1 : ix + 1);
-            const int y1 = (iy < 0) ? 0 : ((iy >= src_rows) ? src_rows - 1 : iy);
-            const int y2 = (iy < 0) ? 0 : ((iy >= src_rows - 1) ? src_rows - 1 : iy + 1);
+            int x1(0), x2(0), y1(0), y2(0);
+            if (ix >= 0) {
+                if (ix >= src_cols) {
+                    x1 = src_cols - 1;
+                    x2 = src_cols - 1;
+                } else {
+                    x1 = ix;
+                    if (ix == src_cols - 1) {
+                        x2 = src_cols - 1;
+                    } else {
+                        x2 = ix + 1;
+                    }
+                }
+            }
+            if (iy >= 0) {
+                if (iy >= src_rows) {
+                    y1 = src_rows - 1;
+                    y2 = src_rows - 1;
+                } else {
+                    y1 = iy;
+                    if (iy == src_rows - 1) {
+                        y2 = src_rows - 1;
+                    } else {
+                        y2 = iy + 1;
+                    }
+                }
+            }
 
             const uchar q11 = src.at<uchar>(y1, x1);
             const uchar q12 = src.at<uchar>(y2, x1);
             const uchar q21 = src.at<uchar>(y1, x2);
             const uchar q22 = src.at<uchar>(y2, x2);
 
-            const int temp = (x1 == x2) ? (int)(q11 * (y2 - y) + q22 * (y - y1)) :
-                            ((y1 == y2) ? (int)(q11 * (x2 - x) + q22 * (x - x1)) : (int)(q11 * (x2 - x) * (y2 - y) + q21 * (x - x1) * (y2 - y) + q12 * (x2 - x) * (y - y1) + q22 * (x - x1) * (y - y1)));
+            const int temp = (x1 == x2 && y1 == y2) ? q11 :
+                             (x1 == x2) ? (int) (q11 * (y2 - y) + q22 * (y - y1)) :
+                             ((y1 == y2) ? (int) (q11 * (x2 - x) + q22 * (x - x1)) :
+                              (int) (q11 * (x2 - x) * (y2 - y) + q21 * (x - x1) * (y2 - y) + q12 * (x2 - x) * (y - y1) +
+                                     q22 * (x - x1) * (y - y1)));
             ptr_dst[col] = (temp < 0) ? 0 : ((temp > 255) ? 255 : (uchar)temp);
         }
     }
