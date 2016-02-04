@@ -1,4 +1,5 @@
 #include "opencv_ptest/include/opencv2/ts/ts.hpp"
+#include "opencv2/highgui/highgui.hpp"
 
 #include <iostream>
 
@@ -14,12 +15,20 @@ using std::tr1::get;
 // Test(s) for the ConvertColor_BGR2GRAY_BT709 function
 //
 
-// PERF_TEST(skeleton, ConvertColor_BGR2GRAY_BT709)
-// {
-//     Mat input = cv::imread("./bin/testdata/sla.png");
-//
-//     // Add code here
-// }
+PERF_TEST(skeleton, ConvertColor_BGR2GRAY_BT709)
+{
+    Mat input = cv::imread("./bin/testdata/sla.png");
+
+    Mat result(input.size(), CV_8UC1);
+    declare.in(input).out(result).iterations(10).time(5);
+
+    TEST_CYCLE()
+    {
+        ConvertColor_BGR2GRAY_BT709(input, result);
+    }
+
+    SANITY_CHECK(result, 1 + 1e-6);
+}
 
 //
 // Test(s) for the ImageResize function
@@ -46,18 +55,48 @@ PERF_TEST_P(Size_Only, ImageResize, testing::Values(MAT_SIZES))
 }
 
 //
+// Test(s) for the GuoHallThinning function
+//
+
+PERF_TEST_P(Size_Only, GuoHallThinning, testing::Values(MAT_SIZES))
+{
+    Size sz = GetParam();
+    Mat input(sz, CV_8UC1);
+
+    Mat result(input.size(), CV_8UC1);
+    declare.in(input, WARMUP_RNG).out(result).iterations(10).time(60);
+
+    TEST_CYCLE()
+    {
+        GuoHallThinning(input, result);
+    }
+
+    SANITY_CHECK(result, 1 + 1e-6);
+}
+
+//
 // Test(s) for the skeletonize function
 //
 
-// #define IMAGES testing::Values( std::string("./bin/testdata/sla.png"),\
-//                                 std::string("./bin/testdata/page.png"),\
-//                                 std::string("./bin/testdata/schedule.png") )
-//
-// typedef perf::TestBaseWithParam<std::string> ImageName;
-//
-// PERF_TEST_P(ImageName, skeletonize, IMAGES)
-// {
-//     Mat input = cv::imread(GetParam());
-//
-//     // Add code here
-// }
+#define IMAGES testing::Values( std::string("./bin/testdata/sla.png"),\
+                                std::string("./bin/testdata/page.png"),\
+                                std::string("./bin/testdata/schedule.png") )
+
+typedef perf::TestBaseWithParam<std::string> ImageName;
+
+PERF_TEST_P(ImageName, skeletonize, IMAGES)
+{
+    Mat input = cv::imread(GetParam());
+
+    Mat output(input);
+    //actually size of aaa will be smaller then size of bbb
+
+    declare.in(input).out(output).iterations(10).time(60);
+
+    TEST_CYCLE()
+    {
+        skeletonize(input, output, false);
+    }
+
+    SANITY_CHECK(output, 1 + 1e-6);
+}

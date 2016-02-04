@@ -47,7 +47,9 @@ int main(int argc, const char** argv)
 
     // Process image
     Mat output;
+    TS(skeletonize_0);
     skeletonize(input, output, save_images);
+    TE(skeletonize_0);
 
     // Show output image
     imshow("Output image", output);
