@@ -1,202 +1,3 @@
-//#include "skeleton_filter.hpp"
-//#include <opencv2/imgproc/imgproc.hpp>
-//#include <vector>
-//
-//static void GuoHallIteration(cv::Mat& im, int iter)
-//{
-//    cv::Mat marker = cv::Mat::zeros(im.size(), CV_8UC1);
-//
-//    for (int i = 1; i < im.rows-1; i++)
-//    {
-//        for (int j = 1; j < im.cols-1; j++)
-//        {
-//            uchar p2 = im.at<uchar>(i-1, j);
-//            uchar p3 = im.at<uchar>(i-1, j+1);
-//            uchar p4 = im.at<uchar>(i, j+1);
-//            uchar p5 = im.at<uchar>(i+1, j+1);
-//            uchar p6 = im.at<uchar>(i+1, j);
-//            uchar p7 = im.at<uchar>(i+1, j-1);
-//            uchar p8 = im.at<uchar>(i, j-1);
-//            uchar p9 = im.at<uchar>(i-1, j-1);
-//
-//            int C  = (!p2 & (p3 | p4)) + (!p4 & (p5 | p6)) +
-//                     (!p6 & (p7 | p8)) + (!p8 & (p9 | p2));
-//            int N1 = (p9 | p2) + (p3 | p4) + (p5 | p6) + (p7 | p8);
-//            int N2 = (p2 | p3) + (p4 | p5) + (p6 | p7) + (p8 | p9);
-//            int N  = N1 < N2 ? N1 : N2;
-//            int m  = iter == 0 ? ((p6 | p7 | !p9) & p8) : ((p2 | p3 | !p5) & p4);
-//
-//            if (C == 1 && (N >= 2 && N <= 3) & (m == 0))
-//                marker.at<uchar>(i,j) = 1;
-//        }
-//    }
-//
-//    im &= ~marker;
-//}
-//
-//void GuoHallThinning(const cv::Mat& src, cv::Mat& dst)
-//{
-//    CV_Assert(CV_8UC1 == src.type());
-//
-//    dst = src / 255;
-//
-//    cv::Mat prev = cv::Mat::zeros(src.size(), CV_8UC1);
-//    cv::Mat diff;
-//
-//    do
-//    {
-//        GuoHallIteration(dst, 0);
-//        GuoHallIteration(dst, 1);
-//        cv::absdiff(dst, prev, diff);
-//        dst.copyTo(prev);
-//    }
-//    while (cv::countNonZero(diff) > 0);
-//
-//    dst *= 255;
-//}
-//
-////
-//// Place optimized version here
-////
-//
-//static uchar encode(uchar p2, uchar p3, uchar p4, uchar p5, uchar p6, uchar p7, uchar p8, uchar p9)
-//{
-//	return p2 * 1 +
-//		   p3 * 2 +
-//		   p4 * 4 +
-//		   p5 * 8 +
-//		   p6 * 16 +
-//		   p7 * 32 +
-//		   p8 * 64 +
-//		   p9 * 128;
-//}
-//
-//#define UNDEF 2
-//
-//static void GuoHallIteration_optimizedFst(cv::Mat& im, std::vector<uchar>& pxlValuesByEncodedNeighbours)
-//{
-//    cv::Mat marker = cv::Mat::zeros(im.size(), CV_8UC1);
-//
-//    for (int i = 1; i < im.rows-1; i++)
-//    {
-//        for (int j = 1; j < im.cols-1; j++)
-//        {
-//			if (im.at<uchar>(i,j) != 0)
-//			{
-//				uchar p2 = im.at<uchar>(i-1, j);
-//				uchar p3 = im.at<uchar>(i-1, j+1);
-//				uchar p4 = im.at<uchar>(i, j+1);
-//				uchar p5 = im.at<uchar>(i+1, j+1);
-//				uchar p6 = im.at<uchar>(i+1, j);
-//				uchar p7 = im.at<uchar>(i+1, j-1);
-//				uchar p8 = im.at<uchar>(i, j-1);
-//				uchar p9 = im.at<uchar>(i-1, j-1);
-//
-//				int code = encode(p2,p3,p4,p5,p6,p7,p8,p9);
-//				if (pxlValuesByEncodedNeighbours[code] != UNDEF)
-//				{
-//					marker.at<uchar>(i,j) = pxlValuesByEncodedNeighbours[code];
-//				}
-//				else
-//				{
-//					int C  = (!p2 & (p3 | p4)) + (!p4 & (p5 | p6)) +
-//							 (!p6 & (p7 | p8)) + (!p8 & (p9 | p2));
-//					int N1 = (p9 | p2) + (p3 | p4) + (p5 | p6) + (p7 | p8);
-//					int N2 = (p2 | p3) + (p4 | p5) + (p6 | p7) + (p8 | p9);
-//					int N  = N1 < N2 ? N1 : N2;
-//					int m  = (p6 | p7 | !p9) & p8; //(p2 | p3 | !p5) & p4
-//
-//					if (C == 1 && (N >= 2 && N <= 3) & (m == 0))
-//						marker.at<uchar>(i,j) = 1;
-//					pxlValuesByEncodedNeighbours[code] = marker.at<uchar>(i,j);
-//				}
-//			}
-//        }
-//    }
-//
-//    im &= ~marker;
-//}
-//static void GuoHallIteration_optimizedSnd(cv::Mat& im, std::vector<uchar>& pxlValuesByEncodedNeighbours)
-//{
-//	cv::Mat marker = cv::Mat::zeros(im.size(), CV_8UC1);
-//
-//    for (int i = 1; i < im.rows-1; i++)
-//    {
-//        for (int j = 1; j < im.cols-1; j++)
-//        {
-//			if (im.at<uchar>(i,j) != 0)
-//			{
-//				uchar p2 = im.at<uchar>(i-1, j);
-//				uchar p3 = im.at<uchar>(i-1, j+1);
-//				uchar p4 = im.at<uchar>(i, j+1);
-//				uchar p5 = im.at<uchar>(i+1, j+1);
-//				uchar p6 = im.at<uchar>(i+1, j);
-//				uchar p7 = im.at<uchar>(i+1, j-1);
-//				uchar p8 = im.at<uchar>(i, j-1);
-//				uchar p9 = im.at<uchar>(i-1, j-1);
-//
-//				int code = encode(p2,p3,p4,p5,p6,p7,p8,p9);
-//				if (pxlValuesByEncodedNeighbours[code] != UNDEF)
-//				{
-//					marker.at<uchar>(i,j) = pxlValuesByEncodedNeighbours[code];
-//				}
-//				else
-//				{
-//					int C  = (!p2 & (p3 | p4)) + (!p4 & (p5 | p6)) +
-//							 (!p6 & (p7 | p8)) + (!p8 & (p9 | p2));
-//					int N1 = (p9 | p2) + (p3 | p4) + (p5 | p6) + (p7 | p8);
-//					int N2 = (p2 | p3) + (p4 | p5) + (p6 | p7) + (p8 | p9);
-//					int N  = N1 < N2 ? N1 : N2;
-//					int m  = (p2 | p3 | !p5) & p4;
-//
-//					if (C == 1 && (N >= 2 && N <= 3) & (m == 0))
-//						marker.at<uchar>(i,j) = 1;
-//					pxlValuesByEncodedNeighbours[code] = marker.at<uchar>(i,j);
-//				}
-//			}
-//        }
-//    }
-//
-//    im &= ~marker;
-//}
-//
-//void GuoHallThinning_optimized(const cv::Mat& src, cv::Mat& dst)
-//{
-//    CV_Assert(CV_8UC1 == src.type());
-//
-//    dst = src / 255;
-//
-//    cv::Mat prev = cv::Mat::zeros(src.size(), CV_8UC1);
-//    cv::Mat diff;
-//
-//	std::vector<uchar> pxlValuesByEncodedNeighbours0(256, UNDEF);
-//	std::vector<uchar> pxlValuesByEncodedNeighbours1(256, UNDEF);
-//    do
-//    {
-//        GuoHallIteration_optimizedFst(dst, pxlValuesByEncodedNeighbours0);//0
-//        GuoHallIteration_optimizedSnd(dst, pxlValuesByEncodedNeighbours1);//1
-//        cv::absdiff(dst, prev, diff);
-//        dst.copyTo(prev);
-//    }
-//    while (cv::countNonZero(diff) > 0);
-//
-//    dst *= 255;
-//}
-//
-////
-//// Sample performance report
-////
-////           Name of Test               base          1           2          1          2
-////                                                                           vs         vs
-////                                                                          base       base
-////                                                                       (x-factor) (x-factor)
-//// Thinning::Size_Only::640x480      333.442 ms  216.775 ms  142.484 ms     1.54       2.34
-//// Thinning::Size_Only::1280x720     822.569 ms  468.958 ms  359.877 ms     1.75       2.29
-//// Thinning::Size_Only::1920x1080    2438.715 ms 1402.072 ms 1126.428 ms    1.74       2.16
-//
-//
-//#undef UNDEF
-
 #include "skeleton_filter.hpp"
 #include <opencv2/imgproc/imgproc.hpp>
 
@@ -270,14 +71,6 @@ static uchar encode(uchar p2, uchar p3, uchar p4, uchar p5, uchar p6, uchar p7, 
 }
 static void decode(uchar code, uchar& p2, uchar& p3, uchar& p4, uchar& p5, uchar& p6, uchar& p7, uchar& p8, uchar& p9)
 {
-	/*p2 = code & 1 ? 1 : 0;
-	p3 = code & 2 ? 1 : 0;
-	p4 = code & 4 ? 1 : 0;
-	p5 = code & 8 ? 1 : 0;
-	p6 = code & 16 ? 1 : 0;
-	p7 = code & 32 ? 1 : 0;
-	p8 = code & 64 ? 1 : 0;
-	p9 = code & 128 ? 1 : 0;*/
 	p2 = (bool)(code & 1);
 	p3 = (bool)(code & 2);
 	p4 = (bool)(code & 4);
@@ -288,7 +81,7 @@ static void decode(uchar code, uchar& p2, uchar& p3, uchar& p4, uchar& p5, uchar
 	p9 = (bool)(code & 128);
 }
 
-static void GuoHallIteration_optimized(cv::Mat& im, std::vector<uchar> table)
+static void GuoHallIteration_optimized(cv::Mat& im, std::vector<uchar> table, cv::Mat& prev, cv::Mat& status)
 {
     cv::Mat marker = cv::Mat::zeros(im.size(), CV_8UC1);
 
@@ -296,19 +89,34 @@ static void GuoHallIteration_optimized(cv::Mat& im, std::vector<uchar> table)
     {
         for (int j = 1; j < im.cols-1; j++)
         {
-			if (im.at<uchar>(i,j) != 0)
+            if (im.at<uchar>(i,j) != 0 && status.at<uchar>(i,j) != 0)
 			{
-				uchar p2 = im.at<uchar>(i-1, j);
-				uchar p3 = im.at<uchar>(i-1, j+1);
-				uchar p4 = im.at<uchar>(i, j+1);
-				uchar p5 = im.at<uchar>(i+1, j+1);
-				uchar p6 = im.at<uchar>(i+1, j);
-				uchar p7 = im.at<uchar>(i+1, j-1);
-				uchar p8 = im.at<uchar>(i, j-1);
-				uchar p9 = im.at<uchar>(i-1, j-1);
+                uchar p9 = im.at<uchar>(i-1, j-1);
+                uchar p2 = im.at<uchar>(i-1, j);
+                uchar p3 = im.at<uchar>(i-1, j+1);
+                uchar p8 = im.at<uchar>(i, j-1);
+                uchar p4 = im.at<uchar>(i, j+1);
+                uchar p7 = im.at<uchar>(i+1, j-1);
+                uchar p6 = im.at<uchar>(i+1, j);
+                uchar p5 = im.at<uchar>(i+1, j+1);
 
 				int code = encode(p2,p3,p4,p5,p6,p7,p8,p9);
-				marker.at<uchar>(i,j) = table[code];
+                marker.at<uchar>(i,j) = table[code];
+
+                uchar newActualValue = im.at<uchar>(i,j) & !table[code];
+
+                if (newActualValue != prev.at<uchar>(i,j))
+                {
+                    status.at<uchar>(i-1, j-1) = 1;
+                    status.at<uchar>(i-1, j) = 1;
+                    status.at<uchar>(i-1, j+1) = 1;
+                    status.at<uchar>(i, j-1) = 1;
+                    status.at<uchar>(i, j+1) = 1;
+                    status.at<uchar>(i+1, j-1) = 1;
+                    status.at<uchar>(i+1, j) = 1;
+                    status.at<uchar>(i+1, j+1) = 1;
+                }
+                status.at<uchar>(i,j) = 0;
 			}
         }
     }
@@ -375,8 +183,10 @@ void GuoHallThinning_optimized(const cv::Mat& src, cv::Mat& dst)
 
     dst = src / 255;
 
-    cv::Mat prev = cv::Mat::zeros(src.size(), CV_8UC1);
+    cv::Mat prev;
     cv::Mat diff;
+    cv::Mat changeGrid = ~(cv::Mat::zeros(src.size(), CV_8UC1));
+    dst.copyTo(prev);
 
 	std::vector<uchar> tableIter0(256, 0);
 	std::vector<uchar> tableIter1(256, 0);
@@ -385,8 +195,9 @@ void GuoHallThinning_optimized(const cv::Mat& src, cv::Mat& dst)
 
     do
     {
-        GuoHallIteration_optimized(dst, tableIter0);
-        GuoHallIteration_optimized(dst, tableIter1);
+        GuoHallIteration_optimized(dst, tableIter0, prev, changeGrid);
+        dst.copyTo(prev);
+        GuoHallIteration_optimized(dst, tableIter1, prev, changeGrid);
         cv::absdiff(dst, prev, diff);
         dst.copyTo(prev);
     }
