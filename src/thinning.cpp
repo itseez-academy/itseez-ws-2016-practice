@@ -61,14 +61,14 @@ void GuoHallThinning(const cv::Mat& src, cv::Mat& dst)
 
 static void Decode(uchar* p, uchar code)
 {
-    p[0] = code & 1 && 1;//p2
-    p[1] = code & 2 && 1;//p3
-    p[2] = code & 4 && 1;//p4
-    p[3] = code & 8 && 1;//p5
-    p[4] = code & 16 && 1;//p6
-    p[5] = code & 32 && 1;//p7
-    p[6] = code & 64 && 1;//p8
-    p[7] = code & 128 && 1;//p9
+    p[0] = code & 1;//p2
+    p[1] = (code & 2) >> 1;//p3
+    p[2] = (code & 4) >> 2;//p4
+    p[3] = (code & 8) >> 3;//p5
+    p[4] = (code & 16) >> 4;//p6
+    p[5] = (code & 32) >> 5;//p7
+    p[6] = (code & 64) >> 6;//p8
+    p[7] = (code & 128) >> 7;//p9
 }
 
 static uchar Encode(uchar* p)
@@ -78,33 +78,7 @@ static uchar Encode(uchar* p)
     return code;
 }
 
-static void GuoHallIteration_optimized(cv::Mat& im, uchar* neighbours_to_value)
-{
-    cv::Mat marker = cv::Mat::zeros(im.size(), CV_8UC1);
-    uchar p[8] = {0};
-    uchar code = 0;
-    for (int i = 1; i < im.rows-1; i++)
-    {
-        for (int j = 1; j < im.cols-1; j++)
-        {
-            if(im.at<uchar>(i, j) > 0)
-            {
-                p[0] = im.at<uchar>(i-1, j);
-                p[1] = im.at<uchar>(i-1, j+1);
-                p[2] = im.at<uchar>(i, j+1);
-                p[3] = im.at<uchar>(i+1, j+1);
-                p[4] = im.at<uchar>(i+1, j);
-                p[5] = im.at<uchar>(i+1, j-1);
-                p[6] = im.at<uchar>(i, j-1);
-                p[7] = im.at<uchar>(i-1, j-1);
-                code = Encode(p);
-                marker.at<uchar>(i,j) = neighbours_to_value[code];
-            }
-        }
-    }
 
-    im &= ~marker;
-}
 
 static void calculateTables(uchar* neighbours_to_value_zero, uchar* neighbours_to_value_one)
 {
@@ -136,40 +110,54 @@ static void calculateTables(uchar* neighbours_to_value_zero, uchar* neighbours_t
         {
             neighbours_to_value_one[code] = 0;
         }
-
     }
-    // cout<<"$$$$$$$$$"<<endl;
-    // for(int i = 0; i < 256; i++)
-    // {
-    //     cout<<neighbours_to_value_one[i]<<"  ";
-    // }
-    // cout<<"$$$$$$$$$"<<endl;
+}
+
+static void GuoHallIteration_optimized(cv::Mat& im, uchar* neighbours_to_value)
+{
+    cv::Mat marker = cv::Mat::zeros(im.size(), CV_8UC1);
+    uchar p[8] = {0};
+    uchar code = 0;
+    for (int i = 1; i < im.rows-1; i++)
+    {
+        for (int j = 1; j < im.cols-1; j++)
+        {
+            if(im.at<uchar>(i, j) > 0)
+            {
+                p[0] = im.at<uchar>(i-1, j);
+                p[1] = im.at<uchar>(i-1, j+1);
+                p[2] = im.at<uchar>(i, j+1);
+                p[3] = im.at<uchar>(i+1, j+1);
+                p[4] = im.at<uchar>(i+1, j);
+                p[5] = im.at<uchar>(i+1, j-1);
+                p[6] = im.at<uchar>(i, j-1);
+                p[7] = im.at<uchar>(i-1, j-1);
+                code = Encode(p);
+                marker.at<uchar>(i,j) = neighbours_to_value[code];
+            }
+        }
+    }
+
+    im &= ~marker;
 }
 
 void GuoHallThinning_optimized(const cv::Mat& src, cv::Mat& dst)
 {
     CV_Assert(CV_8UC1 == src.type());
     dst = src / 255;
-    cv::Mat prev = cv::Mat::zeros(src.size(), CV_8UC1);
-    cv::Mat diff;
     uchar neighbours_to_value_one[256] = {0};
     uchar neighbours_to_value_zero[256] = {0};
     calculateTables(neighbours_to_value_zero, neighbours_to_value_one);
-    // cout<<"======="<<endl;
-    // for(int i = 0; i < 256; i++)
-    // {
-    //     cout<<static_cast<int>(neighbours_to_value_one[i])<<"  ";
-    // }
-    // cout<<"======"<<endl;
+    uint prev_non_zeros = 0;
+    uint current_non_zeros = cv::countNonZero(dst);
     do
     {
+        prev_non_zeros = current_non_zeros;
         GuoHallIteration_optimized(dst, neighbours_to_value_zero);
         GuoHallIteration_optimized(dst, neighbours_to_value_one);
-        cv::absdiff(dst, prev, diff);
-        dst.copyTo(prev);
-    }
-    while (cv::countNonZero(diff) > 0);
-
+        current_non_zeros = cv::countNonZero(dst);
+     }
+    while(current_non_zeros < prev_non_zeros);
     dst *= 255;
 }
 
