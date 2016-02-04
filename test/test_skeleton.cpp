@@ -76,3 +76,14 @@ TEST(skeleton, the_same_size_ConvertColor_BGR2GRAY_BT709)
 	EXPECT_EQ(image.cols, result.cols);
 	EXPECT_EQ(image.rows, result.rows);
 }
+
+TEST(skeleton, the_same_size_GuoHallThinning)
+{
+	Mat image(100, 100, CV_8UC1);
+	Mat result;
+
+	GuoHallThinning(image, result);
+
+	EXPECT_EQ(image.cols, result.cols);
+	EXPECT_EQ(image.rows, result.rows);
+}
