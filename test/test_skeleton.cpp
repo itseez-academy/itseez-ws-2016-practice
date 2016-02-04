@@ -87,3 +87,15 @@ TEST(skeleton, the_same_size_GuoHallThinning)
 	EXPECT_EQ(image.cols, result.cols);
 	EXPECT_EQ(image.rows, result.rows);
 }
+
+TEST(skeleton, the_same_size_of_arg_ImageResize)
+{
+	Mat image(200, 100, CV_8UC1);
+	Mat result;
+
+	Size sz(image.cols / 2, image.rows / 2);
+	ImageResize(image, result, sz);
+
+	EXPECT_EQ(result.cols, sz.width);
+	EXPECT_EQ(result.rows, sz.height);
+}
