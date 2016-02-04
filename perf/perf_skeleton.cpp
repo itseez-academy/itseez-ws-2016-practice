@@ -38,7 +38,7 @@ PERF_TEST_P(Size_Only, ImageResize, testing::Values(MAT_SIZES))
     cv::Mat dst(Size(sz_to), CV_8UC1);
     cv::Mat gold(Size(sz_to), CV_8UC1);
     declare.in(src, WARMUP_RNG).out(dst);
-
+	
     cv::RNG rng(234231412);
     rng.fill(src, CV_8UC1, 0, 255);
 
@@ -76,7 +76,6 @@ PERF_TEST_P(Size_Only, ImageResize, testing::Values(MAT_SIZES))
 //
 // Test(s) for the Thinning function
 //
-
 PERF_TEST_P(Size_Only, Thinning, testing::Values(MAT_SIZES))
 {
     Size sz = GetParam();
