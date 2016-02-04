@@ -1,5 +1,10 @@
 #include "skeleton_filter.hpp"
 #include <opencv2/imgproc/imgproc.hpp>
+#include "iostream"
+#include "fstream"
+#include "opencv2/highgui/highgui.hpp"
+#include <typeinfo>
+#include <C:\opencv\build\include\opencv2\core\types_c.h>
 
 static void GuoHallIteration(cv::Mat& im, int iter)
 {
@@ -64,7 +69,7 @@ static void GuoHallIteration_optimized(cv::Mat& im, int iter)
 
     for (int i = 1; i < im.rows-1; i++)
     {
-        for (int j = 1; j < im.cols-1; j++)
+        for (int j = 1; j < im.cols-1 && im.at<uchar>(i, j); j++)
         {
             uchar p2 = im.at<uchar>(i-1, j);
             uchar p3 = im.at<uchar>(i-1, j+1);
