@@ -115,3 +115,20 @@ TEST(skeleton, the_same_color_ImageResize)
 		}
 	}
 }
+
+TEST(skeleton, the_same_color_ConvertColor_BGR2GRAY_BT709)
+{
+	Scalar color = Scalar(40, 80, 120);
+	Mat image(200, 200, CV_8UC3, color);
+	Mat result;
+
+	ConvertColor_BGR2GRAY_BT709(image, result);
+	uchar chng_color = result.at<uchar>(0, 0);
+
+	for (int i = 0; i < result.rows; i++) {
+		for (int j = 0; j < result.cols; j++) {
+			EXPECT_EQ(result.at<uchar>(i, j), chng_color);
+		}
+	}
+}
+
