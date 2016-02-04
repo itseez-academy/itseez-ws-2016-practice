@@ -99,3 +99,19 @@ TEST(skeleton, the_same_size_of_arg_ImageResize)
 	EXPECT_EQ(result.cols, sz.width);
 	EXPECT_EQ(result.rows, sz.height);
 }
+
+TEST(skeleton, the_same_color_ImageResize)
+{
+	Mat image(200, 200, CV_8UC1, Scalar(30));
+	Mat result;
+
+	Size sz(image.cols / 2, image.rows / 2);
+	ImageResize(image, result, sz);
+	uchar color = image.at<uchar>(0, 0);
+
+	for (int i = 0; i < sz.height; i++) {
+		for (int j = 0; j < sz.width; j++) {
+			EXPECT_EQ(result.at<uchar>(i, j), color);
+		}
+	}
+}
