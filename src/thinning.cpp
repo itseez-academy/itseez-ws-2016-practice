@@ -1,7 +1,11 @@
 #include "skeleton_filter.hpp"
 #include <opencv2/imgproc/imgproc.hpp>
 
-static void GuoHallIteration(cv::Mat& im, int iter)
+#include <vector>
+
+static void GuoHallIteration(cv::Mat& im, int iter,
+                             const std::vector<unsigned>& table_iter0,
+                             const std::vector<unsigned>& table_iter1)
 {
     cv::Mat marker = cv::Mat::zeros(im.size(), CV_8UC1);
 
@@ -11,29 +15,59 @@ static void GuoHallIteration(cv::Mat& im, int iter)
         {
             if (im.at<uchar>(i, j) != 0)
             {
-                uchar p2 = im.at<uchar>(i-1, j);
-                uchar p3 = im.at<uchar>(i-1, j+1);
-                uchar p4 = im.at<uchar>(i, j+1);
-                uchar p5 = im.at<uchar>(i+1, j+1);
-                uchar p6 = im.at<uchar>(i+1, j);
-                uchar p7 = im.at<uchar>(i+1, j-1);
-                uchar p8 = im.at<uchar>(i, j-1);
-                uchar p9 = im.at<uchar>(i-1, j-1);
-
-                int C  = (!p2 & (p3 | p4)) + (!p4 & (p5 | p6)) +
-                         (!p6 & (p7 | p8)) + (!p8 & (p9 | p2));
-                int N1 = (p9 | p2) + (p3 | p4) + (p5 | p6) + (p7 | p8);
-                int N2 = (p2 | p3) + (p4 | p5) + (p6 | p7) + (p8 | p9);
-                int N  = N1 < N2 ? N1 : N2;
-                int m  = iter == 0 ? ((p6 | p7 | !p9) & p8) : ((p2 | p3 | !p5) & p4);
-
-                if (C == 1 && (N >= 2 && N <= 3) & (m == 0))
-                    marker.at<uchar>(i,j) = 1;
+                unsigned code = im.at<uchar>(i-1, j) +
+                                2 * im.at<uchar>(i-1, j+1) +
+                                4 * im.at<uchar>(i, j+1) +
+                                8 * im.at<uchar>(i+1, j+1) +
+                                16 * im.at<uchar>(i+1, j) +
+                                32 * im.at<uchar>(i+1, j-1) +
+                                64 * im.at<uchar>(i, j-1) +
+                                128 * im.at<uchar>(i-1, j-1);
+                if (iter != 0)
+                {
+                    if (table_iter1[code])
+                        marker.at<uchar>(i,j) = table_iter1[code];
+                }
+                else
+                {
+                    if (table_iter0[code])
+                        marker.at<uchar>(i,j) = table_iter0[code];
+                }                    
             }
         }
     }
 
     im &= ~marker;
+}
+
+static void MakeTable(std::vector<unsigned>& table_iter0,
+                      std::vector<unsigned>& table_iter1)
+{
+    table_iter0.resize(256);
+    table_iter1.resize(256);
+    unsigned value = 0;
+    for (int i = 0; i < 256; ++i)
+    {
+        uchar p2 = i & 1;
+        uchar p3 = i & 2;
+        uchar p4 = i & 4;
+        uchar p5 = i & 8;
+        uchar p6 = i & 16;
+        uchar p7 = i & 32;
+        uchar p8 = i & 64;
+        uchar p9 = i & 128;
+
+        int C  = (!p2 & (p3 | p4)) + (!p4 & (p5 | p6)) +
+                 (!p6 & (p7 | p8)) + (!p8 & (p9 | p2));
+        int N1 = (p9 | p2) + (p3 | p4) + (p5 | p6) + (p7 | p8);
+        int N2 = (p2 | p3) + (p4 | p5) + (p6 | p7) + (p8 | p9);
+        int N  = N1 < N2 ? N1 : N2;
+        if (C == 1 && (N >= 2 && N <= 3))
+        {
+            table_iter0[i] = !((p6 | p7 | !p9) & p8);
+            table_iter1[i] = !((p2 | p3 | !p5) & p4);
+        }
+    }
 }
 
 void GuoHallThinning(const cv::Mat& src, cv::Mat& dst)
@@ -45,10 +79,14 @@ void GuoHallThinning(const cv::Mat& src, cv::Mat& dst)
     cv::Mat prev = cv::Mat::zeros(src.size(), CV_8UC1);
     cv::Mat diff;
 
+    std::vector<unsigned> table_iter0;
+    std::vector<unsigned> table_iter1;
+    MakeTable(table_iter0, table_iter1);
+
     do
     {
-        GuoHallIteration(dst, 0);
-        GuoHallIteration(dst, 1);
+        GuoHallIteration(dst, 0, table_iter0, table_iter1);
+        GuoHallIteration(dst, 1, table_iter0, table_iter1);
         cv::absdiff(dst, prev, diff);
         dst.copyTo(prev);
     }
