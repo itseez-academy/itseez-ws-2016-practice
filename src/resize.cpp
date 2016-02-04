@@ -46,6 +46,7 @@ void ImageResize(const cv::Mat &src, cv::Mat &dst, const cv::Size sz)
 
 void ImageResize_optimized(const cv::Mat &src, cv::Mat &dst, const cv::Size sz)
 {
+    //adding some comment
     CV_Assert(CV_8UC1 == src.type());
     cv::Size sz_src = src.size();
     dst.create(sz, src.type());
