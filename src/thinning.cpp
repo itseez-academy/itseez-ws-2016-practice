@@ -109,7 +109,7 @@ static uchar createByte(std::vector<uchar> p)
 	}
 	return res;
 }
-static std::vector<std::vector<uchar>> table(2,std::vector<uchar>(256,0));
+static std::vector<std::vector<uchar> > table(2,std::vector<uchar>(256,0));
 
 
 static void createTable(int iter)
