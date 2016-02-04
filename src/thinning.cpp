@@ -125,14 +125,14 @@ static void createTable(int iter)
 		uchar p8 = i & 64;
 		uchar p9 = i & 128;
 
-		p2 = (!p2 ? 1 : 0);
-		p3 = (!p3 ? 1 : 0);
-		p4 = (!p4 ? 1 : 0);
-		p5 = (!p5 ? 1 : 0);
-		p6 = (!p6 ? 1 : 0);
-		p7 = (!p7 ? 1 : 0);
-		p8 = (!p8 ? 1 : 0);
-		p9 = (!p9 ? 1 : 0);
+		p2 = (p2 != 0 ? 1 : 0);
+		p3 = (p3 != 0 ? 1 : 0);
+		p4 = (p4 != 0 ? 1 : 0);
+		p5 = (p5 != 0 ? 1 : 0);
+		p6 = (p6 != 0 ? 1 : 0);
+		p7 = (p7 != 0 ? 1 : 0);
+		p8 = (p8 != 0 ? 1 : 0);
+		p9 = (p9 != 0 ? 1 : 0);
 		
 		int C  = (!p2 & (p3 | p4)) + (!p4 & (p5 | p6)) +
 					(!p6 & (p7 | p8)) + (!p8 & (p9 | p2));
@@ -177,7 +177,7 @@ static void GuoHallIteration_optimized(cv::Mat& im, int iter)
         {
 			if (im.at<uchar>(i, j))
 			{
-				std::vector<uchar> p(8);
+				/*std::vector<uchar> p(8);
 				p[0] = im.at<uchar>(i-1, j);
 				p[1] = im.at<uchar>(i-1, j+1);
 				p[2] = im.at<uchar>(i, j+1);
@@ -185,41 +185,27 @@ static void GuoHallIteration_optimized(cv::Mat& im, int iter)
 				p[4] = im.at<uchar>(i+1, j);
 				p[5] = im.at<uchar>(i+1, j-1);
 				p[6] = im.at<uchar>(i, j-1);
-				p[7] = im.at<uchar>(i-1, j-1);
+				p[7] = im.at<uchar>(i-1, j-1);*/
+				uchar p2 = im.at<uchar>(i-1, j);
+				uchar p3 = im.at<uchar>(i-1, j+1);
+				uchar p4 = im.at<uchar>(i, j+1);
+				uchar p5 = im.at<uchar>(i+1, j+1);
+				uchar p6 = im.at<uchar>(i+1, j);
+				uchar p7 = im.at<uchar>(i+1, j-1);
+				uchar p8 = im.at<uchar>(i, j-1);
+				uchar p9 = im.at<uchar>(i-1, j-1);
 
-				uchar hash = createByte(p);
+				/*uchar hash = createByte(p);*/
+				uchar hash = p2 * 1 +
+					p3 * 2 +
+					p4 * 4 +
+					p5 * 8 +
+					p6 * 16 +
+					p7 * 32 +
+					p8 * 64 +
+					p9 * 128;
 				marker.at<uchar>(i,j) = table[iter][hash];
-				
-				//if (table[iter][hash] == 0)
-				//{
-				//	/*int C  = (!p2 & (p3 | p4)) + (!p4 & (p5 | p6)) +
-				//	(!p6 & (p7 | p8)) + (!p8 & (p9 | p2));
-				//int N1 = (p9 | p2) + (p3 | p4) + (p5 | p6) + (p7 | p8);
-				//int N2 = (p2 | p3) + (p4 | p5) + (p6 | p7) + (p8 | p9);
-				//int N  = N1 < N2 ? N1 : N2;
-				//int m  = iter == 0 ? ((p6 | p7 | !p9) & p8) : ((p2 | p3 | !p5) & p4);*/
 
-				//	int C  = (!p[0] & (p[1] | p[2])) + (!p[2] & (p[3] | p[4])) +
-				//		(!p[4] & (p[5] | p[6])) + (!p[6] & (p[7] | p[0]));
-				//	int N1 = (p[7] | p[0]) + (p[1] | p[2]) + (p[3] | p[4]) + (p[5] | p[6]);
-				//	int N2 = (p[0] | p[1]) + (p[2] | p[3]) + (p[4] | p[5]) + (p[6] | p[7]);
-				//	int N  = N1 < N2 ? N1 : N2;
-				//	int m  = iter == 0 ? ((p[4] | p[5] | !p[7]) & p[6]) : ((p[0] | p[1] | !p[3]) & p[2]);
-
-				//	if (C == 1 && (N >= 2 && N <= 3) & (m == 0))
-				//	{
-				//		marker.at<uchar>(i,j) = 1;
-				//		table[iter][hash] = 2;
-				//	}
-				//	else
-				//	{
-				//		table[iter][hash] = 1;
-				//	}
-
-				//}
-				//else
-				//if (table[iter][hash] == 2) marker.at<uchar>(i,j) = 1;
-				
 			}
 			
         }
