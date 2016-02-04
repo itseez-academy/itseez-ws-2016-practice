@@ -56,13 +56,13 @@ void ImageResize_optimized(const cv::Mat &src, cv::Mat &dst, const cv::Size sz)
 
     const int dst_rows = sz.height;
     const int dst_cols = sz.width;
-//
+
     const float xscale = ((float)sz_src.width ) / sz.width;
     const float x0 = .5f * xscale - .5f;
 
     const float yscale = ((float)sz_src.height )/ sz.height;
     const float y0 = .5f * yscale - .5f;
-//
+
     for (int row = 0; row < dst_rows; row++)
     {
         uchar *ptr_dst = dst.ptr<uchar>(row);
@@ -72,8 +72,8 @@ void ImageResize_optimized(const cv::Mat &src, cv::Mat &dst, const cv::Size sz)
             const float x = ((float) col) * xscale + x0;
             const float y = ((float) row) * yscale + y0;
 
-            const int ix = (int)floor(x);
-            const int iy = (int)floor(y);
+            const int ix = (int)(x);
+            const int iy = (int)(y);
 
             const int x1 = (ix < 0) ? 0 : ((ix >= src_cols) ? src_cols - 1 : ix);
             const int x2 = (ix < 0) ? 0 : ((ix >= src_cols - 1) ? src_cols - 1 : ix + 1);
@@ -93,3 +93,17 @@ void ImageResize_optimized(const cv::Mat &src, cv::Mat &dst, const cv::Size sz)
         }
     }
 }
+
+//Geometric mean
+
+//          Name of Test            optimized optimized optimized
+//                                    zise      zise       zise
+//                                    base        1         1
+//                                                          vs
+//                                                      optimized
+//                                                         zise
+//                                                         base
+//                                                      (x-factor)
+//ImageResize::Size_Only::640x480   6.703 ms  2.972 ms     2.26
+//ImageResize::Size_Only::1280x720  19.588 ms 9.003 ms     2.18
+//ImageResize::Size_Only::1920x1080 44.218 ms 20.715 ms    2.13
