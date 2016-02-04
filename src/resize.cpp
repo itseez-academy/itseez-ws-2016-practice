@@ -96,14 +96,14 @@ void ImageResize_optimized(const cv::Mat &src, cv::Mat &dst, const cv::Size sz)
 
 //Geometric mean
 
-//          Name of Test            optimized optimized optimized
-//                                    zise      zise       zise
-//                                    base        1         1
-//                                                          vs
-//                                                      optimized
-//                                                         zise
-//                                                         base
-//                                                      (x-factor)
-//ImageResize::Size_Only::640x480   6.703 ms  2.972 ms     2.26
-//ImageResize::Size_Only::1280x720  19.588 ms 9.003 ms     2.18
-//ImageResize::Size_Only::1920x1080 44.218 ms 20.715 ms    2.13
+//          Name of Test            optimized optimized optimized optimized  optimized
+//                                    zise      zise      zise       zise       zise
+//                                    base        1         2         1          2
+//                                                                    vs         vs
+//                                                                optimized  optimized
+//                                                                   zise       zise
+//                                                                   base       base
+//                                                                (x-factor) (x-factor)
+//ImageResize::Size_Only::640x480   6.703 ms  2.972 ms  2.494 ms     2.26       2.69
+//ImageResize::Size_Only::1280x720  19.588 ms 9.003 ms  7.486 ms     2.18       2.62
+//ImageResize::Size_Only::1920x1080 44.218 ms 20.715 ms 17.157 ms    2.13       2.58
