@@ -90,7 +90,7 @@ PERF_TEST_P(Size_Only, Thinning, testing::Values(MAT_SIZES))
 
     cv::Mat image(sz, CV_8UC1);
     declare.in(image, WARMUP_RNG).out(image);
-    declare.time(40);
+    declare.time(60);
 
     cv::RNG rng(234231412);
     rng.fill(image, CV_8UC1, 0, 255);
