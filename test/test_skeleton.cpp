@@ -65,3 +65,14 @@ TEST(skeleton, 2_plus_2_equals_4)
 {
    EXPECT_EQ(4, 2 + 2);
 }
+
+TEST(skeleton, the_same_size_ConvertColor_BGR2GRAY_BT709)
+{
+	Mat image(20, 40, CV_8UC3);
+	Mat result;
+	
+	ConvertColor_BGR2GRAY_BT709(image, result);
+	
+	EXPECT_EQ(image.cols, result.cols);
+	EXPECT_EQ(image.rows, result.rows);
+}
