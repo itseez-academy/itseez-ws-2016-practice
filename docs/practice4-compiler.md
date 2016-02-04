@@ -1,5 +1,7 @@
 # Практика 4: Компилятор и оптимизация
 
+[![Feedback](feedback.png)][feedback_day4]
+
 ## Цели
 
 __Цель данной работы__ — познакомиться с примером кода, незначительные изменения
@@ -109,3 +111,4 @@ __Дополнительные задачи__
 [upstream]:        https://github.com/itseez-academy/itseez-ws-2016-practice
 [git-update]:      https://github.com/itseez-academy/itseez-ws-2016-practice/blob/master/docs/practice2-profiling-and-benchmarking.md#Получение-актуальной-версии-исходных-файлов
 [collect-metrics]: https://github.com/itseez-academy/itseez-ws-2016-practice/blob/master/docs/practice3-memory.md#Сбор-первоначальных-метрик-производительности
+[feedback_day4]: https://docs.google.com/forms/d/1s2CBJudCw_u-ws-Rzc0drC9sAi6Ham3-9fOWuTtMjBQ/viewform
