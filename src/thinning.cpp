@@ -54,6 +54,7 @@ void GuoHallThinning(const cv::Mat &src, cv::Mat &dst) {
 //
 // Place optimized version here
 //
+
 namespace {
 
     uchar new_value_0[256];
@@ -181,6 +182,7 @@ static void GuoHallIteration_optimized_1(cv::Mat &im) {
 
 void GuoHallThinning_optimized(const cv::Mat &src, cv::Mat &dst) {
     CV_Assert(CV_8UC1 == src.type());
+
     dst = src / 255;
 
     cv::Mat prev = cv::Mat::zeros(src.size(), CV_8UC1);
