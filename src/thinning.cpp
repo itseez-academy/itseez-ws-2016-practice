@@ -1,10 +1,5 @@
 #include "skeleton_filter.hpp"
 #include <opencv2/imgproc/imgproc.hpp>
-#include "iostream"
-#include "fstream"
-#include "opencv2/highgui/highgui.hpp"
-#include <typeinfo>
-#include <C:\opencv\build\include\opencv2\core\types_c.h>
 
 static void GuoHallIteration(cv::Mat& im, int iter)
 {
