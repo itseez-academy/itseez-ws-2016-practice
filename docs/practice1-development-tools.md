@@ -1,5 +1,7 @@
 ﻿# Практика 1. Инструменты разработки ПО
 
+[![Feedback](feedback.png)][feedback_day1]
+
 ## Цели
 
 __Цель данной работы__ — ознакомиться с современным рабочим процессом (workflow)
@@ -50,6 +52,7 @@ __Дополнительные задачи__
   - Ознакомиться с реализацией функций `ConvertColor_BGR2GRAY_BT709`,
     `ImageResize`, `GuoHallThinning`.
   - Добавить еще несколько тестов, имеющих по вашему мнению смысл.
+  - Одна из функций содержит ошибку. Реализуйте тест для идентификации данной ошибки и исправьте её.
 
 ## Общая последовательность действий
 
@@ -487,15 +490,16 @@ __Примечание:__ генератор проекта должен сов�
 
 <!-- LINKS -->
 
-[git]:        https://git-scm.com/book/en/v2
-[github]:     https://github.com
-[travis]:    https://travis-ci.org/itseez-academy/itseez-ws-2016-practice
-[gtest]:      https://github.com/google/googletest
-[upstream]:   https://github.com/itseez-academy/itseez-ws-2016-practice
-[origin]:     https://github.com/github-account/itseez-ws-2016-practice
+[git]:          https://git-scm.com/book/en/v2
+[github]:       https://github.com
+[travis]:       https://travis-ci.org/itseez-academy/itseez-ws-2016-practice
+[gtest]:        https://github.com/google/googletest
+[upstream]:     https://github.com/itseez-academy/itseez-ws-2016-practice
+[origin]:       https://github.com/github-account/itseez-ws-2016-practice
 [git-intro]:  https://github.com/itseez-academy/itseez-ws-2016-practice/blob/master/docs/practice1-development-tools.md#Общие-инструкции-по-работе-с-git
 [cmake-msvs]: https://github.com/itseez-academy/itseez-ws-2016-practice/blob/master/docs/practice1-development-tools.md#Сборка-проекта-с-помощью-cmake-и-microsoft-visual-studio
-[tasks]:      https://github.com/itseez-academy/itseez-ws-2016-practice/blob/master/docs/practice1-development-tools.md#Задачи
-[gtest-doc]:  https://github.com/google/googletest/blob/master/googletest/docs/Documentation.md
-[gtest-prim]: https://github.com/google/googletest/blob/master/googletest/docs/Primer.md
-[opencv-doc]: http://docs.opencv.org/2.4.11/modules/core/doc/basic_structures.html
+[tasks]:        https://github.com/itseez-academy/itseez-ws-2016-practice/blob/master/docs/practice1-development-tools.md#Задачи
+[gtest-doc]:    https://github.com/google/googletest/blob/master/googletest/docs/Documentation.md
+[gtest-prim]:   https://github.com/google/googletest/blob/master/googletest/docs/Primer.md
+[opencv-doc]:   http://docs.opencv.org/2.4.11/modules/core/doc/basic_structures.html
+[feedback_day1]:https://docs.google.com/forms/d/172QaSZopk-ecXXWF6qVymah_OBhPumVjOTwW4OzzB-g/viewform

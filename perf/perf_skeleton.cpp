@@ -32,19 +32,26 @@ typedef perf::TestBaseWithParam<Size> Size_Only;
 PERF_TEST_P(Size_Only, ImageResize, testing::Values(MAT_SIZES))
 {
     Size sz = GetParam();
-    Size sz_to(sz.width / 2, sz.height / 2);
+    Size sz_to(sz.width / 1.7, sz.height / 1.4);
 
     cv::Mat src(sz, CV_8UC1);
     cv::Mat dst(Size(sz_to), CV_8UC1);
+    cv::Mat gold(Size(sz_to), CV_8UC1);
     declare.in(src, WARMUP_RNG).out(dst);
 
     cv::RNG rng(234231412);
     rng.fill(src, CV_8UC1, 0, 255);
 
+    ImageResize(src, gold, sz_to);
+
     TEST_CYCLE()
     {
-        ImageResize(src, dst, sz_to);
+        ImageResize_optimized(src, dst, sz_to);
     }
+
+    cv::Mat diff; cv::absdiff(dst, gold, diff);
+    cv::threshold(diff, diff, 1, 0, cv::THRESH_TOZERO);
+    ASSERT_EQ(0, cv::countNonZero(diff));
 
     SANITY_CHECK(dst);
 }
