@@ -151,11 +151,7 @@ static void createTable(int iter)
 
 //static std::map<int,std::map<uchar,uchar>> table;
 
-void setTableNull()
-{
-	table[0].clear();
-	table[1].clear();
-}
+
 
 static bool writer = true;
 
