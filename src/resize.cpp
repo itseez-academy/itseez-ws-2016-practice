@@ -72,8 +72,11 @@ void ImageResize_optimized(const cv::Mat &src, cv::Mat &dst, const cv::Size sz)
 			//const float x = ((float)col + .5f) * sz_src.width  / sz.width  - .5f;
             //const float y = ((float)row + .5f) * sz_src.height / sz.height - .5f;
 
-            const int ix = (int)floor(x);
-            const int iy = (int)floor(y);
+            //const int ix = (int)floor(x);
+            //const int iy = (int)floor(y);
+
+			const int ix = (x<0)||(x > (1<<31)) ? (int)floor(x) : (int)x;
+            const int iy = (y<0)||(y > (1<<31)) ? (int)floor(y) : (int)y;
 
             const int x1 = (ix < 0) ? 0 : ((ix >= src_cols) ? src_cols - 1 : ix);
             const int x2 = (ix < 0) ? 0 : ((ix >= src_cols - 1) ? src_cols - 1 : ix + 1);
