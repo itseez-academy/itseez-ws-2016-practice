@@ -68,6 +68,8 @@ void ImageResize_optimized(const cv::Mat &src, cv::Mat &dst, const cv::Size sz)
 		const int iy = (int)y;
 		const int y1 = iy;
         const int y2 = iy + 1;
+		const uchar *y1_row = src.ptr<uchar>(y1);
+		const uchar *y2_row = src.ptr<uchar>(y2);
 
         for (int col = 0; col < dst_cols; col++)
         {
@@ -78,13 +80,14 @@ void ImageResize_optimized(const cv::Mat &src, cv::Mat &dst, const cv::Size sz)
             const int x1 = ix;
             const int x2 = ix + 1;
 
-            const uchar q11 = src.at<uchar>(y1, x1);
-            const uchar q12 = src.at<uchar>(y2, x1);
-            const uchar q21 = src.at<uchar>(y1, x2);
-            const uchar q22 = src.at<uchar>(y2, x2);
+            const uchar q11 = y1_row[x1];
+            const uchar q12 = y2_row[x1];
+            const uchar q21 = y1_row[x2];
+            const uchar q22 = y2_row[x2];
+			
 
-            const int temp = 
-              (int)(q11 * (x2 - x) * (y2 - y) + q21 * (x - x1) * (y2 - y) + q12 * (x2 - x) * (y - y1) + q22 * (x - x1) * (y - y1));
+            const uchar temp = 
+              (uchar)(q11 * ((x2 - x) * (y2 - y)) + q21 * ((x - x1) * (y2 - y)) + q12 * ((x2 - x) * (y - y1)) + q22 * ((x - x1) * (y - y1)));
             ptr_dst[col] = (uchar)temp;
         }
     }
