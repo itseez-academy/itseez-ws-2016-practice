@@ -52,6 +52,24 @@ void ConvertColor_BGR2GRAY_BT709(const cv::Mat& src, cv::Mat& dst)
     }
 }
 
+#include <stdint.h>
+#include <iostream>
+typedef uint16_t fixed_t;
+#define FIXED_OFFSET 8
+
+static float fixedConvertConst()
+{
+    return (float)(1 << FIXED_OFFSET);
+}
+static fixed_t toFixed(float value, float convertConst)
+{
+    return (fixed_t)(value * convertConst);
+}
+static float fixedToDouble(fixed_t value, float convertConst)
+{
+    return (float)value / convertConst;
+}
+
 void ConvertColor_BGR2GRAY_BT709_fpt(const cv::Mat& src, cv::Mat& dst)
 {
     CV_Assert(CV_8UC3 == src.type());
@@ -60,6 +78,12 @@ void ConvertColor_BGR2GRAY_BT709_fpt(const cv::Mat& src, cv::Mat& dst)
 
     const int bidx = 0;
 
+    const float conCon = fixedConvertConst();
+    const fixed_t c0p2126 = toFixed(21.26f, conCon);
+    const fixed_t c0p7152 = toFixed(71.52f, conCon);
+    const fixed_t c0p0722 = toFixed(72.2f, conCon);
+    const fixed_t c0p5 = toFixed(50.0f, conCon);
+
     for (int y = 0; y < sz.height; y++)
     {
         const cv::Vec3b *psrc = src.ptr<cv::Vec3b>(y);
@@ -67,8 +91,10 @@ void ConvertColor_BGR2GRAY_BT709_fpt(const cv::Mat& src, cv::Mat& dst)
 
         for (int x = 0; x < sz.width; x++)
         {
-            float color = 0.2126 * psrc[x][2-bidx] + 0.7152 * psrc[x][1] + 0.0722 * psrc[x][bidx];
-            pdst[x] = (int)(color + 0.5);
+            fixed_t color = (c0p2126 * psrc[x][2-bidx] +
+                             c0p7152 * psrc[x][1] +
+                             c0p0722 * psrc[x][bidx] / 10 + c0p5) / 100;
+            pdst[x] = (uchar)(fixedToDouble(color, conCon));
         }
     }
 }
