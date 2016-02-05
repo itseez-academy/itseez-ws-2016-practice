@@ -69,10 +69,10 @@ void ConvertColor_BGR2GRAY_BT709_fpt(const cv::Mat& src, cv::Mat& dst)
     cv::Size sz = src.size();
     dst.create(sz, CV_8UC1);
 
-	const ushort cB = nearst(std::ldexp(0.2126f, 16));
-	const ushort cG = nearst(std::ldexp(0.7152f, 16));
-	const ushort cR = nearst(std::ldexp(0.0722f, 16));
-	const ushort c  = nearst(std::ldexp(0.5f,    16));
+	const ushort cB = nearst(0.2126f * pow(2.0f, 16));
+	const ushort cG = nearst(0.7152f * pow(2.0f, 16));
+	const ushort cR = nearst(0.0722f * pow(2.0f, 16));
+	const ushort c  = nearst(0.5f    * pow(2.0f, 16));
 
     for (int y = 0; y < sz.height; y++)
     {
@@ -81,9 +81,7 @@ void ConvertColor_BGR2GRAY_BT709_fpt(const cv::Mat& src, cv::Mat& dst)
 
         for (int x = 0; x < sz.width; x++)
         {
-
             pdst[x] = (uchar)((cB * psrc[3*x+2] + cG * psrc[3*x+1] + cR * psrc[3*x] + c) >> 16);
-            
         }
     }
 }
