@@ -24,3 +24,5 @@ void GuoHallThinning(const cv::Mat& src, cv::Mat& dst);
 // Optimized versions
 void GuoHallThinning_optimized(const cv::Mat& src, cv::Mat& dst);
 void ImageResize_optimized(const cv::Mat &src, cv::Mat &dst, const cv::Size sz);
+void ConvertColor_BGR2GRAY_BT709_fpt(const cv::Mat& src, cv::Mat& dst);
+void ConvertColor_BGR2GRAY_BT709_simd(const cv::Mat& src, cv::Mat& dst);
