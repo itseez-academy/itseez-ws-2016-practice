@@ -84,12 +84,207 @@ void GuoHallGenerateMaskTable(uchar* maskTable)
     }
 }
 
-static int GuoHallIteration_optimized(cv::Mat& im,
-                                      const uchar* maskTable,
-                                      char m1,
-                                      char m2,
-                                      uchar* top,
-                                      uchar* topNext)
+static void GuoHallAddToBuffer(int i,
+                               int j,
+                               uchar value,
+                               int rows,
+                               int cols,
+                               int* buffer,
+                               int &bufferCount,
+                               uchar* table)
+{
+    if (value > 0 && i > 0 && i < rows - 1 && j > 0 && j < cols - 1)
+    {
+        int index = i * cols + j;
+        if (table[index] == 0)
+        {
+            table[index] = 1;
+            buffer[bufferCount++] = index;
+        }
+    }
+}
+
+static int GuoHallGetLutIndex(uchar p2, uchar p3, uchar p4, uchar p5,
+                              uchar p6, uchar p7, uchar p8, uchar p9)
+{
+    return ((int)p2 * 1 +
+            (int)p3 * 2 +
+            (int)p4 * 4 +
+            (int)p5 * 8 +
+            (int)p6 * 16 +
+            (int)p7 * 32 +
+            (int)p8 * 64 +
+            (int)p9 * 128) / 255;
+}
+
+static bool GuoHallIsChange(int index,
+                            const uchar* maskTable,
+                            char m1,
+                            char m2)
+{
+    return maskTable[index] == m1 || maskTable[index] == m2;
+}
+
+static int GuoHallNext(int* &buffer,
+                       int &bufferCount,
+                       uchar* table,
+                       size_t tableSize,
+                       int* &nextBuffer,
+                       int &nextBufferCount)
+{
+    memset(table, 0, tableSize);
+    std::swap(buffer, nextBuffer);
+    bufferCount = nextBufferCount;
+    return nextBufferCount > 0 ? 1 : 0;
+}
+
+static void GuoHallIteration1_optimized(cv::Mat& im,
+                                        const uchar* maskTable,
+                                        char m1,
+                                        char m2,
+                                        int* buffer,
+                                        int &bufferCount,
+                                        uchar* table)
+{
+    cv::Mat marker(im.size(), CV_8UC1, 255);
+    for (int i = 1; i < im.rows - 1; ++i)
+    {
+        for (int j = 1; j < im.cols - 1; ++j)
+        {
+            if (im.at<uchar>(i, j) > 0)
+            {
+                uchar p8 = im.at<uchar>(i, j-1);
+                uchar p4 = im.at<uchar>(i, j+1);
+                uchar p9 = im.at<uchar>(i-1, j-1);
+                uchar p2 = im.at<uchar>(i-1, j);
+                uchar p3 = im.at<uchar>(i-1, j+1);
+                uchar p7 = im.at<uchar>(i+1, j-1);
+                uchar p6 = im.at<uchar>(i+1, j);
+                uchar p5 = im.at<uchar>(i+1, j+1);
+
+                const int index = GuoHallGetLutIndex(p2, p3, p4, p5,
+                                                     p6, p7, p8, p9);
+                if (GuoHallIsChange(index, maskTable, m1, m2))
+                {
+                    GuoHallAddToBuffer(i - 1, j - 1, p9, im.rows, im.cols,
+                                       buffer, bufferCount, table);
+                    GuoHallAddToBuffer(i - 1, j, p2, im.rows, im.cols,
+                                       buffer, bufferCount, table);
+                    GuoHallAddToBuffer(i - 1, j + 1, p3, im.rows, im.cols,
+                                       buffer, bufferCount, table);
+                    GuoHallAddToBuffer(i, j - 1, p8, im.rows, im.cols,
+                                       buffer, bufferCount, table);
+                    GuoHallAddToBuffer(i, j + 1, p4, im.rows, im.cols,
+                                       buffer, bufferCount, table);
+                    GuoHallAddToBuffer(i + 1, j - 1, p7, im.rows, im.cols,
+                                       buffer, bufferCount, table);
+                    GuoHallAddToBuffer(i + 1, j, p6, im.rows, im.cols,
+                                       buffer, bufferCount, table);
+                    GuoHallAddToBuffer(i + 1, j + 1, p5, im.rows, im.cols,
+                                       buffer, bufferCount, table);
+                    marker.at<uchar>(i, j) = 0;
+                }
+            }
+        }
+    }
+    im &= marker;
+}
+static void GuoHallIteration2_optimized(cv::Mat& im,
+                                        const uchar* maskTable,
+                                        char m1,
+                                        char m2,
+                                        int* buffer,
+                                        int bufferCount,
+                                        uchar* table,
+                                        int* nextBuffer,
+                                        int &nextBufferCount)
+{
+    cv::Mat marker(im.size(), CV_8UC1, 255);
+    for (int bi = 0; bi < bufferCount; ++bi)
+    {
+        const int bii = buffer[bi];
+        const int i = bii / im.cols;
+        const int j = bii % im.cols;
+        uchar p8 = im.at<uchar>(i, j-1);
+        uchar p4 = im.at<uchar>(i, j+1);
+        uchar p9 = im.at<uchar>(i-1, j-1);
+        uchar p2 = im.at<uchar>(i-1, j);
+        uchar p3 = im.at<uchar>(i-1, j+1);
+        uchar p7 = im.at<uchar>(i+1, j-1);
+        uchar p6 = im.at<uchar>(i+1, j);
+        uchar p5 = im.at<uchar>(i+1, j+1);
+        const int index = GuoHallGetLutIndex(p2, p3, p4, p5,
+                                             p6, p7, p8, p9);
+        if (GuoHallIsChange(index, maskTable, m1, m2))
+        {
+            GuoHallAddToBuffer(i - 1, j - 1, p9, im.rows, im.cols,
+                               nextBuffer, nextBufferCount, table);
+            GuoHallAddToBuffer(i - 1, j, p2, im.rows, im.cols,
+                               nextBuffer, nextBufferCount, table);
+            GuoHallAddToBuffer(i - 1, j + 1, p3, im.rows, im.cols,
+                               nextBuffer, nextBufferCount, table);
+            GuoHallAddToBuffer(i, j - 1, p8, im.rows, im.cols,
+                               nextBuffer, nextBufferCount, table);
+            GuoHallAddToBuffer(i, j + 1, p4, im.rows, im.cols,
+                               nextBuffer, nextBufferCount, table);
+            GuoHallAddToBuffer(i + 1, j - 1, p7, im.rows, im.cols,
+                               nextBuffer, nextBufferCount, table);
+            GuoHallAddToBuffer(i + 1, j, p6, im.rows, im.cols,
+                               nextBuffer, nextBufferCount, table);
+            GuoHallAddToBuffer(i + 1, j + 1, p5, im.rows, im.cols,
+                               nextBuffer, nextBufferCount, table);
+            marker.at<uchar>(i, j) = 0;
+        }
+    }
+    im &= marker;
+}
+
+void GuoHallThinning_optimized(const cv::Mat& src, cv::Mat& dst)
+{
+    CV_Assert(CV_8UC1 == src.type());
+
+    dst = src.clone();
+
+    uchar maskTable[256];
+    GuoHallGenerateMaskTable(maskTable);
+    const size_t tableSize = static_cast<size_t>(src.cols) *
+                             static_cast<size_t>(src.rows);
+    int* buffers = reinterpret_cast<int*>(malloc(tableSize * sizeof(int) * 2));
+    int* buffer = buffers;
+    int* nextBuffer = buffers + tableSize * sizeof(int);
+    int bufferCount = 0, nextBufferCount = 0;
+    uchar* table = reinterpret_cast<uchar*>(malloc(tableSize));
+
+    GuoHallIteration1_optimized(dst, maskTable, 1, 3, buffer, bufferCount,
+                                table);
+    int cnt = GuoHallNext(buffer, bufferCount, table,
+                          tableSize, nextBuffer, nextBufferCount);
+    GuoHallIteration2_optimized(dst, maskTable, 2, 3, buffer, bufferCount,
+                                table, nextBuffer, nextBufferCount);
+    cnt += GuoHallNext(buffer, bufferCount, table,
+                       tableSize, nextBuffer, nextBufferCount);
+    while (cnt > 0)
+    {
+        GuoHallIteration2_optimized(dst, maskTable, 1, 3, buffer, bufferCount,
+                                    table, nextBuffer, nextBufferCount);
+        cnt = GuoHallNext(buffer, bufferCount, table,
+                          tableSize, nextBuffer, nextBufferCount);
+        GuoHallIteration2_optimized(dst, maskTable, 2, 3, buffer, bufferCount,
+                                    table, nextBuffer, nextBufferCount);
+        cnt += GuoHallNext(buffer, bufferCount, table,
+                           tableSize, nextBuffer, nextBufferCount);
+    }
+
+    free(table);
+    free(buffers);
+}
+
+static int GuoHallIteration_preoptimized(cv::Mat& im,
+                                         const uchar* maskTable,
+                                         char m1,
+                                         char m2,
+                                         uchar* top,
+                                         uchar* topNext)
 {
     int dif = 0;
     memcpy(top, im.data, im.cols);
@@ -137,7 +332,7 @@ static int GuoHallIteration_optimized(cv::Mat& im,
     return dif;
 }
 
-void GuoHallThinning_optimized(const cv::Mat& src, cv::Mat& dst)
+void GuoHallThinning_preoptimized(const cv::Mat& src, cv::Mat& dst)
 {
     CV_Assert(CV_8UC1 == src.type());
 
@@ -150,30 +345,32 @@ void GuoHallThinning_optimized(const cv::Mat& src, cv::Mat& dst)
     int dif = 0;
     do
     {
-        dif = GuoHallIteration_optimized(dst, maskTable, 1, 3, top, topNext);
-        dif += GuoHallIteration_optimized(dst, maskTable, 2, 3, top, topNext);
+        dif = GuoHallIteration_preoptimized(dst, maskTable, 1, 3,
+                                            top, topNext);
+        dif += GuoHallIteration_preoptimized(dst, maskTable, 2, 3,
+                                             top, topNext);
     }
     while (dif > 0);
     free(top);
 }
 
-// Geometric mean
+//Geometric mean
 
-//          Name of Test
+//         Name of Test
 
-//                                   perf        perf        perf        perf        perf        perf       perf       perf       perf
-//                                    res         res         res         res         res        res        res        res        res
-//                                     0           1           2           3           4          1          2          3          4
-//                                               luts         fix         fix         fix        luts       fix        fix        fix
-//                                                and          2        copying     marker       and         2       copying     marker
-//                                               zeros       luts                               zeros       luts        vs         vs
-//                                                                                                vs         vs
+//                                  perf        perf       perf       perf       perf
+//                                   res         res        res       res        res
+//                                    0           1          1         1          1
+//                                              first     realgo     first      realgo
+//                                               opt                  opt         vs
+//                                                                     vs
 
-//                                                                                                                     perf       perf
-//                                                                                               perf       perf       res        res
-//                                                                                               res        res         0          0
-//                                                                                                0          0      (x-factor) (x-factor)
-//                                                                                            (x-factor) (x-factor)
-// Thinning::Size_Only::640x480   928.535 ms  549.163 ms  481.489 ms  464.392 ms  350.819 ms     1.69       1.93       2.00       2.65
-// Thinning::Size_Only::1280x720  2304.949 ms 1410.921 ms 1284.146 ms 1254.155 ms 880.699 ms     1.63       1.79       1.84       2.62
-// Thinning::Size_Only::1920x1080 6655.387 ms 4048.845 ms 3577.448 ms 3386.069 ms 2447.177 ms    1.64       1.86       1.97       2.72
+//                                                                               perf
+//                                                                    perf       res
+//                                                                    res         0
+//                                                                     0      (x-factor)
+//                                                                 (x-factor)
+//Thinning::Size_Only::640x480   970.769 ms  355.407 ms  6.101 ms     2.73      159.11
+//Thinning::Size_Only::1280x720  2421.474 ms 886.766 ms  19.683 ms    2.73      123.03
+//Thinning::Size_Only::1920x1080 6995.375 ms 2477.897 ms 45.317 ms    2.82      154.37
+
