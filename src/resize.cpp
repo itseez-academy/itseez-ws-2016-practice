@@ -1,6 +1,6 @@
 #include "skeleton_filter.hpp"
 #include <math.h>
-
+using namespace std;
 void ImageResize(const cv::Mat &src, cv::Mat &dst, const cv::Size sz)
 {
     CV_Assert(CV_8UC1 == src.type());
@@ -64,9 +64,12 @@ void ImageResize_optimized(const cv::Mat &src, cv::Mat &dst, const cv::Size sz)
         uchar *ptr_dst = dst.ptr<uchar>(row);
 
         const float y = (float)row * y_scale + y_0;
-        const int iy = (int)y;
-        const int y1 =  iy;
-        const int y2 = iy + 1;
+        int iy = (int)y;
+        int right_bound_check_y1 = (int)(min(src_rows, iy));
+        int right_bound_check_y2 = (int)min(src_rows - 1, iy + 1);
+            
+        int y1 = (int)(max(0, right_bound_check_y1));
+        int y2 = (int)(max(0, right_bound_check_y2));
         const uchar *y1_row = src.ptr<uchar>(y1);
         const uchar *y2_row = src.ptr<uchar>(y2);
 
@@ -74,13 +77,11 @@ void ImageResize_optimized(const cv::Mat &src, cv::Mat &dst, const cv::Size sz)
         {
             const float x = (float)col * x_scale + x_0;
 
-
-            const int ix = (int)x;
-        
-
-            const int x1 = ix;
-            const int x2 = ix + 1;
-            
+            int ix = (int)x;
+            int right_bound_check_x1 = (int)min(src_cols, ix);
+            int right_bound_check_x2 = (int)min(src_cols - 1, ix + 1);
+            int x1 = (int)max(0, right_bound_check_x1);
+            int x2 = (int)max(0, right_bound_check_x2);
 
             uchar q11 = y1_row[x1];
             uchar q21 = y1_row[x2];
