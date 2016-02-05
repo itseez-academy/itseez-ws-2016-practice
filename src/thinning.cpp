@@ -96,55 +96,28 @@ static void GuoHallIteration_optimized(cv::Mat& im, int iter, std::vector<uchar>
 {
     cv::Mat marker = cv::Mat::zeros(im.size(), CV_8UC1);
 
-	if (iter == 0)
-	{
-		for (int i = 1; i < im.rows-1; i++)
-		{
-        for (int j = 1; j < im.cols-1; j++)
-         {
-			if (true)
-			{
-				uchar p2 = im.at<uchar>(i-1, j);
-				uchar p3 = im.at<uchar>(i-1, j+1);
-				uchar p4 = im.at<uchar>(i, j+1);
-				uchar p5 = im.at<uchar>(i+1, j+1);
-				uchar p6 = im.at<uchar>(i+1, j);
-				uchar p7 = im.at<uchar>(i+1, j-1);
-				uchar p8 = im.at<uchar>(i, j-1);
-				uchar p9 = im.at<uchar>(i-1, j-1);
-
-				int C  = (!p2 & (p3 | p4)) + (!p4 & (p5 | p6)) +
-				         (!p6 & (p7 | p8)) + (!p8 & (p9 | p2));
-				int N1 = (p9 | p2) + (p3 | p4) + (p5 | p6) + (p7 | p8);
-				int N2 = (p2 | p3) + (p4 | p5) + (p6 | p7) + (p8 | p9);
-				int N  = N1 < N2 ? N1 : N2;
-				int m  = (p2 | p3 | !p5) & p4;
-
-				if (C == 1 && (N >= 2 && N <= 3) & (m == 0))
-				    marker.at<uchar>(i,j) = 1;
-			}
-		 }
-		}
-	}
-
     for (int i = 1; i < im.rows-1; i++)
     {
         for (int j = 1; j < im.cols-1; j++)
         {
-			if (true)
-			{
-				uchar p2 = im.at<uchar>(i-1, j);
-				uchar p3 = im.at<uchar>(i-1, j+1);
-				uchar p4 = im.at<uchar>(i, j+1);
-				uchar p5 = im.at<uchar>(i+1, j+1);
-				uchar p6 = im.at<uchar>(i+1, j);
-				uchar p7 = im.at<uchar>(i+1, j-1);
-				uchar p8 = im.at<uchar>(i, j-1);
-				uchar p9 = im.at<uchar>(i-1, j-1);
+            uchar p2 = im.at<uchar>(i-1, j);
+            uchar p3 = im.at<uchar>(i-1, j+1);
+            uchar p4 = im.at<uchar>(i, j+1);
+            uchar p5 = im.at<uchar>(i+1, j+1);
+            uchar p6 = im.at<uchar>(i+1, j);
+            uchar p7 = im.at<uchar>(i+1, j-1);
+            uchar p8 = im.at<uchar>(i, j-1);
+            uchar p9 = im.at<uchar>(i-1, j-1);
 
-				int code = p2 * 1 + p3 * 2 + p4 * 4 + p5 * 8 + p6 * 16 + p7 * 32 + p8 * 64 + p9 * 128;
-				marker.at<uchar>(i,j) = markerTable[code];
-			}
+            int C  = (!p2 & (p3 | p4)) + (!p4 & (p5 | p6)) +
+                     (!p6 & (p7 | p8)) + (!p8 & (p9 | p2));
+            int N1 = (p9 | p2) + (p3 | p4) + (p5 | p6) + (p7 | p8);
+            int N2 = (p2 | p3) + (p4 | p5) + (p6 | p7) + (p8 | p9);
+            int N  = N1 < N2 ? N1 : N2;
+            int m  = iter == 0 ? ((p6 | p7 | !p9) & p8) : ((p2 | p3 | !p5) & p4);
+
+            if (C == 1 && (N >= 2 && N <= 3) & (m == 0))
+                marker.at<uchar>(i,j) = 1;
         }
     }
 
@@ -160,13 +133,10 @@ void GuoHallThinning_optimized(const cv::Mat& src, cv::Mat& dst)
     cv::Mat prev = cv::Mat::zeros(src.size(), CV_8UC1);
     cv::Mat diff;
 
-	std::vector<uchar> markerTable;
-	FormTable(markerTable);
-
     do
     {
-        GuoHallIteration_optimized(dst, 0, markerTable);
-        GuoHallIteration_optimized(dst, 1, markerTable);
+        GuoHallIteration(dst, 0);
+        GuoHallIteration(dst, 1);
         cv::absdiff(dst, prev, diff);
         dst.copyTo(prev);
     }
