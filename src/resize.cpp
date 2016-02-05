@@ -39,7 +39,7 @@ void ImageResize(const cv::Mat &src, cv::Mat &dst, const cv::Size sz)
                              ( (x1 == x2) ? (int)(q11 * (y2 - y) + q22 * (y - y1)) :
                                ( (y1 == y2) ? (int)(q11 * (x2 - x) + q22 * (x - x1)) : 
                                  (int)(q11 * (x2 - x) * (y2 - y) + q21 * (x - x1) * (y2 - y) + q12 * (x2 - x) * (y - y1) + q22 * (x - x1) * (y - y1))));
-            ptr_dst[col] = (temp < 0) ? 0 : ((temp > 255) ? 255 : (uchar)temp);
+            ptr_dst[col] = (uchar)(temp);
         }
     }
 }
@@ -73,13 +73,6 @@ void ImageResize_optimized(const cv::Mat &src, cv::Mat &dst, const cv::Size sz)
 
             int ix = (int)(x);
             int iy = (int)(y);
-
-			/*
-            const int x1 = (ix < 0) ? 0 : ((ix >= src_cols) ? src_cols - 1 : ix);
-            const int x2 = (ix < 0) ? 0 : ((ix >= src_cols - 1) ? src_cols - 1 : ix + 1);
-            const int y1 = (iy < 0) ? 0 : ((iy >= src_rows) ? src_rows - 1 : iy);
-            const int y2 = (iy < 0) ? 0 : ((iy >= src_rows - 1) ? src_rows - 1 : iy + 1);
-			*/
 			
 			const int x1 = (ix >= src_cols) ? src_cols - 1 : ix;
             const int x2 = (ix >= src_cols - 1) ? src_cols - 1 : ix + 1;
