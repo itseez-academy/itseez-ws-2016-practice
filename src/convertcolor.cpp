@@ -58,17 +58,26 @@ void ConvertColor_BGR2GRAY_BT709_fpt(const cv::Mat& src, cv::Mat& dst)
     cv::Size sz = src.size();
     dst.create(sz, CV_8UC1);
 
-    const int bidx = 0;
+    const uint16_t n = 14;
+
+    const float k0 = 0.0722f;
+    const float k1 = 0.7152f;
+    const float k2 = 0.2126f;
+    const float k3 = 0.5f;
+
+    const uint16_t q0 = (uint16_t) (std::ldexp(k0, n)+0.5f);
+    const uint16_t q1 = (uint16_t) (std::ldexp(k1, n)+0.5f);
+    const uint16_t q2 = (uint16_t) (std::ldexp(k2, n)+0.5f);
+    const uint16_t q3 = (uint16_t) (std::ldexp(k3, n)+0.5f);
 
     for (int y = 0; y < sz.height; y++)
     {
-        const cv::Vec3b *psrc = src.ptr<cv::Vec3b>(y);
-        uchar *pdst = dst.ptr<uchar>(y);
+        const uchar* psrc = src.ptr<uchar>(y);
+        uchar* pdst = dst.ptr<uchar>(y);
 
         for (int x = 0; x < sz.width; x++)
         {
-            float color = 0.2126 * psrc[x][2-bidx] + 0.7152 * psrc[x][1] + 0.0722 * psrc[x][bidx];
-            pdst[x] = (int)(color + 0.5);
+            pdst[x] = (uint8_t) ((q0*psrc[3*x+0]+q1*psrc[3*x+1]+q2*psrc[3*x+2]+q3)>>n);
         }
     }
 }
