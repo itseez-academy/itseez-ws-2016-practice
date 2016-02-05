@@ -58,21 +58,26 @@ void GuoHallThinning(const cv::Mat& src, cv::Mat& dst)
 // Place optimized version here
 //
 
-static void GuoHallIteration_optimized(cv::Mat& im, uchar** table)
+static void GuoHallIteration_optimized(cv::Mat& im, uchar table[2][256])
 {
     cv::Mat marker = cv::Mat::zeros(im.size(), CV_8UC1);
 
-    for (int i = 1; i < im.rows-1; i++)
-    {
-        for (int j = 1; j < im.cols-1; j++)
-        {
-			if (im.at<uchar>(i, j))
+	for (int iteration = 0; iteration < 2; iteration++)
+	{
+		for (int i = 1; i < im.rows-1; i++)
+		{
+			for (int j = 1; j < im.cols-1; j++)
 			{
-				
+				if (im.at<uchar>(i, j))
+				{
+					marker.at<uchar>(i, j) = table[iteration] [im.at<uchar>(i - 1, j) + im.at<uchar>(i - 1, j + 1) * 2 + \
+															  im.at<uchar>(i, j + 1) * 4 + im.at<uchar>(i + 1, j + 1) * 8 + \
+															  im.at<uchar>(i + 1, j) * 16 + im.at<uchar>(i + 1, j - 1) * 32 + \
+															  im.at<uchar>(i, j - 1) * 64 + im.at<uchar>(i-1, j-1) * 128];
+				}
 			}
-        }
-    }
-
+		}
+	}
     im &= ~marker;
 }
 
@@ -88,14 +93,14 @@ void GuoHallThinning_optimized(const cv::Mat& src, cv::Mat& dst)
 	static uchar look_up_table[2][256];
 	static bool filled = false;
 	
-	if (filled)
+	if (!filled)
 	{
 		for (int i = 0; i < 2; i++)
 		{
 			for (int j = 0; j < 256; j++)
 			{
 				uchar p2 = j & 1, p3 = j & 2, p4 = j & 4, p5 = j & 8, p6 = j & 16, \
-					p7 = j & 32, p8 = j & 64, p9 = j & 128;
+					  p7 = j & 32, p8 = j & 64, p9 = j & 128;
 			
 				int C  = (!p2 & (p3 | p4)) + (!p4 & (p5 | p6)) + (!p6 & (p7 | p8)) + (!p8 & (p9 | p2));
 				int N1 = (p9 | p2) + (p3 | p4) + (p5 | p6) + (p7 | p8);
