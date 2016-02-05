@@ -118,7 +118,7 @@ PERF_TEST_P(Size_Only, ConvertColor_fpt, testing::Values(MAT_SIZES))
 
     TEST_CYCLE()
     {
-        ConvertColor_BGR2GRAY_BT709_fpt(src, dst);
+        ConvertColor_BGR2GRAY_BT709(src, dst);
     }
 
     cv::Mat diff; cv::absdiff(dst, gold, diff);
