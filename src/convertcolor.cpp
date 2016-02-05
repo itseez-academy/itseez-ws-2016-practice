@@ -58,7 +58,6 @@ void ConvertColor_BGR2GRAY_BT709_fpt(const cv::Mat& src, cv::Mat& dst)
     cv::Size sz = src.size();
     dst.create(sz, CV_8UC1);
 
-    const int bidx = 0;
 	int n = 14;
 	ushort a = 0.2126f * (1 << n) + 0.5f;
 	ushort b = 0.7152f * (1 << n) + 0.5f;
