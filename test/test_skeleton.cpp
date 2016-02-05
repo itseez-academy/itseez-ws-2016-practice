@@ -174,7 +174,7 @@ TEST(skeleton, optim_thinning_blacks_count)
 
 TEST(skeleton, optim_thinning)
 {
-    Mat src(5, 5, CV_8UC1);
+    Mat src(15, 15, CV_8UC1);
     randu(src, 0, 255);
 
     Mat dst;

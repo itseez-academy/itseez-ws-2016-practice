@@ -2,19 +2,14 @@
 #include <opencv2/imgproc/imgproc.hpp>
 
 #include <vector>
+#include <iostream>
 
 static void GuoHallIteration(cv::Mat& im, int iter)
 {
     cv::Mat marker = cv::Mat::zeros(im.size(), CV_8UC1);
 
-    const uchar* row_up = im.ptr<uchar>(0);
-    const uchar* row_middle = im.ptr<uchar>(1);
-    const uchar* row_down = 0;
-    uchar* marker_row = 0;
     for (int i = 1; i < im.rows-1; i++)
     {
-        marker_row = marker.ptr<uchar>(i);
-        row_down = im.ptr<uchar>(i + 1);
         for (int j = 1; j < im.cols-1; j++)
         {
             uchar p2 = im.at<uchar>(i-1, j);
@@ -93,8 +88,8 @@ static void MakeTables(std::vector<uchar>& table_iter0,
         int N  = N1 < N2 ? N1 : N2;
         if (C == 1 && (N >= 2 && N <= 3))
         {
-            table_iter0[i] = !((p6 | p7 | !p9) & p8);
-            table_iter1[i] = !((p2 | p3 | !p5) & p4);
+            table_iter0[i] = ((p6 | p7 | !p9) & p8 ? 0 : 255);
+            table_iter1[i] = ((p2 | p3 | !p5) & p4 ? 0 : 255);
         }
     }
 }
@@ -103,43 +98,49 @@ static void GuoHallIteration_optimized(cv::Mat& im, int iter,
                                        const std::vector<uchar>& table_iter0,
                                        const std::vector<uchar>& table_iter1)
 {
-    cv::Mat marker = cv::Mat::zeros(im.size(), CV_8UC1);
+    cv::Mat marker = cv::Mat::zeros(2, im.cols, CV_8UC1);
 
-    const uchar* row_up = im.ptr<uchar>(0);
-    const uchar* row_middle = im.ptr<uchar>(1);
-    const uchar* row_down = 0;
-    uchar* marker_row = 0;
+    uchar* im_row_up = im.ptr<uchar>(0);
+    uchar* im_row_middle = im.ptr<uchar>(1);
+    uchar* im_row_down = 0;
+
+    uchar* marker_row_up = marker.ptr<uchar>(0);
+    uchar* marker_row_middle = marker.ptr<uchar>(1);
+
     for (int i = 1; i < im.rows-1; i++)
     {
-        marker_row = marker.ptr<uchar>(i);
-        row_down = im.ptr<uchar>(i + 1);
+        im_row_down = im.ptr<uchar>(i + 1);
         for (int j = 1; j < im.cols-1; j++)
         {
-            if (row_middle[j] != 0)
+            if (im_row_middle[j] != 0)
             {
-                unsigned code = row_up[j] +
-                                2 * row_up[j + 1] +
-                                4 * row_middle[j + 1] +
-                                8 * row_down[j + 1] +
-                                16 * row_down[j] +
-                                32 * row_down[j - 1] +
-                                64 * row_middle[j - 1] +
-                                128 * row_up[j - 1];
-                if (iter != 0)
-                {
-                    marker_row[j] = table_iter1[code];
-                }
-                else
-                {
-                    marker_row[j] = table_iter0[code];
-                }                    
+                unsigned code = im_row_up[j] +
+                                2 * im_row_up[j + 1] +
+                                4 * im_row_middle[j + 1] +
+                                8 * im_row_down[j + 1] +
+                                16 * im_row_down[j] +
+                                32 * im_row_down[j - 1] +
+                                64 * im_row_middle[j - 1] +
+                                128 * im_row_up[j - 1];
+                marker_row_middle[j] = (iter == 0 ? table_iter0[code] :
+                                                    table_iter1[code]);
             }
         }
-        row_up = row_middle;
-        row_middle = row_down;
-    }
+        for (int j = 1; j < im.cols-1; j++)
+        {
+            im_row_up[j] &= ~marker_row_up[j];
+        }
+        uchar* tmp = marker_row_up;
+        marker_row_up = marker_row_middle;
+        marker_row_middle = tmp;
 
-    im &= ~marker;
+        im_row_up = im_row_middle;
+        im_row_middle = im_row_down;
+    }
+    for (int j = 1; j < im.cols-1; j++)
+    {
+        im_row_up[j] &= ~marker_row_up[j];
+    }
 }
 
 void GuoHallThinning_optimized(const cv::Mat& src, cv::Mat& dst)
