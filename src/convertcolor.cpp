@@ -52,6 +52,8 @@ void ConvertColor_BGR2GRAY_BT709(const cv::Mat& src, cv::Mat& dst)
     }
 }
 
+
+
 void ConvertColor_BGR2GRAY_BT709_fpt(const cv::Mat& src, cv::Mat& dst)
 {
     CV_Assert(CV_8UC3 == src.type());
@@ -60,6 +62,14 @@ void ConvertColor_BGR2GRAY_BT709_fpt(const cv::Mat& src, cv::Mat& dst)
 
     const int bidx = 0;
 
+	int C1 = 13933; 
+	int C2 = 46871; 
+	int C3 = 4732; 
+	int C4 = 32768;
+	/*short C1 = 435; 
+	short C2 = 1465; 
+	short C3 = 148; 
+	short C4 = 1024;*/
     for (int y = 0; y < sz.height; y++)
     {
         const cv::Vec3b *psrc = src.ptr<cv::Vec3b>(y);
@@ -67,8 +77,9 @@ void ConvertColor_BGR2GRAY_BT709_fpt(const cv::Mat& src, cv::Mat& dst)
 
         for (int x = 0; x < sz.width; x++)
         {
-            float color = 0.2126 * psrc[x][2-bidx] + 0.7152 * psrc[x][1] + 0.0722 * psrc[x][bidx];
-            pdst[x] = (int)(color + 0.5);
+            int color = C1 * psrc[x][2-bidx] + C2 * psrc[x][1] + C3 * psrc[x][bidx];
+
+            pdst[x] = (int)(color + C4) * 0.0000152587890625;
         }
     }
 }

@@ -77,6 +77,7 @@ PERF_TEST_P(Size_Only, ImageResize, testing::Values(MAT_SIZES))
 // Test(s) for the Thinning function
 //
 
+
 PERF_TEST_P(Size_Only, Thinning, testing::Values(MAT_SIZES))
 {
     Size sz = GetParam();
@@ -190,3 +191,4 @@ TEST(CompleteColorSpace, ConvertColor_fpt)
     ASSERT_LT(cv::countNonZero(diff), 7565);
     // ASSERT_EQ(0, cv::countNonZero(diff));
 }
+
