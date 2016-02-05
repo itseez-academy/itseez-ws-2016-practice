@@ -54,14 +54,14 @@ void ConvertColor_BGR2GRAY_BT709(const cv::Mat& src, cv::Mat& dst)
 
 void ConvertColor_BGR2GRAY_BT709_fpt(const cv::Mat& src, cv::Mat& dst)
 {
-    CV_Assert(CV_8UC3 == src.type());
+	CV_Assert(CV_8UC3 == src.type());
     cv::Size sz = src.size();
     dst.create(sz, CV_8UC1);
 
     const int bidx = 0;
-	unsigned short coef1 = 2126;
-	unsigned short coef2 = 7152;
-	unsigned short coef3 = 722;
+	unsigned int coef1 = 0.2126f*pow(2,16) + .5f;
+	unsigned int coef2 = 0.7152f*pow(2,16) + .5f;
+	unsigned int coef3 = 0.0722f*pow(2,16) + .5f;
 
     for (int y = 0; y < sz.height; y++)
     {
@@ -70,8 +70,8 @@ void ConvertColor_BGR2GRAY_BT709_fpt(const cv::Mat& src, cv::Mat& dst)
 
         for (int x = 0; x < sz.width; x++)
         {
-            int color = coef1 * psrc[x][2-bidx] + coef2 * psrc[x][1] + coef3 * psrc[x][bidx];
-			pdst[x] = (int)(color/10000.f + .5f);
+            unsigned int color = (coef1 * psrc[x][2-bidx] + coef2 * psrc[x][1] + coef3 * psrc[x][bidx]);
+			pdst[x] = (int)((float)color/pow(2,16) + .5f);
         }
     }
 }
