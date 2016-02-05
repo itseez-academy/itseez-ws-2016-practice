@@ -7,7 +7,7 @@
 
 #include <string>
 #include <sstream>
-#include <cmath>
+#include <math.h>
 
 // Function for debug prints
 template <typename T>
@@ -53,27 +53,37 @@ void ConvertColor_BGR2GRAY_BT709(const cv::Mat& src, cv::Mat& dst)
     }
 }
 
+ushort nearst(float num)
+{
+	int int_part = int(num);
+	float diff   = num - int_part;
+	if (diff < 0.5f)
+		return (ushort)num;
+	else
+		return (ushort)num + 1;
+}
+
 void ConvertColor_BGR2GRAY_BT709_fpt(const cv::Mat& src, cv::Mat& dst)
 {
     CV_Assert(CV_8UC3 == src.type());
     cv::Size sz = src.size();
     dst.create(sz, CV_8UC1);
 
-    const int bidx = 0;
+	const ushort cB = nearst(std::ldexp(0.2126f, 16));
+	const ushort cG = nearst(std::ldexp(0.7152f, 16));
+	const ushort cR = nearst(std::ldexp(0.0722f, 16));
+	const ushort c  = nearst(std::ldexp(0.5f,    16));
 
     for (int y = 0; y < sz.height; y++)
     {
-        const cv::Vec3b *psrc = src.ptr<cv::Vec3b>(y);
-        uchar *pdst = dst.ptr<uchar>(y);
+        const uchar* psrc = src.ptr<uchar>(y);
+        uchar* pdst = dst.ptr<uchar>(y);
 
         for (int x = 0; x < sz.width; x++)
         {
-			uchar uB = psrc[x][2-bidx];
-			uchar uG = psrc[x][1];
-			uchar uR = psrc[x][bidx];
-			
-            unsigned int color = (2126 * uB + 7152 * uG + 722 * uR + 5000) / 10000;
-            pdst[x] = color;
+
+            pdst[x] = (uchar)((cB * psrc[3*x+2] + cG * psrc[3*x+1] + cR * psrc[3*x] + c) >> 16);
+            
         }
     }
 }
