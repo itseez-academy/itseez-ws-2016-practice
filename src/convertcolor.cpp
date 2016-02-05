@@ -7,6 +7,7 @@
 
 #include <string>
 #include <sstream>
+#include <cmath>
 
 // Function for debug prints
 template <typename T>
@@ -67,8 +68,12 @@ void ConvertColor_BGR2GRAY_BT709_fpt(const cv::Mat& src, cv::Mat& dst)
 
         for (int x = 0; x < sz.width; x++)
         {
-            float color = 0.2126 * psrc[x][2-bidx] + 0.7152 * psrc[x][1] + 0.0722 * psrc[x][bidx];
-            pdst[x] = (int)(color + 0.5);
+			uchar uB = psrc[x][2-bidx];
+			uchar uG = psrc[x][1];
+			uchar uR = psrc[x][bidx];
+			
+            unsigned int color = (2126 * uB + 7152 * uG + 722 * uR + 5000) / 10000;
+            pdst[x] = color;
         }
     }
 }
