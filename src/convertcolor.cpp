@@ -67,8 +67,11 @@ void ConvertColor_BGR2GRAY_BT709_fpt(const cv::Mat& src, cv::Mat& dst)
 
         for (int x = 0; x < sz.width; x++)
         {
-            float color = 0.2126 * psrc[x][2-bidx] + 0.7152 * psrc[x][1] + 0.0722 * psrc[x][bidx];
-            pdst[x] = (int)(color + 0.5);
+            //float color = 0.2126 * psrc[x][2-bidx] + 0.7152 * psrc[x][1] + 0.0722 * psrc[x][bidx];
+          //  pdst[x] = (int)(color + 0.5);
+
+			short color = (2126 * psrc[x][2-bidx] + 7152*psrc[x][1] + 722*psrc[x][bidx] + 5000)/10000;
+			pdst[x]= color;
         }
     }
 }
