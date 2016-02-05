@@ -98,7 +98,9 @@ static void GuoHallIteration_optimized(cv::Mat& im, int iter,
                                        const std::vector<uchar>& table_iter0,
                                        const std::vector<uchar>& table_iter1)
 {
-    cv::Mat marker = cv::Mat::zeros(2, im.cols, CV_8UC1);
+    int cols = im.cols;
+    int rows = im.rows;
+    cv::Mat marker = cv::Mat::zeros(2, cols, CV_8UC1);
 
     uchar* im_row_up = im.ptr<uchar>(0);
     uchar* im_row_middle = im.ptr<uchar>(1);
@@ -107,10 +109,25 @@ static void GuoHallIteration_optimized(cv::Mat& im, int iter,
     uchar* marker_row_up = marker.ptr<uchar>(0);
     uchar* marker_row_middle = marker.ptr<uchar>(1);
 
-    for (int i = 1; i < im.rows-1; i++)
+    for (int i = 1; i < rows-1; i++)
     {
         im_row_down = im.ptr<uchar>(i + 1);
-        for (int j = 1; j < im.cols-1; j++)
+
+        // j = 1
+        if (im_row_middle[1] != 0)
+        {
+            unsigned code = im_row_up[1] +
+                            2 * im_row_up[2] +
+                            4 * im_row_middle[2] +
+                            8 * im_row_down[2] +
+                            16 * im_row_down[1] +
+                            32 * im_row_down[0] +
+                            64 * im_row_middle[0] +
+                            128 * im_row_up[0];
+            marker_row_middle[1] = (iter == 0 ? table_iter0[code] :
+                                                table_iter1[code]);
+        }
+        for (int j = 2; j < cols-1; j++)
         {
             if (im_row_middle[j] != 0)
             {
@@ -125,14 +142,12 @@ static void GuoHallIteration_optimized(cv::Mat& im, int iter,
                 marker_row_middle[j] = (iter == 0 ? table_iter0[code] :
                                                     table_iter1[code]);
             }
+            im_row_up[j - 2] &= ~marker_row_up[j - 2];
         }
-        for (int j = 1; j < im.cols-1; j++)
-        {
-            im_row_up[j] &= ~marker_row_up[j];
-        }
-        uchar* tmp = marker_row_up;
-        marker_row_up = marker_row_middle;
-        marker_row_middle = tmp;
+        im_row_up[cols - 3] &= ~marker_row_up[cols - 3];
+        im_row_up[cols - 2] &= ~marker_row_up[cols - 2];
+
+        std::swap(marker_row_up, marker_row_middle);
 
         im_row_up = im_row_middle;
         im_row_middle = im_row_down;
