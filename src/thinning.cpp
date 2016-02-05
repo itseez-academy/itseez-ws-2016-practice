@@ -116,14 +116,9 @@ static void GuoHallIteration_optimized(cv::Mat& im, int iter,
         // j = 1
         if (im_row_middle[1] != 0)
         {
-            unsigned code = im_row_up[1] +
-                            2 * im_row_up[2] +
-                            4 * im_row_middle[2] +
-                            8 * im_row_down[2] +
-                            16 * im_row_down[1] +
-                            32 * im_row_down[0] +
-                            64 * im_row_middle[0] +
-                            128 * im_row_up[0];
+            unsigned code = 128 * im_row_up[0] + im_row_up[1] + 2 * im_row_up[2] +
+                            64 * im_row_middle[0] + 4 * im_row_middle[2] + 
+                            32 * im_row_down[0] + 16 * im_row_down[1] + 8 * im_row_down[2];
             marker_row_middle[1] = (iter == 0 ? table_iter0[code] :
                                                 table_iter1[code]);
         }
@@ -131,14 +126,9 @@ static void GuoHallIteration_optimized(cv::Mat& im, int iter,
         {
             if (im_row_middle[j] != 0)
             {
-                unsigned code = im_row_up[j] +
-                                2 * im_row_up[j + 1] +
-                                4 * im_row_middle[j + 1] +
-                                8 * im_row_down[j + 1] +
-                                16 * im_row_down[j] +
-                                32 * im_row_down[j - 1] +
-                                64 * im_row_middle[j - 1] +
-                                128 * im_row_up[j - 1];
+                unsigned code = 128 * im_row_up[j - 1] + im_row_up[j] + 2 * im_row_up[j + 1] +
+                                64 * im_row_middle[j - 1] + 4 * im_row_middle[j + 1] +
+                                32 * im_row_down[j - 1] + 16 * im_row_down[j] + 8 * im_row_down[j + 1];
                 marker_row_middle[j] = (iter == 0 ? table_iter0[code] :
                                                     table_iter1[code]);
             }
@@ -152,7 +142,7 @@ static void GuoHallIteration_optimized(cv::Mat& im, int iter,
         im_row_up = im_row_middle;
         im_row_middle = im_row_down;
     }
-    for (int j = 1; j < im.cols-1; j++)
+    for (int j = 1; j < cols; j++)
     {
         im_row_up[j] &= ~marker_row_up[j];
     }
