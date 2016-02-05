@@ -51,12 +51,28 @@ void ConvertColor_BGR2GRAY_BT709(const cv::Mat& src, cv::Mat& dst)
         }
     }
 }
+static inline int closestInt(float value)
+{
+    int cvt = (int)value;
+    if (value - cvt < 0.5f)
+        return cvt;
+    else
+        return cvt+1;
+}
 
 void ConvertColor_BGR2GRAY_BT709_fpt(const cv::Mat& src, cv::Mat& dst)
 {
     CV_Assert(CV_8UC3 == src.type());
     cv::Size sz = src.size();
     dst.create(sz, CV_8UC1);
+
+    typedef int Integer;
+    int bitSize = sizeof(Integer)*8;
+    Integer multiplier = pow(2, bitSize / 2);
+    Integer C2126 = closestInt(0.2126*multiplier);
+    Integer C7152 = closestInt(0.7152*multiplier);
+    Integer C0722 = closestInt(0.0722*multiplier);
+    Integer C5 = closestInt(0.5*multiplier);
 
     const int bidx = 0;
 
@@ -67,8 +83,8 @@ void ConvertColor_BGR2GRAY_BT709_fpt(const cv::Mat& src, cv::Mat& dst)
 
         for (int x = 0; x < sz.width; x++)
         {
-            float color = 0.2126 * psrc[x][2-bidx] + 0.7152 * psrc[x][1] + 0.0722 * psrc[x][bidx];
-            pdst[x] = (int)(color + 0.5);
+            Integer color = C2126 * psrc[x][2-bidx] + C7152 * psrc[x][1] + C0722 * psrc[x][bidx];
+            pdst[x] = ((color + C5)/multiplier);
         }
     }
 }
