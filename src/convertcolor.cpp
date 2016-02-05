@@ -59,6 +59,11 @@ void ConvertColor_BGR2GRAY_BT709_fpt(const cv::Mat& src, cv::Mat& dst)
     dst.create(sz, CV_8UC1);
 
     const int bidx = 0;
+	int n = 14;
+	ushort a = 0.2126f * (1 << n) + 0.5f;
+	ushort b = 0.7152f * (1 << n) + 0.5f;
+	ushort c = 0.0722f * (1 << n) + 0.5f;
+	ushort zero_five = 1 << (n-1);
 
     for (int y = 0; y < sz.height; y++)
     {
@@ -67,8 +72,7 @@ void ConvertColor_BGR2GRAY_BT709_fpt(const cv::Mat& src, cv::Mat& dst)
 
         for (int x = 0; x < sz.width; x++)
         {
-			__int32 color = 2126 * psrc[x][2-bidx] + 7152 * psrc[x][1] + 722 * psrc[x][bidx];
-            pdst[x] = (int)((float)color / 10000 + 0.5);
+			pdst[x] = (ushort)((a * psrc[x][2] + b * psrc[x][1] + c * psrc[x][0] + zero_five) >> n);
         }
     }
 }
