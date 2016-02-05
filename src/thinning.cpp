@@ -59,9 +59,8 @@ void GuoHallThinning(const cv::Mat& src, cv::Mat& dst)
 // Place optimized version here
 //
 
-void createTable(uchar*& table, int iter)
+void createTable(uchar table[], int iter)
 {
-	table = new uchar[256];
 	uchar p2, p3, p4, p5, p6, p7, p8, p9;
 	for(int i = 0; i < 256; i++)
 	{
@@ -107,7 +106,7 @@ void createTable(uchar*& table, int iter)
 
 static void GuoHallIteration_optimized(cv::Mat& im, int iter)
 {
-	uchar* table = NULL;
+	uchar table[256];
 	createTable(table, iter);
 
 	cv::Mat marker = cv::Mat::zeros(im.size(), CV_8UC1);
