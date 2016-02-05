@@ -105,10 +105,10 @@ static void GuoHallIteration_optimized(cv::Mat& im, int iter,
 {
     cv::Mat marker = cv::Mat::zeros(im.size(), CV_8UC1);
 
-     const uchar* row_up = im.ptr<uchar>(0);
-     const uchar* row_middle = im.ptr<uchar>(1);
-     const uchar* row_down = 0;
-     uchar* marker_row = 0;
+    const uchar* row_up = im.ptr<uchar>(0);
+    const uchar* row_middle = im.ptr<uchar>(1);
+    const uchar* row_down = 0;
+    uchar* marker_row = 0;
     for (int i = 1; i < im.rows-1; i++)
     {
         marker_row = marker.ptr<uchar>(i);
@@ -127,13 +127,11 @@ static void GuoHallIteration_optimized(cv::Mat& im, int iter,
                                 128 * row_up[j - 1];
                 if (iter != 0)
                 {
-                    if (table_iter1[code])
-                        marker_row[j] = table_iter1[code];
+                    marker_row[j] = table_iter1[code];
                 }
                 else
                 {
-                    if (table_iter0[code])
-                        marker_row[j] = table_iter0[code];
+                    marker_row[j] = table_iter0[code];
                 }                    
             }
         }
