@@ -39,7 +39,7 @@ project(${PROJECT_NAME})
 set(LIBRARY    "${PROJECT_NAME}_filter")
 set(TESTS      "test_${PROJECT_NAME}")
 set(PERF_TESTS "perf_${PROJECT_NAME}")
-set(CMAKE_CXX_FLAGS "-std=c++11 -O2")
+set(CMAKE_CXX_FLAGS "-std=c++11")
 
 # Find OpenCV
 find_package(OpenCV REQUIRED)

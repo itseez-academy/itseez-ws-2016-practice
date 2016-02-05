@@ -210,3 +210,67 @@ TEST(skeleton, test_guo_hall_black_pixel_count)
               std::count(result.begin<uchar>(), result.end<uchar>(), 0));
 
 }
+
+
+TEST(skeleton, Thinning)
+{
+std::cout << "Iterations test" << std::endl;
+    int n = 21;
+    Size sz = Size(n, n);
+
+    cv::Mat image(sz, CV_8UC1, 255);
+
+    int iter = 0;
+
+    for (int i = 1; i < n-1 - iter; i += 7) {
+        for (int j = iter * 4; j < n-1 - ((iter + 1) % 2) * 4; j+=2) {
+            image.at<uchar>(i, j) = 0;
+            image.at<uchar>(i-1, j+1) = 0;
+            image.at<uchar>(i+1, j+1) = 0;
+        }
+        iter = (iter + 1) % 2;
+    }
+    image.at<uchar>(3, n-1) = 0;
+    image.at<uchar>(4, n-1) = 0;
+    image.at<uchar>(5, n-1) = 0;
+    image.at<uchar>(6, n-1) = 0;
+
+
+//cv::RNG rng(234231412);
+//rng.fill(image, CV_8UC1, 0, 255);
+//cv::threshold(image, image, 240, 255, cv::THRESH_BINARY_INV);
+
+    cv::Mat gold;
+    GuoHallThinning(image, gold);
+
+    cv::Mat thinned_image;
+    TS(Thinning);
+    GuoHallThinning_optimized(image, thinned_image);
+    TE(Thinning);
+
+
+    cv::Mat diff;
+    cv::absdiff(thinned_image, gold, diff);
+    ASSERT_EQ(0, cv::countNonZero(diff));
+}
+
+/*
+TEST(skeleton, Thinning_square)
+{
+    Size sz(100, 100);
+
+    cv::Mat image(sz, CV_8UC1);
+
+    cv::RNG rng(234231412);
+    rng.fill(image, CV_8UC1, 0, 255);
+    cv::threshold(image, image, 240, 255, cv::THRESH_BINARY_INV);
+
+    cv::Mat gold; GuoHallThinning(image, gold);
+
+    cv::Mat thinned_image;
+
+    GuoHallThinning_optimized_sq(image, thinned_image);
+
+    cv::Mat diff; cv::absdiff(thinned_image, gold, diff);
+    ASSERT_EQ(0, cv::countNonZero(diff));
+}*/

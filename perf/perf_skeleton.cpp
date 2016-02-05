@@ -108,6 +108,7 @@ PERF_TEST_P(Size_Only, guo_hall, testing::Values(MAT_SIZES)) {
     SANITY_CHECK_NOTHING();
 }
 
+/*
 PERF_TEST_P(Size_Only, Thinning, testing::Values(MAT_SIZES))
 {
     Size sz = GetParam();
@@ -125,7 +126,7 @@ PERF_TEST_P(Size_Only, Thinning, testing::Values(MAT_SIZES))
     cv::Mat thinned_image;
     TEST_CYCLE()
     {
-        GuoHallThinning_optimized(image, thinned_image);
+        GuoHallThinning_optimized_sq(image, thinned_image);
     }
 
     cv::Mat diff; cv::absdiff(thinned_image, gold, diff);
@@ -133,3 +134,4 @@ PERF_TEST_P(Size_Only, Thinning, testing::Values(MAT_SIZES))
 
     SANITY_CHECK(image);
 }
+*/

@@ -2,6 +2,7 @@
 #include <opencv2/imgproc/imgproc.hpp>
 
 #include <iostream>
+#include <set>
 
 static void GuoHallIteration(cv::Mat &im, int iter) {
     cv::Mat marker = cv::Mat::zeros(im.size(), CV_8UC1);
@@ -148,7 +149,6 @@ static void GuoHallIteration_optimized_0(cv::Mat &im) {
                             (im.at<uchar>(i + 1, j - 1) << 2) |
                             (im.at<uchar>(i, j - 1) << 1) |
                             im.at<uchar>(i - 1, j - 1);
-
                 marker.at<uchar>(i, j) = new_value_0[idx];
             }
         }
@@ -188,13 +188,21 @@ void GuoHallThinning_optimized(const cv::Mat &src, cv::Mat &dst) {
     cv::Mat prev = cv::Mat::zeros(src.size(), CV_8UC1);
     cv::Mat diff;
 
+    long counter = 0;
     do {
+        std::cout << " ### " << std::endl;
+        std::cout << dst << std::endl;
+        ++counter;
         GuoHallIteration_optimized_0(dst);
         GuoHallIteration_optimized_1(dst);
         cv::absdiff(dst, prev, diff);
         dst.copyTo(prev);
     }
     while (cv::countNonZero(diff) > 0);
+    std::cout << " ### " << std::endl;
+    std::cout << dst << std::endl;
+    std::cout << " ### " << std::endl;
+    std::cout << "Number of iterations: " << counter << std::endl;
 
     dst *= 255;
 }
@@ -209,3 +217,131 @@ void GuoHallThinning_optimized(const cv::Mat &src, cv::Mat &dst) {
 // Thinning::Size_Only::640x480      333.442 ms  216.775 ms  142.484 ms     1.54       2.34
 // Thinning::Size_Only::1280x720     822.569 ms  468.958 ms  359.877 ms     1.75       2.29
 // Thinning::Size_Only::1920x1080    2438.715 ms 1402.072 ms 1126.428 ms    1.74       2.16
+
+template<typename Iter, typename RIter>
+static void GuoHallIteration_optimized_0_sq(cv::Mat &im, int i, int j, RIter res, Iter it) {
+    if (im.at<uchar>(i, j) != 0) {
+        uchar idx = (im.at<uchar>(i - 1, j) << 7) |
+                    (im.at<uchar>(i - 1, j + 1) << 6) |
+                    (im.at<uchar>(i, j + 1) << 5) |
+                    (im.at<uchar>(i + 1, j + 1) << 4) |
+                    (im.at<uchar>(i + 1, j) << 3) |
+                    (im.at<uchar>(i + 1, j - 1) << 2) |
+                    (im.at<uchar>(i, j - 1) << 1) |
+                    im.at<uchar>(i - 1, j - 1);
+
+        if (new_value_0[idx] & 1) {
+            res++ = {i, j};
+            for (const auto &nidx : std::vector<std::pair<int, int>>{{i - 1, j},
+                                                                     {i - 1, j + 1},
+                                                                     {i,     j + 1},
+                                                                     {i + 1, j + 1},
+                                                                     {i + 1, j},
+                                                                     {i + 1, j - 1},
+                                                                     {i,     j - 1},
+                                                                     {i - 1, j - 1}}) {
+                if (nidx.first > 0
+                    && nidx.second > 0
+                    && nidx.first < (im.rows - 1)
+                    && nidx.second < (im.cols - 1)) {
+                    it++ = nidx;
+                }
+            }
+        }
+    }
+}
+
+template<typename Iter, typename RIter>
+static void GuoHallIteration_optimized_1_sq(cv::Mat &im, int i, int j, RIter res, Iter it) {
+    if (im.at<uchar>(i, j) != 0) {
+        uchar idx = (im.at<uchar>(i - 1, j) << 7) |
+                    (im.at<uchar>(i - 1, j + 1) << 6) |
+                    (im.at<uchar>(i, j + 1) << 5) |
+                    (im.at<uchar>(i + 1, j + 1) << 4) |
+                    (im.at<uchar>(i + 1, j) << 3) |
+                    (im.at<uchar>(i + 1, j - 1) << 2) |
+                    (im.at<uchar>(i, j - 1) << 1) |
+                    im.at<uchar>(i - 1, j - 1);
+        if (new_value_1[idx] & 1) {
+            res++ = {i, j};
+            for (const auto &nidx : std::vector<std::pair<int, int>>{{i - 1, j},
+                                                                     {i - 1, j + 1},
+                                                                     {i,     j + 1},
+                                                                     {i + 1, j + 1},
+                                                                     {i + 1, j},
+                                                                     {i + 1, j - 1},
+                                                                     {i,     j - 1},
+                                                                     {i - 1, j - 1}}) {
+                if (nidx.first > 0
+                    && nidx.second > 0
+                    && nidx.first < (im.rows - 1)
+                    && nidx.second < (im.cols - 1)) {
+                    it++ = nidx;
+                }
+            }
+        };
+    }
+}
+
+void GuoHallThinning_optimized_sq(const cv::Mat &src, cv::Mat &dst) {
+    CV_Assert(CV_8UC1 == src.type());
+
+    dst = src / 255;
+
+    std::set<std::pair<int, int>> modified;
+    auto back = std::inserter(modified, modified.begin());
+
+    std::set<std::pair<int, int>> to_modify;
+
+    for (int i = 1; i < src.rows - 1; i++) {
+        for (int j = 1; j < src.cols - 1; j++) {
+            GuoHallIteration_optimized_0_sq(dst, i, j, std::inserter(to_modify, to_modify.begin()), back);
+        }
+    }
+    for (const auto &id : to_modify) {
+        dst.at<uchar>(id.first, id.second) = 0;
+    }
+    to_modify.clear();
+
+    for (int i = 1; i < src.rows - 1; i++) {
+        for (int j = 1; j < src.cols - 1; j++) {
+            GuoHallIteration_optimized_1_sq(dst, i, j, std::inserter(to_modify, to_modify.begin()), back);
+        }
+    }
+    for (const auto &id : to_modify) {
+        dst.at<uchar>(id.first, id.second) = 0;
+    }
+    to_modify.clear();
+
+    int iter = 0;
+    while (!modified.empty()) {
+//        std::cout << "Iter num: " << ++iter << std::endl;
+//        std::cout << "Modified size: " << modified.size() << std::endl;
+        std::set<std::pair<int, int>> nmodified;
+        auto nback = std::inserter(nmodified, nmodified.begin());
+
+        for (const auto &idx : modified) {
+            GuoHallIteration_optimized_0_sq(dst, idx.first, idx.second, std::inserter(to_modify, to_modify.begin()),
+                                            nback);
+        }
+        for (const auto &id : to_modify) {
+            dst.at<uchar>(id.first, id.second) = 0;
+        }
+        to_modify.clear();
+
+        for (const auto &idx : modified) {
+            GuoHallIteration_optimized_1_sq(dst, idx.first, idx.second, std::inserter(to_modify, to_modify.begin()),
+                                            nback);
+        }
+        for (const auto &id : to_modify) {
+            dst.at<uchar>(id.first, id.second) = 0;
+        }
+        to_modify.clear();
+
+        std::swap(modified, nmodified);
+        nmodified.clear();
+    }
+
+    dst *= 255;
+}
+

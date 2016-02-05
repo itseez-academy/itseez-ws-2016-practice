@@ -23,4 +23,5 @@ void GuoHallThinning(const cv::Mat& src, cv::Mat& dst);
 
 // Optimized versions
 void GuoHallThinning_optimized(const cv::Mat& src, cv::Mat& dst);
+void GuoHallThinning_optimized_sq(const cv::Mat& src, cv::Mat& dst);
 void ImageResize_optimized(const cv::Mat &src, cv::Mat &dst, const cv::Size sz);
