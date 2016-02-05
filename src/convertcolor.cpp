@@ -60,15 +60,19 @@ void ConvertColor_BGR2GRAY_BT709_fpt(const cv::Mat& src, cv::Mat& dst)
 
     const int bidx = 0;
 
+	ushort a = 0.2126*65536 + 0.5f;
+	ushort b = 0.7152*65536 + 0.5f;
+	ushort c = 0.0722*65536 + 0.5f;
+
     for (int y = 0; y < sz.height; y++)
     {
         const cv::Vec3b *psrc = src.ptr<cv::Vec3b>(y);
         uchar *pdst = dst.ptr<uchar>(y);
 
         for (int x = 0; x < sz.width; x++)
-        {
-            float color = 0.2126 * psrc[x][2-bidx] + 0.7152 * psrc[x][1] + 0.0722 * psrc[x][bidx];
-            pdst[x] = (int)(color + 0.5);
+        {	
+			int color = a * psrc[x][2-bidx] + b * psrc[x][1] + c * psrc[x][bidx];
+            pdst[x] = (int)((float)(color)/65536 + 0.5f);
         }
     }
 }
