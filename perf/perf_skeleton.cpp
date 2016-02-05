@@ -102,3 +102,91 @@ PERF_TEST_P(Size_Only, Thinning, testing::Values(MAT_SIZES))
 
     SANITY_CHECK(image);
 }
+
+PERF_TEST_P(Size_Only, ConvertColor_fpt, testing::Values(MAT_SIZES))
+{
+    Size sz = GetParam();
+
+    cv::Mat src(sz, CV_8UC3);
+    cv::Mat dst(sz, CV_8UC1);
+    cv::Mat gold(sz, CV_8UC1);
+    declare.in(src, WARMUP_RNG).out(dst);
+
+    cv::theRNG().fill(src, cv::RNG::UNIFORM, 0, 256);
+
+    ConvertColor_BGR2GRAY_BT709(src, gold);
+
+    TEST_CYCLE()
+    {
+        ConvertColor_BGR2GRAY_BT709_fpt(src, dst);
+    }
+
+    cv::Mat diff; cv::absdiff(dst, gold, diff);
+    cv::Mat diff1; cv::threshold(diff, diff1, 1, 0, cv::THRESH_TOZERO);
+    ASSERT_EQ(0, cv::countNonZero(diff1));
+    // ASSERT_EQ(0, cv::countNonZero(diff));
+
+    SANITY_CHECK(dst);
+}
+
+PERF_TEST_P(Size_Only, ConvertColor_simd, testing::Values(MAT_SIZES))
+{
+    Size sz = GetParam();
+
+    cv::Mat src(sz, CV_8UC3);
+    cv::Mat dst(sz, CV_8UC1);
+    cv::Mat gold(sz, CV_8UC1);
+    declare.in(src, WARMUP_RNG).out(dst);
+
+    cv::theRNG().fill(src, cv::RNG::UNIFORM, 0, 256);
+
+    ConvertColor_BGR2GRAY_BT709(src, gold);
+
+    TEST_CYCLE()
+    {
+        ConvertColor_BGR2GRAY_BT709_simd(src, dst);
+    }
+
+    cv::Mat diff; cv::absdiff(dst, gold, diff);
+    cv::Mat diff1; cv::threshold(diff, diff1, 1, 0, cv::THRESH_TOZERO);
+    ASSERT_EQ(0, cv::countNonZero(diff1));
+
+    // Even if it is 1-off error there should be no more than 20% of such pixels
+    ASSERT_LT(cv::countNonZero(diff), sz.width*sz.height*20/100);
+
+    SANITY_CHECK(dst);
+}
+
+// Accuracy test by the way...
+TEST(CompleteColorSpace, ConvertColor_fpt)
+{
+    Size sz(4096, 4096);
+
+    cv::Mat src(sz, CV_8UC3);
+    cv::Mat dst(sz, CV_8UC1);
+    cv::Mat gold(sz, CV_8UC1);
+
+    int val = 0;
+    for (int y = 0; y < sz.height; y++)
+    {
+        uchar* ptr = src.ptr<uchar>(y);
+
+        for(int x = 0; x < sz.width; x++)
+        {
+            ptr[3*x + 0] = val;
+            ptr[3*x + 1] = val >> 8;
+            ptr[3*x + 2] = val >> 16;
+            val++;
+        }
+    }
+
+    ConvertColor_BGR2GRAY_BT709(src, gold);
+    ConvertColor_BGR2GRAY_BT709_fpt(src, dst);
+
+    cv::Mat diff; cv::absdiff(dst, gold, diff);
+    cv::Mat diff1; cv::threshold(diff, diff1, 1, 0, cv::THRESH_TOZERO);
+
+    EXPECT_EQ(0, cv::countNonZero(diff1));
+    ASSERT_LT(cv::countNonZero(diff), 7565);
+    // ASSERT_EQ(0, cv::countNonZero(diff));
+}
