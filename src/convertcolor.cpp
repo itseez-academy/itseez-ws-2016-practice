@@ -60,9 +60,9 @@ void ConvertColor_BGR2GRAY_BT709_fpt(const cv::Mat& src, cv::Mat& dst)
 
     const int bidx = 0;
 
-		unsigned int a = 0.2126*65536 + 0.5;
-		unsigned int b = 0.7152*65536 + 0.5;
-		unsigned int c = 0.0722*65536 + 0.5;
+	unsigned short a = 0.2126*65536 + 0.5;
+	unsigned short b = 0.7152*65536 + 0.5;
+	unsigned short c = 0.0722*65536 + 0.5;
 
     for (int y = 0; y < sz.height; y++)
     {
