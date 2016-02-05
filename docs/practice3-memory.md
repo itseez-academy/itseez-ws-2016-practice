@@ -1,5 +1,7 @@
 # Практика 3: Оптимизация работы с памятью
 
+[![Feedback](feedback.png)][feedback_day3]
+
 ## Цели
 
 __Цель данной работы__ — научиться ускорять время работы алгоритма за счет более
@@ -218,3 +220,4 @@ __Дополнительные задачи__
 
 [git-update]: https://github.com/itseez-academy/itseez-ws-2016-practice/blob/master/docs/practice2-profiling-and-benchmarking.md#Получение-актуальной-версии-исходных-файлов
 [upstream]:   https://github.com/itseez-academy/itseez-ws-2016-practice
+[feedback_day3]: https://docs.google.com/forms/d/1ravFKjcFUkviel7MWKx6258m34NtwwqmahpVexvFchc/viewform

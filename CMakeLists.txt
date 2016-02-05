@@ -36,6 +36,12 @@ endforeach()
 set(PROJECT_NAME skeleton)
 project(${PROJECT_NAME})
 
+if(MSVC)
+    set(OPENCV_EXTRA_FLAGS "${OPENCV_EXTRA_FLAGS} /arch:SSE3 /Oi")
+else()
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mssse3")
+endif()
+
 set(LIBRARY    "${PROJECT_NAME}_filter")
 set(TESTS      "test_${PROJECT_NAME}")
 set(PERF_TESTS "perf_${PROJECT_NAME}")
