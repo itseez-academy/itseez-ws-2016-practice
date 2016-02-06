@@ -55,8 +55,8 @@ void ImageResize_optimized(const cv::Mat &src, cv::Mat &dst, const cv::Size sz)
 
     const int dst_rows = sz.height;
     const int dst_cols = sz.width;
-    float y_scale = (float)sz_src.height / (float)sz.height;
-    float x_scale = (float)sz_src.width / (float)sz.width;
+    float y_scale = ((float)sz_src.height) / sz.height;
+    float x_scale = ((float)sz_src.width) / sz.width;
     float y_0 = .5f * y_scale - .5f ;
     float x_0 = .5f * x_scale - .5f ;
     for (int row = 0; row < dst_rows; row++)
@@ -65,7 +65,7 @@ void ImageResize_optimized(const cv::Mat &src, cv::Mat &dst, const cv::Size sz)
 
         const float y = (float)row * y_scale + y_0;
         int iy = (int)y;
-        int right_bound_check_y1 = (int)(min(src_rows, iy));
+        int right_bound_check_y1 = (int)min(src_rows - 1, iy);
         int right_bound_check_y2 = (int)min(src_rows - 1, iy + 1);
             
         int y1 = (int)(max(0, right_bound_check_y1));
@@ -78,7 +78,7 @@ void ImageResize_optimized(const cv::Mat &src, cv::Mat &dst, const cv::Size sz)
             const float x = (float)col * x_scale + x_0;
 
             int ix = (int)x;
-            int right_bound_check_x1 = (int)min(src_cols, ix);
+            int right_bound_check_x1 = (int)min(src_cols - 1, ix);
             int right_bound_check_x2 = (int)min(src_cols - 1, ix + 1);
             int x1 = (int)max(0, right_bound_check_x1);
             int x2 = (int)max(0, right_bound_check_x2);
