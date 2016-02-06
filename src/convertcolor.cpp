@@ -84,12 +84,12 @@ void ConvertColor_BGR2GRAY_BT709_simd(const cv::Mat& src, cv::Mat& dst)
     dst.create(sz, CV_8UC1);
 
 #ifdef HAVE_SSE
-    // __m128i ssse3_blue_indices_0  = _mm_set_epi8(-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 15, 12,  9,  6,  3,  0);
-    // __m128i ssse3_blue_indices_1  = _mm_set_epi8(-1, -1, -1, -1, -1, 14, 11,  8,  5,  2, -1, -1, -1, -1, -1, -1);
-    // __m128i ssse3_blue_indices_2  = _mm_set_epi8(13, 10,  7,  4,  1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1);
-    // __m128i ssse3_green_indices_0 = _mm_set_epi8(-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 13, 10,  7,  4,  1);
-    // __m128i ssse3_green_indices_1 = _mm_set_epi8(-1, -1, -1, -1, -1, 15, 12,  9,  6,  3,  0, -1, -1, -1, -1, -1);
-    // __m128i ssse3_green_indices_2 = _mm_set_epi8(14, 11,  8,  5,  2, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1);
+     __m128i ssse3_blue_indices_0  = _mm_set_epi8(-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 15, 12,  9,  6,  3,  0);
+     __m128i ssse3_blue_indices_1  = _mm_set_epi8(-1, -1, -1, -1, -1, 14, 11,  8,  5,  2, -1, -1, -1, -1, -1, -1);
+     __m128i ssse3_blue_indices_2  = _mm_set_epi8(13, 10,  7,  4,  1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1);
+     __m128i ssse3_green_indices_0 = _mm_set_epi8(-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 13, 10,  7,  4,  1);
+     __m128i ssse3_green_indices_1 = _mm_set_epi8(-1, -1, -1, -1, -1, 15, 12,  9,  6,  3,  0, -1, -1, -1, -1, -1);
+     __m128i ssse3_green_indices_2 = _mm_set_epi8(14, 11,  8,  5,  2, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1);
     __m128i ssse3_red_indices_0   = _mm_set_epi8(-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 14, 11,  8,  5,  2);
     __m128i ssse3_red_indices_1   = _mm_set_epi8(-1, -1, -1, -1, -1, -1, 13, 10,  7,  4,  1, -1, -1, -1, -1, -1);
     __m128i ssse3_red_indices_2   = _mm_set_epi8(15, 12,  9,  6,  3,  0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1);
@@ -119,10 +119,34 @@ void ConvertColor_BGR2GRAY_BT709_simd(const cv::Mat& src, cv::Mat& dst)
             __m128i red = _mm_or_si128(_mm_or_si128(_mm_shuffle_epi8(chunk0, ssse3_red_indices_0),
                                                     _mm_shuffle_epi8(chunk1, ssse3_red_indices_1)),
                                                     _mm_shuffle_epi8(chunk2, ssse3_red_indices_2));
+			__m128i green = _mm_or_si128(_mm_or_si128(_mm_shuffle_epi8(chunk0, ssse3_green_indices_0),
+                                                    _mm_shuffle_epi8(chunk1, ssse3_green_indices_1)),
+                                                    _mm_shuffle_epi8(chunk2, ssse3_green_indices_2));
+			__m128i blue = _mm_or_si128(_mm_or_si128(_mm_shuffle_epi8(chunk0, ssse3_blue_indices_0),
+                                                    _mm_shuffle_epi8(chunk1, ssse3_blue_indices_1)),
+                                                    _mm_shuffle_epi8(chunk2, ssse3_blue_indices_2));
 
-            /* ??? */
+			__m128i red_low16 = _mm_unpacklo_epi8(red, zero);
+			__m128i red_hight16 = _mm_unpackhi_epi8(red, zero);
+			__m128i green_low16 = _mm_unpacklo_epi8(green, zero);
+			__m128i green_hight16 = _mm_unpackhi_epi8(green, zero);
+			__m128i blue_low16 = _mm_unpacklo_epi8(blue, zero);
+			__m128i blue_hight16 = _mm_unpackhi_epi8(blue, zero);
 
-            __m128i gray_packed; // Initialize it properly
+			__m128i mult_red0 = _mm_mullo_epi16(red_low16,red_coeff);
+			__m128i mult_red1 = _mm_mullo_epi16(red_hight16,red_coeff);
+			__m128i mult_green0 = _mm_mullo_epi16(green_low16,green_coeff);
+			__m128i mult_green1 = _mm_mullo_epi16(green_hight16,green_coeff);
+			__m128i mult_blue0 = _mm_mullo_epi16(blue_low16,blue_coeff);
+			__m128i mult_blue1 = _mm_mullo_epi16(blue_hight16,blue_coeff);
+
+			__m128i grey0 = _mm_add_epi16(bias,_mm_add_epi16(_mm_add_epi16(mult_red0, mult_green0), mult_blue0));
+			__m128i grey1 = _mm_add_epi16(bias,_mm_add_epi16(_mm_add_epi16(mult_red1, mult_green1), mult_blue1));
+			
+			__m128i grey_shift0 = _mm_srli_epi16(grey0, 8);
+			__m128i grey_shift1 = _mm_srli_epi16(grey1, 8);
+
+			__m128i gray_packed = _mm_packus_epi16(grey_shift0, grey_shift1); // Initialize it properly 
 
             _mm_storeu_si128((__m128i*)(pdst + x), gray_packed);
         }
@@ -137,6 +161,6 @@ void ConvertColor_BGR2GRAY_BT709_simd(const cv::Mat& src, cv::Mat& dst)
     }
 
     // ! Remove this before writing your optimizations !
-    ConvertColor_BGR2GRAY_BT709_fpt(src, dst);
+   // ConvertColor_BGR2GRAY_BT709_fpt(src, dst);
     // ! Remove this before writing your optimizations !
 }
