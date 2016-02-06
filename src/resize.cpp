@@ -50,15 +50,12 @@ void ImageResize_optimized(const cv::Mat &src, cv::Mat &dst, const cv::Size sz)
     cv::Size sz_src = src.size();
     dst.create(sz, src.type());
 
-    const int src_rows = src.rows;
-    const int src_cols = src.cols;
-
     const int dst_rows = sz.height;
     const int dst_cols = sz.width;
 
-    const float scale_x = (float)(src_cols)  / dst_cols;
+    const float scale_x = (float)(src.cols) / dst_cols;
     const float scalar_x0 = 0.5f * scale_x  - 0.5f;
-    const float scale_y = (float)(src_rows)  / dst_rows;;
+    const float scale_y = (float)(src.rows) / dst_rows;;
     const float scalar_y0 = 0.5f * scale_y  - 0.5f;
 
     for (int row = 0; row < dst_rows; row++)
@@ -82,11 +79,10 @@ void ImageResize_optimized(const cv::Mat &src, cv::Mat &dst, const cv::Size sz)
             const uchar q21 = src.at<uchar>(y1, x2);
             const uchar q22 = src.at<uchar>(y2, x2);
 
-            const int temp = ((x1 == x2) && (y1 == y2)) ? (int)q11 :
-              ( (x1 == x2) ? (int)(q11 * (y2 - y) + q22 * (y - y1)) :
-              ( (y1 == y2) ? (int)(q11 * (x2 - x) + q22 * (x - x1)) : 
-              (int)(q11 * (x2 - x) * (y2 - y) + q21 * (x - x1) * (y2 - y) + q12 * (x2 - x) * (y - y1) + q22 * (x - x1) * (y - y1))));
-            ptr_dst[col] = (uchar)temp;
+            ptr_dst[col] = ((x1 == x2) && (y1 == y2)) ? q11 :
+              ( (x1 == x2) ? (q11 * (y2 - y) + q22 * (y - y1)) :
+              ( (y1 == y2) ? (q11 * (x2 - x) + q22 * (x - x1)) : 
+              (q11 * (x2 - x) * (y2 - y) + q21 * (x - x1) * (y2 - y) + q12 * (x2 - x) * (y - y1) + q22 * (x - x1) * (y - y1))));
         }
     }
 }
