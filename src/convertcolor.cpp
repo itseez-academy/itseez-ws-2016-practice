@@ -59,6 +59,11 @@ void ConvertColor_BGR2GRAY_BT709_fpt(const cv::Mat& src, cv::Mat& dst)
     dst.create(sz, CV_8UC1);
 
     const int bidx = 0;
+    int ascale = .2126 * 65536 + .5;
+    int bscale = .7152 * 65536 + 0.5;
+    int cscale = 0.0722 * 65536+0.5;
+    float invScale = 1.0f/65536;
+
 
     for (int y = 0; y < sz.height; y++)
     {
@@ -67,8 +72,8 @@ void ConvertColor_BGR2GRAY_BT709_fpt(const cv::Mat& src, cv::Mat& dst)
 
         for (int x = 0; x < sz.width; x++)
         {
-            __int32_t color = 2126 * psrc[x][2-bidx] + 7152 * psrc[x][1] + 722 * psrc[x][bidx];
-            pdst[x] = (int)(static_cast<float>(color)*0.0001 + 0.5);
+            unsigned int color = ascale * psrc[x][2-bidx] + bscale * psrc[x][1] + cscale * psrc[x][bidx];
+            pdst[x] = (int)((float)(color)*(invScale) + 0.5);
         }
     }
 }
@@ -126,3 +131,16 @@ void ConvertColor_BGR2GRAY_BT709_simd(const cv::Mat& src, cv::Mat& dst)
     // ! Remove this before writing your optimizations !
     ConvertColor_BGR2GRAY_BT709_fpt(src, dst);
 }
+
+//Geometric mean
+
+//             Name of Test                base      base       base
+//                                          bgr       bgr       bgr
+//                                                    op1       op1
+//                                                               vs
+//                                                              base
+//                                                              bgr
+//                                                           (x-factor)
+//ConvertColor_fpt::Size_Only::640x480   3.766 ms  1.779 ms     2.12
+//ConvertColor_fpt::Size_Only::1280x720  11.569 ms 5.304 ms     2.18
+//ConvertColor_fpt::Size_Only::1920x1080 25.655 ms 12.036 ms    2.13
