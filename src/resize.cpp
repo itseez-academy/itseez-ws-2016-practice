@@ -66,6 +66,8 @@ void ImageResize_optimized(const cv::Mat &src, cv::Mat &dst, const cv::Size sz)
         const int iy = (int)floor(y);
         const int y1 = (iy < 0) ? 0 : iy;
         const int y2 = iy + 1;
+        const uchar* upper_row = src.ptr<uchar>(y1);
+        const uchar* lower_row = src.ptr<uchar>(y2);
 
         for (int col = 0; col < dst_cols; col++)
         {
@@ -74,10 +76,10 @@ void ImageResize_optimized(const cv::Mat &src, cv::Mat &dst, const cv::Size sz)
             const int x1 = (ix < 0) ? 0 : ix;
             const int x2 = ix + 1;
 
-            const uchar q11 = src.at<uchar>(y1, x1);
-            const uchar q12 = src.at<uchar>(y2, x1);
-            const uchar q21 = src.at<uchar>(y1, x2);
-            const uchar q22 = src.at<uchar>(y2, x2);
+            const uchar q11 = upper_row[x1];
+            const uchar q12 = lower_row[x1];
+            const uchar q21 = upper_row[x2];
+            const uchar q22 = lower_row[x2];
 
             ptr_dst[col] = ((x1 == x2) && (y1 == y2)) ? q11 :
               ( (x1 == x2) ? (q11 * (y2 - y) + q22 * (y - y1)) :
