@@ -58,11 +58,11 @@ void ConvertColor_BGR2GRAY_BT709_fpt(const cv::Mat& src, cv::Mat& dst)
     cv::Size sz = src.size();
     dst.create(sz, CV_8UC1);
 
-	int n = 14;
-	ushort a = 0.2126f * (1 << n) + 0.5f;
-	ushort b = 0.7152f * (1 << n) + 0.5f;
-	ushort c = 0.0722f * (1 << n) + 0.5f;
-	ushort zero_five = 1 << (n-1);
+	int shift = 16;
+
+    unsigned rw = (unsigned)(0.2126 * (1 << shift) + 0.5);
+    unsigned gw = (unsigned)(0.7152 * (1 << shift) + 0.5);
+    unsigned bw = (unsigned)(0.0722 * (1 << shift) + 0.5);
 
     for (int y = 0; y < sz.height; y++)
     {
@@ -71,7 +71,8 @@ void ConvertColor_BGR2GRAY_BT709_fpt(const cv::Mat& src, cv::Mat& dst)
 
         for (int x = 0; x < sz.width; x++)
         {
-			pdst[x] = (ushort)((a * psrc[x][2] + b * psrc[x][1] + c * psrc[x][0] + zero_five) >> n);
+
+			pdst[x] = (rw * psrc[x][2] + gw * psrc[x][1] + bw * psrc[x][0] + (1<<(shift-1))) >> shift;
         }
     }
 }
@@ -92,6 +93,12 @@ void ConvertColor_BGR2GRAY_BT709_simd(const cv::Mat& src, cv::Mat& dst)
     __m128i ssse3_red_indices_0   = _mm_set_epi8(-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 14, 11,  8,  5,  2);
     __m128i ssse3_red_indices_1   = _mm_set_epi8(-1, -1, -1, -1, -1, -1, 13, 10,  7,  4,  1, -1, -1, -1, -1, -1);
     __m128i ssse3_red_indices_2   = _mm_set_epi8(15, 12,  9,  6,  3,  0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1);
+
+    __m128i red_coeff   = _mm_set1_epi16(54);
+    __m128i green_coeff = _mm_set1_epi16(183);
+    __m128i blue_coeff  = _mm_set1_epi16(19); // 19 instead of 18 because the sum of 3 coeffs must be == 256
+    __m128i bias = _mm_set1_epi16(128);
+    __m128i zero = _mm_setzero_si128();
 #endif
 
     for (int y = 0; y < sz.height; y++)
@@ -115,17 +122,21 @@ void ConvertColor_BGR2GRAY_BT709_simd(const cv::Mat& src, cv::Mat& dst)
 
             /* ??? */
 
-            _mm_storeu_si128((__m128i*)(pdst + x), red);
+            __m128i gray_packed; // Initialize it properly
+
+            _mm_storeu_si128((__m128i*)(pdst + x), gray_packed);
         }
 #endif
 
         // Process leftover pixels
         for (; x < sz.width; x++)
         {
-            /* ??? */
+            float color = 0.2126 * psrc[3 * x + 2] + 0.7152 * psrc[3 * x + 1] + 0.0722 * psrc[3 * x];
+            pdst[x] = (int)(color + 0.5);
         }
     }
 
     // ! Remove this before writing your optimizations !
     ConvertColor_BGR2GRAY_BT709_fpt(src, dst);
+    // ! Remove this before writing your optimizations !
 }
