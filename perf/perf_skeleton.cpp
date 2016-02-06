@@ -129,34 +129,6 @@ PERF_TEST_P(Size_Only, ConvertColor_fpt, testing::Values(MAT_SIZES))
     SANITY_CHECK(dst);
 }
 
-PERF_TEST_P(Size_Only, ConvertColor_simd, testing::Values(MAT_SIZES))
-{
-    Size sz = GetParam();
-
-    cv::Mat src(sz, CV_8UC3);
-    cv::Mat dst(sz, CV_8UC1);
-    cv::Mat gold(sz, CV_8UC1);
-    declare.in(src, WARMUP_RNG).out(dst);
-
-    cv::theRNG().fill(src, cv::RNG::UNIFORM, 0, 256);
-
-    ConvertColor_BGR2GRAY_BT709(src, gold);
-
-    TEST_CYCLE()
-    {
-        ConvertColor_BGR2GRAY_BT709_simd(src, dst);
-    }
-
-    cv::Mat diff; cv::absdiff(dst, gold, diff);
-    cv::Mat diff1; cv::threshold(diff, diff1, 1, 0, cv::THRESH_TOZERO);
-    ASSERT_EQ(0, cv::countNonZero(diff1));
-
-    // Even if it is 1-off error there should be no more than 20% of such pixels
-    ASSERT_LT(cv::countNonZero(diff), sz.width*sz.height*20/100);
-
-    SANITY_CHECK(dst);
-}
-
 // Accuracy test by the way...
 TEST(CompleteColorSpace, ConvertColor_fpt)
 {
