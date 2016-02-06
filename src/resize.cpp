@@ -90,7 +90,7 @@ void ImageResize_optimized(const cv::Mat &src, cv::Mat &dst, const cv::Size sz)
         const float y = row * scale_y + scalar_y0;
         const int y1 = (int)y;
         const int y2 = y1 + 1;
-        const uchar* upper_row = src.ptr<uchar>(y1);
+        upper_row = src.ptr<uchar>(y1);
         const uchar* lower_row = src.ptr<uchar>(y2);
 
         // Negative cols.
