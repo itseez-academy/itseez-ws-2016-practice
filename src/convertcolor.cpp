@@ -7,6 +7,7 @@
 
 #include <string>
 #include <sstream>
+using namespace std;
 
 // Function for debug prints
 template <typename T>
@@ -38,6 +39,15 @@ void ConvertColor_BGR2GRAY_BT709(const cv::Mat& src, cv::Mat& dst)
     dst.create(sz, CV_8UC1);
 
     const int bidx = 0;
+    const float bias = 0.5f;
+    const float red_const_f = 0.2126f;
+    const float green_const_f = 0.7152f;
+    const float blue_const_f = 0.0722f;
+    const uint16_t shift = 16;
+    const uint16_t red_const_i = (uint16_t)(ldexp(red_const_f, shift) + 0.5f);
+    const uint16_t green_const_i = (uint16_t)(ldexp(green_const_f, shift) + 0.5f);
+    const uint16_t blue_const_i = (uint16_t)(ldexp(blue_const_f, shift) + 0.5f);
+    const uint16_t bias_i = (uint16_t)(ldexp(bias, shift) + 0.5f);
 
     for (int y = 0; y < sz.height; y++)
     {
@@ -46,8 +56,7 @@ void ConvertColor_BGR2GRAY_BT709(const cv::Mat& src, cv::Mat& dst)
 
         for (int x = 0; x < sz.width; x++)
         {
-            float color = 0.2126 * psrc[x][2-bidx] + 0.7152 * psrc[x][1] + 0.0722 * psrc[x][bidx];
-            pdst[x] = (int)(color + 0.5);
+            pdst[x] = (uchar)((red_const_i * psrc[x][2-bidx] + green_const_i * psrc[x][1] + blue_const_i * psrc[x][bidx] + bias_i) >> shift);
         }
     }
 }
