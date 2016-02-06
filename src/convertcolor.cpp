@@ -59,9 +59,8 @@ void ConvertColor_BGR2GRAY_BT709_fpt(const cv::Mat& src, cv::Mat& dst)
     dst.create(sz, CV_8UC1);
 
     int shift = 16;
-    int bias  = 0;
 
-    unsigned rw = (unsigned)(0.2126 * (1 << shift) + 0.5);
+	unsigned rw = (unsigned)(0.2126 * (1 << shift) + 0.5);
     unsigned gw = (unsigned)(0.7152 * (1 << shift) + 0.5);
     unsigned bw = (unsigned)(0.0722 * (1 << shift) + 0.5);
 
@@ -72,7 +71,7 @@ void ConvertColor_BGR2GRAY_BT709_fpt(const cv::Mat& src, cv::Mat& dst)
 
         for (int x = 0; x < sz.width; x++)
         {
-            pdst[x] = (rw * psrc[x][2] + gw * psrc[x][1] + bw * psrc[x][0] + (1<<(shift-1)) + bias) >> shift;
+            pdst[x] = (rw * psrc[x][2] + gw * psrc[x][1] + bw * psrc[x][0] + (1<<(shift-1))) >> shift;
         }
     }
 }
