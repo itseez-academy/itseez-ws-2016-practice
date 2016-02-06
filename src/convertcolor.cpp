@@ -96,7 +96,7 @@ void ConvertColor_BGR2GRAY_BT709_simd(const cv::Mat& src, cv::Mat& dst)
     cv::Size sz = src.size();
     dst.create(sz, CV_8UC1);
     const int bidx = 0;
-    const float bias = 0.5f;
+    const float bias_f = 0.5f;
     const float red_const_f = 0.2126f;
     const float green_const_f = 0.7152f;
     const float blue_const_f = 0.0722f;
@@ -104,7 +104,7 @@ void ConvertColor_BGR2GRAY_BT709_simd(const cv::Mat& src, cv::Mat& dst)
     const uint16_t red_const_i = (uint16_t)(ldexp(red_const_f, shift) + 0.5f);
     const uint16_t green_const_i = (uint16_t)(ldexp(green_const_f, shift) + 0.5f);
     const uint16_t blue_const_i = (uint16_t)(ldexp(blue_const_f, shift) + 0.5f);
-    const uint16_t bias_i = (uint16_t)(ldexp(bias, shift) + 0.5f);
+    const uint16_t bias_i = (uint16_t)(ldexp(bias_f, shift) + 0.5f);
 
 
 
