@@ -81,7 +81,7 @@ PERF_TEST_P(Size_Only, Thinning, testing::Values(MAT_SIZES))
     rng.fill(image, CV_8UC1, 0, 255);
     cv::threshold(image, image, 240, 255, cv::THRESH_BINARY_INV);
 
-    //cv::Mat gold; GuoHallThinning(image, gold);
+    cv::Mat gold; GuoHallThinning(image, gold);
 
     cv::Mat thinned_image;
     TEST_CYCLE()
@@ -89,8 +89,8 @@ PERF_TEST_P(Size_Only, Thinning, testing::Values(MAT_SIZES))
         GuoHallThinning_optimized2(image, thinned_image);
     }
 
-    //cv::Mat diff; cv::absdiff(thinned_image, gold, diff);
-    //ASSERT_EQ(0, cv::countNonZero(diff));
+    cv::Mat diff; cv::absdiff(thinned_image, gold, diff);
+    ASSERT_EQ(0, cv::countNonZero(diff));
 
     SANITY_CHECK(image);
 }

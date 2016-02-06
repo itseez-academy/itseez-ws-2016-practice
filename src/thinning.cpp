@@ -89,8 +89,8 @@ static void createTabs(cv::Vec<bool, 256>& tab0, cv::Vec<bool, 256>& tab1)
     }
 }
 
-static void GuoHall_stackInit(cv::Mat& im, cv::Mat& marker, 
-                              cv::Vector<cv::Point2i>& stack, const cv::Vec<bool, 256>& tab0, const cv::Vec<bool, 256>& tab1)
+static void GuoHall_stackInit(cv::Mat& im, cv::Vector<cv::Point2i>& stack,
+                            const cv::Vec<bool, 256>& tab0, const cv::Vec<bool, 256>& tab1)
 {
     for (int i = 1; i < im.rows-1; i++)
     {
@@ -118,26 +118,86 @@ static void GuoHall_stackInit(cv::Mat& im, cv::Mat& marker,
                        p9 * 128;
 
             if (tab0[code] || tab1[code])
-            {
-                im.at<uchar>(i, j) = 0;
-                marker.at<uchar>(i,j) = 0;
-
-                marker.at<uchar>(i-1, j) = 1;
-                marker.at<uchar>(i-1, j+1) = 1;
-                marker.at<uchar>(i, j+1) = 1;
-                marker.at<uchar>(i+1, j+1) = 1;
-                marker.at<uchar>(i+1, j) = 1;
-                marker.at<uchar>(i+1, j-1) = 1;
-                marker.at<uchar>(i, j-1) = 1;
-                marker.at<uchar>(i-1, j-1) = 1;
-            }
+                stack.push_back(cv::Point2i(i, j));
         }
     }
+}
 
-    for (int i = 1; i < im.rows-1; i++)
-        for (int j = 1; j < im.cols-1; j++)
-            if(marker.at<uchar>(i,j) == 1)
-                stack.push_back(cv::Point2i(i, j));
+static void GuoHall_make0(cv::Mat& im, cv::Mat& marker, const cv::Vec<bool, 256>& tab, const cv::Vec<bool, 256>& dtab,
+                          cv::Vector<cv::Point2i>& stackIn, cv::Vector<cv::Point2i>& stackOut)
+{
+    cv::Vector<cv::Point2i> tstack;
+
+    while(!stackIn.empty())
+    {
+        int i = stackIn.back().x; 
+        int j = stackIn.back().y; 
+        stackIn.pop_back();
+        marker.at<uchar>(i, j) = 0;
+
+        if(im.at<uchar>(i, j) == 0 || i == 0 || j == 0 || i == (im.rows - 1) || j == (im.cols - 1))
+            continue;
+
+        uchar p2 = im.at<uchar>(i-1, j);
+        uchar p3 = im.at<uchar>(i-1, j+1);
+        uchar p4 = im.at<uchar>(i, j+1);
+        uchar p5 = im.at<uchar>(i+1, j+1);
+        uchar p6 = im.at<uchar>(i+1, j);
+        uchar p7 = im.at<uchar>(i+1, j-1);
+        uchar p8 = im.at<uchar>(i, j-1);
+        uchar p9 = im.at<uchar>(i-1, j-1);
+
+        int code = p2 * 1 +
+                       p3 * 2 +
+                       p4 * 4 +
+                       p5 * 8 +
+                       p6 * 16 +
+                       p7 * 32 +
+                       p8 * 64 +
+                       p9 * 128;
+
+        if(tab[code])
+        {
+            tstack.push_back(cv::Point2i(i, j));
+        }
+        else
+            if(dtab[code])
+                stackOut.push_back(cv::Point2i(i, j));
+    }
+
+    while(!tstack.empty())
+    {
+        int i = tstack.back().x; 
+        int j = tstack.back().y; 
+        tstack.pop_back();
+
+        im.at<uchar>(i, j) = 0;
+        if(marker.at<uchar>(i-1, j  ) == 0)
+            stackOut.push_back(cv::Point2i(i-1, j  ));
+        if(marker.at<uchar>(i-1, j+1) == 0)
+            stackOut.push_back(cv::Point2i(i-1, j+1));
+        if(marker.at<uchar>(i  , j+1) == 0)
+            stackOut.push_back(cv::Point2i(i  , j+1));
+        if(marker.at<uchar>(i+1, j+1) == 0)
+            stackOut.push_back(cv::Point2i(i+1, j+1));
+        if(marker.at<uchar>(i+1, j  ) == 0)
+            stackOut.push_back(cv::Point2i(i+1, j  ));
+        if(marker.at<uchar>(i+1, j-1) == 0)
+            stackOut.push_back(cv::Point2i(i+1, j-1));
+        if(marker.at<uchar>(i  , j-1) == 0)
+            stackOut.push_back(cv::Point2i(i  , j-1));
+        if(marker.at<uchar>(i-1, j-1) == 0)
+            stackOut.push_back(cv::Point2i(i-1, j-1));
+
+        marker.at<uchar>(i-1, j) = 1;
+        marker.at<uchar>(i-1, j+1) = 1;
+        marker.at<uchar>(i, j+1) = 1;
+        marker.at<uchar>(i+1, j+1) = 1;
+        marker.at<uchar>(i+1, j) = 1;
+        marker.at<uchar>(i+1, j-1) = 1;
+        marker.at<uchar>(i, j-1) = 1;
+        marker.at<uchar>(i-1, j-1) = 1;
+    }
 }
 
 void GuoHallThinning_optimized2(const cv::Mat& src, cv::Mat& dst)
@@ -151,74 +211,15 @@ void GuoHallThinning_optimized2(const cv::Mat& src, cv::Mat& dst)
     createTabs(tab0, tab1);
 
     cv::Mat marker = cv::Mat::zeros(dst.size(), CV_8UC1);
-    cv::Vector<cv::Point2i> stack;
 
-    GuoHall_stackInit(dst, marker, stack, tab0, tab1);
-    while(!stack.empty())
+    cv::Vector<cv::Point2i> stack0;
+    cv::Vector<cv::Point2i> stack1;
+
+    GuoHall_stackInit(dst, stack0, tab0, tab1);
+    while(!stack0.empty())
     {
-        int i = stack.back().x; 
-        int j = stack.back().y; 
-        stack.pop_back();
-        marker.at<uchar>(i, j) = 0;
-
-        if(dst.at<uchar>(i, j) == 0 || i == 0 || j == 0 || i == (dst.rows - 1) || j == (dst.cols - 1))
-            continue;
-
-        uchar p2 = dst.at<uchar>(i-1, j);
-        uchar p3 = dst.at<uchar>(i-1, j+1);
-        uchar p4 = dst.at<uchar>(i, j+1);
-        uchar p5 = dst.at<uchar>(i+1, j+1);
-        uchar p6 = dst.at<uchar>(i+1, j);
-        uchar p7 = dst.at<uchar>(i+1, j-1);
-        uchar p8 = dst.at<uchar>(i, j-1);
-        uchar p9 = dst.at<uchar>(i-1, j-1);
-
-        int code = p2 * 1 +
-                       p3 * 2 +
-                       p4 * 4 +
-                       p5 * 8 +
-                       p6 * 16 +
-                       p7 * 32 +
-                       p8 * 64 +
-                       p9 * 128;
-
-        if (tab0[code] || tab1[code])
-        {
-            dst.at<uchar>(i, j) = 0;
-            marker.at<uchar>(i, j) = 0;
-
-            if(marker.at<uchar>(i-1, j) == 0)
-                stack.push_back(cv::Point2i(i-1, j));
-            marker.at<uchar>(i-1, j) = 1;
-
-            if(marker.at<uchar>(i-1, j+1) == 0)
-                stack.push_back(cv::Point2i(i-1, j+1));
-            marker.at<uchar>(i-1, j+1) = 1;
-
-            if(marker.at<uchar>(i, j+1) == 0)
-                stack.push_back(cv::Point2i(i, j+1));
-            marker.at<uchar>(i, j+1) = 1;
-
-            if(marker.at<uchar>(i+1, j+1) == 0)
-                stack.push_back(cv::Point2i(i+1, j+1));
-            marker.at<uchar>(i+1, j+1) = 1;
-
-            if(marker.at<uchar>(i+1, j) == 0)
-                stack.push_back(cv::Point2i(i+1, j));
-            marker.at<uchar>(i+1, j) = 1;
-
-            if(marker.at<uchar>(i+1, j-1) == 0)
-                stack.push_back(cv::Point2i(i+1, j-1));
-            marker.at<uchar>(i+1, j-1) = 1;
-
-            if(marker.at<uchar>(i, j-1) == 0)
-                stack.push_back(cv::Point2i(i, j-1));
-            marker.at<uchar>(i, j-1) = 1;
-
-            if(marker.at<uchar>(i-1, j-1) == 0)
-                stack.push_back(cv::Point2i(i-1, j-1));
-            marker.at<uchar>(i-1, j-1) = 1;
-        }
+        GuoHall_make0(dst, marker, tab0, tab1, stack0, stack1);
+        GuoHall_make0(dst, marker, tab1, tab0, stack1, stack0);
     }
 
     dst *= 255;
