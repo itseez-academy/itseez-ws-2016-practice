@@ -135,7 +135,8 @@ static int GuoHallNext(int* &buffer,
     memset(table, 0, tableSize);
     std::swap(buffer, nextBuffer);
     bufferCount = nextBufferCount;
-    return nextBufferCount > 0 ? 1 : 0;
+    nextBufferCount = 0;
+    return bufferCount > 0 ? 1 : 0;
 }
 
 static void GuoHallIteration1_optimized(cv::Mat& im,
@@ -202,7 +203,10 @@ static void GuoHallIteration2_optimized(cv::Mat& im,
     cv::Mat marker(im.size(), CV_8UC1, 255);
     for (int bi = 0; bi < bufferCount; ++bi)
     {
+        //printf("%d\n", bi);
         const int bii = buffer[bi];
+        //printf("%d\n", bii);
+
         const int i = bii / im.cols;
         const int j = bii % im.cols;
         uchar p8 = im.at<uchar>(i, j-1);
@@ -251,20 +255,32 @@ void GuoHallThinning_optimized(const cv::Mat& src, cv::Mat& dst)
                              static_cast<size_t>(src.rows);
     int* buffers = reinterpret_cast<int*>(malloc(tableSize * sizeof(int) * 2));
     int* buffer = buffers;
-    int* nextBuffer = buffers + tableSize * sizeof(int);
-    int bufferCount = 0, nextBufferCount = 0;
+    int* nextBuffer = buffers + tableSize;
+    int bufferCount = 0;
+    int nextBufferCount = 0;
     uchar* table = reinterpret_cast<uchar*>(malloc(tableSize));
+    memset(table, 0, tableSize);
 
     GuoHallIteration1_optimized(dst, maskTable, 1, 3, buffer, bufferCount,
                                 table);
-    int cnt = GuoHallNext(buffer, bufferCount, table,
-                          tableSize, nextBuffer, nextBufferCount);
+
+    int cnt = GuoHallNext(nextBuffer, nextBufferCount, table,
+                          tableSize, buffer, bufferCount);
+
+    //printf("%d, %d, %d\n", bufferCount, nextBufferCount, tableSize);
+    //std::swap(buffer, nextBuffer);
+
     GuoHallIteration2_optimized(dst, maskTable, 2, 3, buffer, bufferCount,
                                 table, nextBuffer, nextBufferCount);
+
+    //printf("%d, %d\n", bufferCount, nextBufferCount);
     cnt += GuoHallNext(buffer, bufferCount, table,
                        tableSize, nextBuffer, nextBufferCount);
+
+
     while (cnt > 0)
     {
+        //printf("%d, %d\n", bufferCount, nextBufferCount);
         GuoHallIteration2_optimized(dst, maskTable, 1, 3, buffer, bufferCount,
                                     table, nextBuffer, nextBufferCount);
         cnt = GuoHallNext(buffer, bufferCount, table,
