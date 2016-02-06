@@ -60,6 +60,13 @@ void ConvertColor_BGR2GRAY_BT709_fpt(const cv::Mat& src, cv::Mat& dst)
 
     const int bidx = 0;
 
+	const unsigned int scale_factor = 1 << 14;
+
+	
+	const unsigned int R = (int)(0.2126 * scale_factor + .5f);
+	const unsigned int G = (int)(0.7152 * scale_factor + .5f);
+	const unsigned int B = (int)(0.0722 * scale_factor + .5f);
+	
     for (int y = 0; y < sz.height; y++)
     {
         const cv::Vec3b *psrc = src.ptr<cv::Vec3b>(y);
@@ -67,8 +74,11 @@ void ConvertColor_BGR2GRAY_BT709_fpt(const cv::Mat& src, cv::Mat& dst)
 
         for (int x = 0; x < sz.width; x++)
         {
-            float color = 0.2126 * psrc[x][2-bidx] + 0.7152 * psrc[x][1] + 0.0722 * psrc[x][bidx];
-            pdst[x] = (int)(color + 0.5);
+            unsigned int color = R * psrc[x][2-bidx] + G * psrc[x][1] + B * psrc[x][bidx];
+
+            // pdst[x] = (int)((float)(color >> 14) + .5f);
+			pdst[x] = (int)(color/(float)scale_factor + .5f);
+
         }
     }
 }
