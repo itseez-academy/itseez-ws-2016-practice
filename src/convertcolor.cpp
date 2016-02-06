@@ -72,7 +72,7 @@ void ConvertColor_BGR2GRAY_BT709_fpt(const cv::Mat& src, cv::Mat& dst)
 
         for (int x = 0; x < sz.width; x++)
         {
-			pdst[x] = (ushort)(a * psrc[x][2] + b * psrc[x][1] + c * psrc[x][0] + zero_five) >> n;
+			pdst[x] = (a * psrc[x][2] + b * psrc[x][1] + c * psrc[x][0] + zero_five) >> n;
         }
 	}
 }
