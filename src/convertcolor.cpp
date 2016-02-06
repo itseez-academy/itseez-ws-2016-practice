@@ -7,6 +7,7 @@
 
 #include <string>
 #include <sstream>
+#include <iostream>
 
 // Function for debug prints
 template <typename T>
@@ -97,6 +98,7 @@ void ConvertColor_BGR2GRAY_BT709_simd(const cv::Mat& src, cv::Mat& dst)
     __m128i red_coeff   = _mm_set1_epi16(54);
     __m128i green_coeff = _mm_set1_epi16(183);
     __m128i blue_coeff  = _mm_set1_epi16(19); // 19 instead of 18 because the sum of 3 coeffs must be == 256
+	__m128i bias = _mm_set1_epi16(128);
     __m128i zero = _mm_setzero_si128();
 #endif
 
@@ -141,11 +143,14 @@ void ConvertColor_BGR2GRAY_BT709_simd(const cv::Mat& src, cv::Mat& dst)
 			__m128i B0 = _mm_mullo_epi16(blue16_0, blue_coeff);
 			__m128i B1 = _mm_mullo_epi16(blue16_1, blue_coeff);
 
-			__m128i gray0 = _mm_add_epi16(_mm_add_epi16(R0, G0), B0);
-			__m128i gray1 = _mm_add_epi16(_mm_add_epi16(R1, G1), B1);
+			__m128i gray0 = _mm_add_epi16(bias,_mm_add_epi16(_mm_add_epi16(R0, G0), B0));
+			__m128i gray1 = _mm_add_epi16(bias,_mm_add_epi16(_mm_add_epi16(R1, G1), B1));
+
+			__m128i gray0s = _mm_srli_epi16(gray0, 8);
+			__m128i gray1s = _mm_srli_epi16(gray1, 8);
 
 			// x2 16 -> 8
-            __m128i gray_packed = _mm_packus_epi16(gray0, gray1);
+            __m128i gray_packed = _mm_packus_epi16(gray0s, gray1s);
 
             _mm_storeu_si128((__m128i*)(pdst + x), gray_packed);
         }
