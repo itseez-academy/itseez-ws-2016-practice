@@ -74,7 +74,7 @@ void ImageResize_optimized(const cv::Mat &src, cv::Mat &dst, const cv::Size sz)
         {
             ptr_dst[col] = (y1 == y2) ? upper_row[0] : (upper_row[0] * (y2 - y) + lower_row[0] * (y - y1));
         }
-        for (int col = last_negative_col; col <= dst_cols; ++col)
+        for (int col = last_negative_col; col < dst_cols; ++col)
         {
             const float x = col * scale_x + scalar_x0;
             const int x1 = (int)x;
