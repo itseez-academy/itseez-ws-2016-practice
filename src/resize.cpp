@@ -47,8 +47,7 @@ void ImageResize(const cv::Mat &src, cv::Mat &dst, const cv::Size sz)
 void ImageResize_optimized(const cv::Mat &src, cv::Mat &dst, const cv::Size sz)
 {
     CV_Assert(CV_8UC1 == src.type());
-    cv::Size sz_src = src.size();
-    dst.create(sz, src.type());
+    dst.create(sz, CV_8UC1);
 
     const int dst_rows = sz.height;
     const int dst_cols = sz.width;
@@ -69,22 +68,25 @@ void ImageResize_optimized(const cv::Mat &src, cv::Mat &dst, const cv::Size sz)
         const uchar* upper_row = src.ptr<uchar>(y1);
         const uchar* lower_row = src.ptr<uchar>(y2);
 
-        for (int col = 0; col < dst_cols; col++)
+        // (col+0.5)*scale_x-0.5 < 0
+        int last_negative_col = (int)(0.5f / scale_x - 0.5f);
+        for (int col = 0; col < last_negative_col; ++col)
+        {
+            ptr_dst[col] = (y1 == y2) ? upper_row[0] : (upper_row[0] * (y2 - y) + lower_row[0] * (y - y1));
+        }
+        for (int col = last_negative_col; col <= dst_cols; ++col)
         {
             const float x = col * scale_x + scalar_x0;
-            const int ix = (int)floor(x);
-            const int x1 = (ix < 0) ? 0 : ix;
-            const int x2 = ix + 1;
+            const int x1 = (int)x;
+            const int x2 = x1 + 1;
 
             const uchar q11 = upper_row[x1];
             const uchar q12 = lower_row[x1];
             const uchar q21 = upper_row[x2];
             const uchar q22 = lower_row[x2];
 
-            ptr_dst[col] = ((x1 == x2) && (y1 == y2)) ? q11 :
-              ( (x1 == x2) ? (q11 * (y2 - y) + q22 * (y - y1)) :
-              ( (y1 == y2) ? (q11 * (x2 - x) + q22 * (x - x1)) : 
-              (q11 * (x2 - x) * (y2 - y) + q21 * (x - x1) * (y2 - y) + q12 * (x2 - x) * (y - y1) + q22 * (x - x1) * (y - y1))));
+            ptr_dst[col] = (y1 == y2) ? (q11 * (x2 - x) + q22 * (x - x1)) : 
+              (q11 * (x2 - x) * (y2 - y) + q21 * (x - x1) * (y2 - y) + q12 * (x2 - x) * (y - y1) + q22 * (x - x1) * (y - y1));
         }
     }
 }
