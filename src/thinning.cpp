@@ -78,34 +78,7 @@ static uchar GetIndex(uchar p2, uchar p3, uchar p4, uchar p5, uchar p6, uchar p7
 	return code;
 }
 
-static uchar CountIJ(int iter, uchar p2, uchar p3, uchar p4, uchar p5, uchar p6, uchar p7, uchar p8, uchar p9, uchar *p23456789)
-{
-	uchar index = GetIndex(p2,p3,p4,p5,p6,p7,p8,p9);
-
-	//if (index == 207 && iter == 1)
-	//	printf("123");
-
-	int res = p23456789[index];
-	if (res != 2) 
-		return res;
-
-	res = 0;
-
-	int C  = (!p2 & (p3 | p4)) + (!p4 & (p5 | p6)) +
-			(!p6 & (p7 | p8)) + (!p8 & (p9 | p2));
-	int N1 = (p9 | p2) + (p3 | p4) + (p5 | p6) + (p7 | p8);
-	int N2 = (p2 | p3) + (p4 | p5) + (p6 | p7) + (p8 | p9);
-	int N  = N1 < N2 ? N1 : N2;
-	int m  = iter == 0 ? ((p6 | p7 | !p9) & p8) : ((p2 | p3 | !p5) & p4);
-
-	if (C == 1 && (N >= 2 && N <= 3) & (m == 0))
-		res = 1;
-
-	p23456789[index] = res;
-	return res;
-}
-
-static void GuoHallIteration_optimized(cv::Mat& im, int iter, uchar *pold, uchar *pnew)
+static void GuoHallIteration_optimized(cv::Mat& im, int iter, uchar *pnew)
 {
     cv::Mat marker = cv::Mat::zeros(im.size(), CV_8UC1);
 
@@ -124,12 +97,8 @@ static void GuoHallIteration_optimized(cv::Mat& im, int iter, uchar *pold, uchar
             uchar p8 = im.at<uchar>(i, j-1);
             uchar p9 = im.at<uchar>(i-1, j-1);
 
-			//uchar uold = CountIJ(iter, p2,p3,p4,p5,p6,p7,p8,p9, pold);
 			uchar unew = pnew[GetIndex(p2,p3,p4,p5,p6,p7,p8,p9)];
-
-			//if (uold != unew)
-			//	printf("456");
-
+			
 			marker.at<uchar>(i,j) = unew;
         }
     }
@@ -151,9 +120,6 @@ static void FillP(uchar *p23456789, int iter)
 		uchar p7 = (bool)(code & 32);
 		uchar p8 = (bool)(code & 64);
 		uchar p9 = (bool)(code & 128);
-
-		//if (code == 207)
-		//	printf("123");
 
 		int C  = (!p2 & (p3 | p4)) + (!p4 & (p5 | p6)) +
 			(!p6 & (p7 | p8)) + (!p8 & (p9 | p2));
@@ -178,30 +144,17 @@ void GuoHallThinning_optimized(const cv::Mat& src, cv::Mat& dst)
     cv::Mat prev = cv::Mat::zeros(src.size(), CV_8UC1);
     cv::Mat diff;
 
-	uchar *pold0 = new uchar[256]; for (int i=0; i<256; i++) pold0[i] = 2;
-	uchar *pold1 = new uchar[256]; for (int i=0; i<256; i++) pold1[i] = 2;
-
 	uchar *pnew0 = new uchar[256]; FillP(pnew0, 0);
 	uchar *pnew1 = new uchar[256]; FillP(pnew1, 1);
 
     do
     {
-        GuoHallIteration_optimized(dst, 0, pold0, pnew0);
-        GuoHallIteration_optimized(dst, 1, pold1, pnew1);
+        GuoHallIteration_optimized(dst, 0, pnew0);
+        GuoHallIteration_optimized(dst, 1, pnew1);
         cv::absdiff(dst, prev, diff);
         dst.copyTo(prev);
     }
     while (cv::countNonZero(diff) > 0);
-
-	//printf("DIFF:\n");
-	//uchar *p23456789_00 = new uchar[256]; FillP(p23456789_00, 0);	
-	//uchar *p23456789_11 = new uchar[256]; FillP(p23456789_11, 1);
-	//for (int i=0; i<256; i++)
-	//{
-	//	if (p23456789_0[i]!=2 && p23456789_00[i] != p23456789_0[i]) printf("0) Wrong in %i: %i %i\n", i, +p23456789_0[i], +p23456789_00[i]);
-	//	if (p23456789_1[i]!=2 && p23456789_11[i] != p23456789_1[i]) printf("1) Wrong in %i: %i %i\n", i, +p23456789_1[i], +p23456789_11[i]);
-	//}
-	//printf("END\n");
 
     dst *= 255;
 }
