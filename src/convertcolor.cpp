@@ -59,9 +59,9 @@ void ConvertColor_BGR2GRAY_BT709_fpt(const cv::Mat& src, cv::Mat& dst)
     dst.create(sz, CV_8UC1);
 
 	unsigned short shift = 16;
-	unsigned short kR = 0.0722 * (1 << shift);
-	unsigned short kG = 0.7152 * (1 << shift);
-	unsigned short kB = 0.2126 * (1 << shift);
+	unsigned short kR = (unsigned short)(0.0722 * (1 << shift) + 0.5);
+	unsigned short kG = (unsigned short)(0.7152 * (1 << shift) + 0.5);
+	unsigned short kB = (unsigned short)(0.2126 * (1 << shift) + 0.5);
 
     for (int y = 0; y < sz.height; y++)
     {
@@ -75,9 +75,9 @@ void ConvertColor_BGR2GRAY_BT709_fpt(const cv::Mat& src, cv::Mat& dst)
 			uchar uG = psrc[x][1];
 			uchar uB = psrc[x][2];
 
-			unsigned int ic = kR*uR + kG*uG + kB*uB;
-			
-			pdst[x] = (int)((float)ic / (1 << shift) + 0.5);
+			unsigned int ui = kR*uR + kG*uG + kB*uB + (1 << (shift-1));
+
+			pdst[x] = (ui >> shift);
         }
     }
 }
