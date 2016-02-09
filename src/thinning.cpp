@@ -60,7 +60,7 @@ void GuoHallThinning(const cv::Mat& src, cv::Mat& dst)
 
 static void GuoHallIteration_optimized(cv::Mat& im, int iter)
 {
-    cv::Mat marker = cv::Mat::zeros(im.size(), CV_8UC1);
+   cv::Mat marker = cv::Mat::zeros(im.size(), CV_8UC1);
 
     for (int i = 1; i < im.rows-1; i++)
     {
@@ -98,6 +98,7 @@ void GuoHallThinning_optimized(const cv::Mat& src, cv::Mat& dst)
 
     cv::Mat prev = cv::Mat::zeros(src.size(), CV_8UC1);
     cv::Mat diff;
+
 
     do
     {
