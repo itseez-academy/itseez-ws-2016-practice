@@ -38,6 +38,7 @@ PERF_TEST_P(Size_Only, ImageResize, testing::Values(MAT_SIZES))
     cv::Mat dst(Size(sz_to), CV_8UC1);
     cv::Mat gold(Size(sz_to), CV_8UC1);
     declare.in(src, WARMUP_RNG).out(dst);
+    declare.iterations(200);
 
     cv::RNG rng(234231412);
     rng.fill(src, CV_8UC1, 0, 255);
