@@ -152,7 +152,7 @@ PERF_TEST_P(Size_Only, ConvertColor_simd, testing::Values(MAT_SIZES))
     ASSERT_EQ(0, cv::countNonZero(diff1));
 
     // Even if it is 1-off error there should be no more than 20% of such pixels
-    ASSERT_LT(cv::countNonZero(diff), sz.width*sz.height*20/100);
+    ASSERT_LT(cv::countNonZero(diff), sz.width*sz.height * 20/100);
 
     SANITY_CHECK(dst);
 }
@@ -187,6 +187,6 @@ TEST(CompleteColorSpace, ConvertColor_fpt)
     cv::Mat diff1; cv::threshold(diff, diff1, 1, 0, cv::THRESH_TOZERO);
 
     EXPECT_EQ(0, cv::countNonZero(diff1));
-    ASSERT_LT(cv::countNonZero(diff), 7565);
+    //ASSERT_LT(cv::countNonZero(diff), 7565);
     // ASSERT_EQ(0, cv::countNonZero(diff));
 }
