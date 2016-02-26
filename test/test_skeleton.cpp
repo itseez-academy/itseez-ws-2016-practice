@@ -60,3 +60,75 @@ TEST(skeleton, resize_matches_opencv)
     // std::cout << "Difference:\n" << reference - result << std::endl;
     EXPECT_LT(maxDifference(reference, result), 2);
 }
+
+TEST(skeleton, 2_plus_2_equals_4)
+{
+   EXPECT_EQ(4, 2 + 2);
+}
+
+TEST(skeleton, the_same_size_ConvertColor_BGR2GRAY_BT709)
+{
+	Mat image(20, 40, CV_8UC3);
+	Mat result;
+	
+	ConvertColor_BGR2GRAY_BT709(image, result);
+	
+	EXPECT_EQ(image.cols, result.cols);
+	EXPECT_EQ(image.rows, result.rows);
+}
+
+TEST(skeleton, the_same_size_GuoHallThinning)
+{
+	Mat image(100, 100, CV_8UC1);
+	Mat result;
+
+	GuoHallThinning(image, result);
+
+	EXPECT_EQ(image.cols, result.cols);
+	EXPECT_EQ(image.rows, result.rows);
+}
+
+TEST(skeleton, the_same_size_of_arg_ImageResize)
+{
+	Mat image(200, 100, CV_8UC1);
+	Mat result;
+
+	Size sz(image.cols / 2, image.rows / 2);
+	ImageResize(image, result, sz);
+
+	EXPECT_EQ(result.cols, sz.width);
+	EXPECT_EQ(result.rows, sz.height);
+}
+
+TEST(skeleton, the_same_color_ImageResize)
+{
+	Mat image(200, 200, CV_8UC1, Scalar(30));
+	Mat result;
+
+	Size sz(image.cols / 2, image.rows / 2);
+	ImageResize(image, result, sz);
+	uchar color = image.at<uchar>(0, 0);
+
+	for (int i = 0; i < sz.height; i++) {
+		for (int j = 0; j < sz.width; j++) {
+			EXPECT_EQ(result.at<uchar>(i, j), color);
+		}
+	}
+}
+
+TEST(skeleton, the_same_color_ConvertColor_BGR2GRAY_BT709)
+{
+	Scalar color = Scalar(40, 80, 120);
+	Mat image(200, 200, CV_8UC3, color);
+	Mat result;
+
+	ConvertColor_BGR2GRAY_BT709(image, result);
+	uchar chng_color = result.at<uchar>(0, 0);
+
+	for (int i = 0; i < result.rows; i++) {
+		for (int j = 0; j < result.cols; j++) {
+			EXPECT_EQ(result.at<uchar>(i, j), chng_color);
+		}
+	}
+}
+
