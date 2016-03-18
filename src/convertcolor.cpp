@@ -58,23 +58,23 @@ void ConvertColor_BGR2GRAY_BT709_fpt(const cv::Mat& src, cv::Mat& dst)
     cv::Size sz = src.size();
     dst.create(sz, CV_8UC1);
 
-    int shift = 16;
-    int bias  = 0;
+	const ushort n = 8;
 
-    unsigned rw = (unsigned)(0.2126 * (1 << shift) + 0.5);
-    unsigned gw = (unsigned)(0.7152 * (1 << shift) + 0.5);
-    unsigned bw = (unsigned)(0.0722 * (1 << shift) + 0.5);
-
-    for (int y = 0; y < sz.height; y++)
-    {
-        const cv::Vec3b *psrc = src.ptr<cv::Vec3b>(y);
-        uchar *pdst = dst.ptr<uchar>(y);
+ 	ushort a = 0.2126f * (1 << n) + 0.5f;
+ 	ushort b = 0.7152f * (1 << n) + 0.5f;
+ 	ushort c = 0.0722f * (1 << n) + 0.5f;
+ 	ushort zero_five = 1 << (n - 1);
+  
+	for (int y = 0; y < sz.height; y++)
+	{
+		const cv::Vec3b *psrc = src.ptr<cv::Vec3b>(y);
+		uchar *pdst = dst.ptr<uchar>(y);  
 
         for (int x = 0; x < sz.width; x++)
         {
-            pdst[x] = (rw * psrc[x][2] + gw * psrc[x][1] + bw * psrc[x][0] + (1<<(shift-1)) + bias) >> shift;
+			pdst[x] = (a * psrc[x][2] + b * psrc[x][1] + c * psrc[x][0] + zero_five) >> n;
         }
-    }
+	}
 }
 
 void ConvertColor_BGR2GRAY_BT709_simd(const cv::Mat& src, cv::Mat& dst)
