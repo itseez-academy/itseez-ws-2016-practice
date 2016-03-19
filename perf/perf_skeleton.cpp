@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include "skeleton_filter.hpp"
+#include "opencv2/highgui/highgui.hpp"
 
 using namespace std;
 using namespace perf;
@@ -14,12 +15,12 @@ using std::tr1::get;
 // Test(s) for the ConvertColor_BGR2GRAY_BT709 function
 //
 
-// PERF_TEST(skeleton, ConvertColor_BGR2GRAY_BT709)
-// {
-//     Mat input = cv::imread("./bin/testdata/sla.png");
-//
-//     // Add code here
-// }
+ PERF_TEST(skeleton, ConvertColor_BGR2GRAY_BT709)
+ {
+     Mat input = cv::imread("./bin/testdata/sla.png");
+
+     // Add code here
+ }
 
 //
 // Test(s) for the ImageResize function
