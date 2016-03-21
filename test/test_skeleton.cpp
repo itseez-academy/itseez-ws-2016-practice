@@ -60,3 +60,31 @@ TEST(skeleton, resize_matches_opencv)
     // std::cout << "Difference:\n" << reference - result << std::endl;
     EXPECT_LT(maxDifference(reference, result), 2);
 }
+TEST(skeleton, 2_plus_2_equals_4)
+{
+   EXPECT_EQ(4, 2 + 2);
+}
+TEST(skeleton, CC_CheckCorrectColons)
+{
+	Mat Start(12, 14, CV_8UC3);
+	randu(Start,Scalar::all(0), Scalar::all(255));
+	Mat Final;
+	ConvertColor_BGR2GRAY_BT709(Start, Final);
+	EXPECT_EQ(Start.cols, Final.cols);
+}
+TEST(skeleton, CC_CheckCorrectSize)
+{
+	Mat Start(12, 14, CV_8UC3);
+	randu(Start, Scalar::all(0), Scalar::all(255));
+	Mat Final;
+	ConvertColor_BGR2GRAY_BT709(Start, Final);
+	EXPECT_EQ(Start.size, Final.size);
+}
+TEST(skeleton, GHT_CheckCorrectSize)
+{
+	Mat Start(12, 14, CV_8UC3);
+	randu(Start, Scalar::all(0), Scalar::all(255));
+	Mat Final;
+	GuoHallThinning(Start, Final);
+	EXPECT_EQ(Start.size, Final.size);
+}
