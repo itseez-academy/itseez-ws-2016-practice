@@ -60,3 +60,62 @@ TEST(skeleton, resize_matches_opencv)
     // std::cout << "Difference:\n" << reference - result << std::endl;
     EXPECT_LT(maxDifference(reference, result), 2);
 }
+
+TEST(skeleton, 2_plus_2_equals_4)
+{
+   EXPECT_EQ(4, 2 + 2);
+}
+
+TEST(skeleton, ConvertColorDoesNotChangeSize)
+{
+	Mat src(10, 20, CV_8UC3);
+	randu(src, Scalar::all(0), Scalar::all(255));
+	Mat dst;
+
+	ConvertColor_BGR2GRAY_BT709(src, dst);
+
+	EXPECT_EQ(src.size, dst.size);
+}
+
+TEST(skeleton, GuoHallThinningDoesNotChangeSize)
+{
+	Mat src(10, 20, CV_8UC1);
+	randu(src, Scalar(0), Scalar(255));
+	Mat dst;
+
+	GuoHallThinning(src, dst);
+
+	EXPECT_EQ(src.size, dst.size);
+}
+
+TEST(skeleton, ImageResizeSetsCorrectSize)
+{
+	Mat src(10, 20, CV_8UC1);
+	randu(src, Scalar(0), Scalar(255));
+	Mat dst;
+	int firstSize = 4;
+	int secondSize = 5;
+	Size sz(firstSize, secondSize);
+
+	ImageResize(src, dst, sz);
+
+	EXPECT_EQ(true, ((dst.cols == firstSize) && (dst.rows == secondSize)));
+}
+
+TEST(skeleton, ImageResizeSavesColor)
+{
+	Mat srcMtx(20, 16, CV_8UC1, Scalar(0));
+	Mat dstMtx;
+	Mat expectedMtx(4, 5, CV_8UC1, Scalar(0));
+	Size sz(4, 5);
+
+	ImageResize(srcMtx, dstMtx, sz);
+
+	double srcMin, srcMax;
+	minMaxLoc(srcMtx, &srcMin, &srcMax);
+	double dstMin, dstMax;
+	minMaxLoc(dstMtx, &dstMin, &dstMax);
+	EXPECT_EQ(dstMin, dstMax);
+	EXPECT_EQ(srcMin, dstMin);
+	EXPECT_EQ(srcMax, dstMax);
+}
