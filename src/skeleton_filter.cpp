@@ -29,6 +29,8 @@ void skeletonize(const cv::Mat &input, cv::Mat &output, bool save_images)
     // Thinning
     cv::Mat thinned_image;
     GuoHallThinning(small_image, thinned_image);
+	//	Test  Optimized Function
+	//GuoHallThinning_optimized(small_image, thinned_image);
     if (save_images) cv::imwrite("4-thinning.png", thinned_image);
 
     // Back inversion
