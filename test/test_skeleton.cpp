@@ -60,3 +60,27 @@ TEST(skeleton, resize_matches_opencv)
     // std::cout << "Difference:\n" << reference - result << std::endl;
     EXPECT_LT(maxDifference(reference, result), 2);
 }
+
+TEST(skeleton, 2_plus_2_equals_4)
+{
+   EXPECT_EQ(4, 2 + 2);
+}
+
+TEST(skeleton, init_size_matches_out_size)
+{
+    // Arrange
+    Mat bgr(5, 5, CV_8UC3);
+    randu(bgr, Scalar::all(0), Scalar::all(255));
+
+    // Act
+    Mat result;
+    ConvertColor_BGR2GRAY_BT709(bgr, result);
+
+    // Assert
+	
+	EXPECT_EQ(bgr.size, result.size);
+}
+
+
+
+
